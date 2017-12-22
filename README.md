@@ -5,7 +5,7 @@
 * cmsrel CMSSW_8_0_28
 * cd CMSSW_8_0_28/src
 * cmsenv
-* git clone https://github.com/ravindkv/Analysis.git 
+* https://github.com/shalinithakur06/Analysis.git 
 * cd Analysis/src
 * make clean 
 * make
