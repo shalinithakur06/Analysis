@@ -9,7 +9,7 @@
 #---------------------------------------------
 
 Universe              = vanilla
-x509userproxy         = /home/rverma/x509up_u56537
+x509userproxy         = /tmp/x509up_u56526
 #use_x509userproxy    = true
 Executable            = Analyzer_TIFR.sh
 Arguments             = FNAME OUTPUTFILE OUTPUTDIR $(Process) $(Cluster)

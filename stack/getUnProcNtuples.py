@@ -21,32 +21,34 @@ print ""
 print"----------------------------------------------------"
 print" Fetching the un-processed ntuples, please wait ... "
 print"----------------------------------------------------"
-for line_err in open("outHistoFiles.log"):
-    line_err = line_err.strip()
-    split_line_err = line_err.split("/")
-    line_found = split_line_err[1].replace("_Anal", "")
-    #print line_found
-    for line_ntuple in open("allNtuples.log"):
-        line_ntuple = line_ntuple.strip()
-	if line_found in line_ntuple:
-	    #print line_ntuple
-	    processedPaths.write(line_ntuple+"\n")
+for line_out in open("outHistoFiles.log"):
+    line_out = line_out.strip()
+    split_line_out = line_out.split("/")
+    ntuple_out = split_line_out[-1].replace("_Anal", "")
+    #print ntuple_out
+    for line_in_all_ntuple in open("allNtuples.log"):
+        ntuple_input = line_in_all_ntuple.strip()
+	if ntuple_out in ntuple_input:
+	    processedPaths.write(ntuple_input+"\n")
 
 ##------------------------------------------------
 # compare the two file, output the unmatched lines
 ##------------------------------------------------
 def compare(File1,File2):
-    with open(File1,'r') as f:
-        d=set(f.readlines())
-
-    with open(File2,'r') as f:
-        e=set(f.readlines())
+    with open(File1,'r') as f1:
+        d=set(f1.readlines())
+    with open(File2,'r') as f2:
+        e=set(f2.readlines())
     open('unProcNtuples.log','w').close() #Create the file
     with open('unProcNtuples.log','a') as f:
         for line in list(d-e):
            f.write(line)
-	   print line
+	   #print line
 
 compare("allNtuples.log", "procNtuples.log")
-
+print ""
+print"----------------------------------------------------"
+print": 		Done       			 :"
+print": 	See unProcNtuples.log                    :"
+print"----------------------------------------------------"
 

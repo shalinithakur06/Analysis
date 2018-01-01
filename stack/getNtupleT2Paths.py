@@ -17,9 +17,9 @@ import datetime
 
 #USERS INPUTS
 #-------------------------------
-isMuon = False
-isElectron = True
-isMC = False
+isMuon = True
+isElectron = False
+isMC = True
 isData = True
 #-------------------------------
 
@@ -36,7 +36,7 @@ def getSampName(line, sampName, sampPaths):
         for n in range(1, len(s1)-1):
             sampPaths.append(s1[n].replace(" ",""))
 
-for line in open("ntupleT2Paths_20170919.txt"):
+for line in open("ntupleT2Paths_20171115.txt"):
     line = line.strip()
     if len(line)!=0:
         getSampName(line, "MUON MC", muMC_T2Paths)

@@ -165,8 +165,7 @@ void ObjectSelector::preSelectMuons(vector<int> * m_i, const vector<MyMuon> & vM
     double zmuon     = m->vertex.z();
     double dz =  fabs(zvertex-zmuon);
     
-    if(mPt > M_PT_MIN_ && mEta < M_ETA_MAX_ && mD0 < M_D0_MAX_&& dz < ZMAX_){ 
-    //if(passId && mPt > 20 && mEta < 2.1 && mRelIso <0.50){ 
+    if(mPt > 35 && mEta < 2.4 && mD0 < 0.2 && dz < 0.5){ 
       m_i->push_back(i);
     }
   }
@@ -185,7 +184,7 @@ void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vec
 
     ///double pujetid    = int(jet->puIDMVALoose);
     ///if(jetPt > JET_PT_MIN_ && jetEta < JET_ETA_MAX_ && pujetid==1.0  )
-    if(jetPt > JET_PT_MIN_ && jetEta < JET_ETA_MAX_
+    if(jetPt > 20 && jetEta < 2.5
       && neutralHadEnFrac < 0.99
       && neutralEmEnFrac  < 0.99
       && chargedHadEnFrac > 0

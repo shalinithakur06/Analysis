@@ -57,14 +57,6 @@ public :
     xss["DY4JetsToLL"]       =  51.4;          evtDBS["DY4JetsToLL"]       =  4197868;
     xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  48103700;
   //xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  49144274;
-    xss["HplusM100"]         =  831.76*0.32;   evtDBS["HplusM100"]         =  996170; 
-    xss["HplusM120"]         =  831.76*0.32;   evtDBS["HplusM120"]         =  994498; 
-    xss["HplusM140"]         =  831.76*0.32;   evtDBS["HplusM140"]         =  987730; 
-    xss["HplusM150"]         =  831.76*0.32;   evtDBS["HplusM150"]         =  990645;
-    xss["HplusM155"]         =  831.76*0.32;   evtDBS["HplusM155"]         =  952984;
-    xss["HplusM160"]         =  831.76*0.32;   evtDBS["HplusM160"]         =  992264;
-    xss["HplusM80"]          =  831.76*0.32;   evtDBS["HplusM80"]          =  976710;
-    xss["HplusM90"]          =  831.76*0.32;   evtDBS["HplusM90"]          =  988480;
     xss["QCD_Pt-15to20_Mu"]  =  3819570;       evtDBS["QCD_Pt-15to20_Mu"]  =  4141251;
     xss["QCD_Pt-20to30_Mu"]  =  2960198;       evtDBS["QCD_Pt-20to30_Mu"]  =  31475157;
     xss["QCD_Pt-30to50_Mu"]  =  1652471;       evtDBS["QCD_Pt-30to50_Mu"]  =  29954815;
@@ -73,19 +65,7 @@ public :
     xss["QCD_Pt-120to170_Mu"]=  25190;         evtDBS["QCD_Pt-120to170_Mu"]=  8042721;
     xss["QCD_Pt-170to300_Mu"]=  8654;          evtDBS["QCD_Pt-170to300_Mu"]=  7947159;
     xss["QCD_Pt-300to470_Mu"]=  797;           evtDBS["QCD_Pt-300to470_Mu"]=  7937590;
-    xss["ST_s"]              =  10.32;         evtDBS["ST_s"]              =  2989199;
-    xss["ST_t"]              =  80.95;         evtDBS["ST_t"]              =  38811017;
-    xss["ST_tW"]             =  71.7;          evtDBS["ST_tW"]             =  6933094;
-    xss["TTJetsM"]           =  831.76;        evtDBS["TTJetsM"]           =  10139950;   
     xss["TTJetsP"]           =  831.76;        evtDBS["TTJetsP"]           =  77081156;   
-    //-------------------------
-    xss["TTJetsP_up"]        =  831.76;        evtDBS["TTJetsP_up"]        =  29310620;   
-    xss["TTJetsP_down"]      =  831.76;        evtDBS["TTJetsP_down"]      =  28354188;   
-    xss["TTJetsP_mtop1735"]  =  831.76;        evtDBS["TTJetsP_mtop1735"]  =  19419050;   
-    xss["TTJetsP_mtop1715"]  =  831.76;        evtDBS["TTJetsP_mtop1715"]  =  19578812;   
-    xss["TTJetsP_hdampUP"]   =  831.76;        evtDBS["TTJetsP_hdampUP"]   =  29689380;   
-    xss["TTJetsP_hdampDOWN"] =  831.76;        evtDBS["TTJetsP_hdampDOWN"] =  29117820;   
-    //-------------------------
     xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  44813600;
   //xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  45367044;
     xss["W2JetsToLNu"]       =  3120;          evtDBS["W2JetsToLNu"]       =  29878415;
