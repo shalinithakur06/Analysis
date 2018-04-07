@@ -65,10 +65,6 @@ public :
     xss["QCD_Pt-120to170_Mu"]=  25190;         evtDBS["QCD_Pt-120to170_Mu"]=  8042721;
     xss["QCD_Pt-170to300_Mu"]=  8654;          evtDBS["QCD_Pt-170to300_Mu"]=  7947159;
     xss["QCD_Pt-300to470_Mu"]=  797;           evtDBS["QCD_Pt-300to470_Mu"]=  7937590;
-    xss["QCD_Pt-470to600_Mu"]=  79 ;           evtDBS["QCD_Pt-470to600_Mu"]=  18976018;
-    xss["QCD_Pt-600to800_Mu"]=  25.09;         evtDBS["QCD_Pt-600to800_Mu"]=  9981311;
-    xss["QCD_Pt-800to1000_Mu"]= 4.70;          evtDBS["QCD_Pt-800to1000_Mu"]=  19767439;
-    xss["QCD_Pt-1000toInf_Mu"]= 1.62;          evtDBS["QCD_Pt-1000toInf_Mu"]=  13400031;
     xss["TTJetsP"]           =  831.76;        evtDBS["TTJetsP"]           =  77081156;   
     xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  44813600;
   //xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  45367044;
@@ -80,14 +76,8 @@ public :
     xss["WW"]                =  118.7;         evtDBS["WW"]                =  994012;
     xss["WZ"]                =  46.74;         evtDBS["WZ"]                =  1000000;
     xss["ZZ"]                =  17.72;         evtDBS["ZZ"]                =  990064; 
-    //xss["sampCode_"]         =  1;             evtDBS["sampCode_"]         =  1; 
-    xss["sampCode_"]         =  0.1662;             evtDBS["sampCode_"]         =  10000; 
-  //xss["Signal sample"]
-    xss["TestLHEGeneration_Mu_2000"]    =  0.1662;      evtDBS["TestLHEGeneration_Mu_2000"]       =  10000;
-    xss["TestLHEGeneration_Mu_4000"]    =  0.1662;      evtDBS["TestLHEGeneration_Mu_4000"]       =  10000;
-    xss["TestLHEGeneration_Mu_6000"]    =  0.1662;      evtDBS["TestLHEGeneration_Mu_6000"]       =  10000;
-
-
+    xss["sampCode_"]         =  1;             evtDBS["sampCode_"]         =  1; 
+    
     //Lumis(inverse pb) of single muon DATA at 13TeV
   };
   ~Analyzer() {

@@ -11,7 +11,7 @@ void Analyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
   
   TString outFile("13TeV/outputDir/");
   //TString Filename_ = outFile+evtType+"_8Feb_signal_6000.root";
-  TString Filename_ = outFile+evtType+"_Anal.root";
+  TString Filename_ = outFile+evtType+"_Anal6000.root";
   TFile *outFile_ = TFile::Open( Filename_, "RECREATE" );
   outFile_->SetCompressionLevel( 9 );
   
@@ -146,14 +146,18 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     //---------------------------------------------------//
     //apply electron triggers
     //---------------------------------------------------//
+    //HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v
+    //HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v7
+    //HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v5
+    //HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v6
     bool passTrig = false;
     vector<string> trig = ev->hlt;
     for(size_t it = 0; it < trig.size(); it++){
-      if(trig[it].find("HLT_DoubleEle33_CaloIdL") != string::npos) {
+      if(trig[it].find("HLT_Mu17_TrkIsoVVL") != string::npos) {
         passTrig = true;
       }
     }
-    if(!passTrig) continue;
+    //if(!passTrig) continue;
 
     double nCutPass = 1.0;
     double nCutPass_NonIso = 1.0;
@@ -197,8 +201,8 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     double pri_vtxs = Vertices[0].totVtx;
     if(nEle != 2)continue;
     //fill histo for relative isolation of both electrons
-    fillHisto(outFile_, cutflowType+"/Iso", "", "RelIso", 100, 0, 1, pfElectrons[e_init[0]].relCombPFIsoEA, evtWeight);
-    fillHisto(outFile_, cutflowType+"/Iso", "", "RelIso", 100, 0, 1, pfElectrons[e_init[1]].relCombPFIsoEA, evtWeight);
+    fillHisto(outFile_, cutflowType+"/Iso", "", "RelIso", 100, 0, 1, pfElectrons[e_init[0]].pfRelIso, evtWeight);
+    fillHisto(outFile_, cutflowType+"/Iso", "", "RelIso", 100, 0, 1, pfElectrons[e_init[1]].pfRelIso, evtWeight);
     
     //get Medium ID for first electron
     int e1 = e_init[0];
@@ -225,23 +229,15 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
        //---------------------------------------------------//
     //apply Electron SF to eventWeights 
     //---------------------------------------------------//
-    double eleSF1 =1.0;
+    double eleSF =1.0;
     //Reco, ID, trigger 
-    double ele_recoSF1       = getEleSF(h2_ele_recoSF, pfElectrons[e1].eleSCEta, pfElectrons[e1].p4.pt());
-    double ele_medium_idSF1      = getEleSF(h2_ele_medium_idSF, pfElectrons[e1].eleSCEta, pfElectrons[e1].p4.pt());
-    double ele_trigSF1       = getEleTrigSF(h2_ele_trigSF, pfElectrons[e1].p4.pt(), pfElectrons[e1].eleSCEta);
+    double ele_recoSF       = getEleSF(h2_ele_recoSF, pfElectrons[e_i].eleSCEta, pfElectrons[e_i].p4.pt());
+    double ele_medium_idSF      = getEleSF(h2_ele_medium_idSF, pfElectrons[e_i].eleSCEta, pfElectrons[e_i].p4.pt());
+    double ele_trigSF       = getEleTrigSF(h2_ele_trigSF, pfElectrons[e_i].p4.pt(), pfElectrons[e_i].eleSCEta);
     if(!ev->isData){
-      eleSF1 = ele_recoSF1*ele_medium_idSF1*ele_trigSF1;
+      eleSF = ele_recoSF*ele_medium_idSF*ele_trigSF;
     }
-    double eleSF2 =1.0;
-    //Reco, ID, trigger 
-    double ele_recoSF2       = getEleSF(h2_ele_recoSF, pfElectrons[e2].eleSCEta, pfElectrons[e2].p4.pt());
-    double ele_medium_idSF2      = getEleSF(h2_ele_medium_idSF, pfElectrons[e2].eleSCEta, pfElectrons[e2].p4.pt());
-    double ele_trigSF2       = getEleTrigSF(h2_ele_trigSF, pfElectrons[e2].p4.pt(), pfElectrons[e2].eleSCEta);
-    if(!ev->isData){
-      eleSF2 = ele_recoSF2*ele_medium_idSF2*ele_trigSF2;
-    }
-    evtWeight *= eleSF1*eleSF2;
+    evtWeight *= eleSF;
     nCutPass++;
     nCutPass_NonIso++;
     fillHisto(outFile_, cutflowType+"/Iso", "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
@@ -252,7 +248,7 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     //---------------------------------------------------//
     bool noisofound = false;
     bool isofound = false;
-    double tmp_iso = pfElectrons[e1].relCombPFIsoEA;
+    double tmp_iso = pfElectrons[e1].pfRelIso;
     fillHisto(outFile_, cutflowType, "", "RelIso_ele", 100, 0, 1, tmp_iso, evtWeight );
     string cutflowType_(cutflowType);
     cutflowType_ = cutflowType+"/Iso";
@@ -262,7 +258,7 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     if(tmp_iso > 0.08) continue;
     nCutPass++;
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
-    double eRelIso = pfElectrons[e1].relCombPFIsoEA;
+    double eRelIso = pfElectrons[e1].pfRelIso;
     
     //---------------------------------------------------//
     //get 4 vector for Z boson
@@ -386,7 +382,7 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
    
     //fill histos for Z boson
     fillHisto(outFile_, cutflowType_, "ZTag","pt_Z",  50, 0, 500, vZ.Pt(), evtWeight );
-    fillHisto(outFile_, cutflowType_, "ZTag","eta_Z",  50, -5, 5, vZ.Rapidity(), evtWeight );
+    fillHisto(outFile_, cutflowType_, "ZTag","eta_Z",  50, 0, 500, vZ.Rapidity(), evtWeight );
     fillHisto(outFile_, cutflowType_, "ZTag","phi_Z",  50, 0, 500, vZ.Phi(), evtWeight );
     fillHisto(outFile_, cutflowType_, "ZTag","mjj", 200, 0, 1000, vZ.M(), evtWeight );
     fillHisto(outFile_, cutflowType_, "ZTag","mjj_max", 200, 0, 10000, vZmax.M(), evtWeight );
@@ -424,7 +420,10 @@ void Analyzer::processEvents(){
   //Data, MC sample from lxplus and T2
   //CutFlowAnalysis("TTJetsP_MuMC_20171104_Ntuple_1.root", "PF", ""); 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094/", "PF", "");
-  CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_EleMC_20180317/EleMC_20180317/DYJetsToLL_EleMC_20180317/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DYJetsToLL_EleMC_20180317/180317_094707/0000/DYJetsToLL_EleMC_20180317_Ntuple_1.root", "PF", "");
+  CutFlowAnalysis("All_Mu6000_Ntuple.root", "PF", ""); 
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_MuData_20180224/MuData_20180224/MuRunH2v1_MuData_20180224/DoubleMuon/MuRunH2v1_MuData_20180224/180224_185841/0000/MuRunH2v1_MuData_20180224_Ntuple_45.root", "PF", "");
+
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_MuMC_20180224/MuMC_20180224/DYJetsToLL_MuMC_20180224/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DYJetsToLL_MuMC_20180224/180224_185201/0000/DYJetsToLL_MuMC_20180224_Ntuple_1.root", "PF", "");
 
   //====================================
   //condor submission

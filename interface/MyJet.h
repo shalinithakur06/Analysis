@@ -14,7 +14,7 @@ class MyJet
   MyJet();
   ~MyJet();
   void   Reset();
-  
+  //https://twiki.cern.ch/twiki/bin/view/CMS/JetID13TeVRun2016 
   std::string GetName() { 
       std::string name(jetName);
       return name; 
@@ -58,6 +58,11 @@ class MyJet
   double resolution;
   double triggerJet_pt;
   int quality;
+  //Jet subjetiness and pruned mass
+  double ak8Tau1;
+  double ak8Tau2;
+  double ak8Tau3;
+  double ak8Pmass;
 
  private :
 

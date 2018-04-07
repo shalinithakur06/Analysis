@@ -1,6 +1,6 @@
 
 ///////////////////////
-// Electron Channel
+// Muon Channel
 ///////////////////////
 
 #include "Analyzer.h"
@@ -11,7 +11,7 @@ void Analyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
   
   TString outFile("13TeV/outputDir/");
   //TString Filename_ = outFile+evtType+"_8Feb_signal_6000.root";
-  TString Filename_ = outFile+evtType+"_Anal.root";
+  TString Filename_ = outFile+evtType+"_Anal6000.root";
   TFile *outFile_ = TFile::Open( Filename_, "RECREATE" );
   outFile_->SetCompressionLevel( 9 );
   
@@ -31,7 +31,6 @@ void Analyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
   //---------------------------------------------------//
   //for systematics (all sys in one go)
   //---------------------------------------------------//  
-  /*
   if(!ev_->isData){ 
     CutFlowProcessor(url, myKey, "JESPlus", 	outFile_);
     CutFlowProcessor(url, myKey, "JESMinus", 	outFile_);
@@ -39,7 +38,6 @@ void Analyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
     CutFlowProcessor(url, myKey, "JERMinus", 	outFile_);
 
   }
-  */
   outFile_->Write(); 
   outFile_->Close();
   f_->Close();
@@ -144,16 +142,20 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     } 
     
     //---------------------------------------------------//
-    //apply electron triggers
+    //apply muon triggers
     //---------------------------------------------------//
+    //HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v
+    //HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v7
+    //HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v5
+    //HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v6
     bool passTrig = false;
     vector<string> trig = ev->hlt;
     for(size_t it = 0; it < trig.size(); it++){
-      if(trig[it].find("HLT_DoubleEle33_CaloIdL") != string::npos) {
+      if(trig[it].find("HLT_Mu17_TrkIsoVVL") != string::npos) {
         passTrig = true;
       }
     }
-    if(!passTrig) continue;
+    //if(!passTrig) continue;
 
     double nCutPass = 1.0;
     double nCutPass_NonIso = 1.0;
@@ -193,21 +195,42 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     //---------------------------------------------------//
     //apply selection cuts on leptons
     //---------------------------------------------------//
-    int nEle = e_init.size();
+    int nMuon = m_init.size();
     double pri_vtxs = Vertices[0].totVtx;
-    if(nEle != 2)continue;
-    //fill histo for relative isolation of both electrons
-    fillHisto(outFile_, cutflowType+"/Iso", "", "RelIso", 100, 0, 1, pfElectrons[e_init[0]].relCombPFIsoEA, evtWeight);
-    fillHisto(outFile_, cutflowType+"/Iso", "", "RelIso", 100, 0, 1, pfElectrons[e_init[1]].relCombPFIsoEA, evtWeight);
+    if(nMuon != 2)continue;
+    //fill histo for relative isolation of both muons
+    fillHisto(outFile_, cutflowType+"/Iso", "", "RelIso", 100, 0, 1, pfMuons[m_init[0]].pfRelIso, evtWeight);
+    fillHisto(outFile_, cutflowType+"/Iso", "", "RelIso", 100, 0, 1, pfMuons[m_init[1]].pfRelIso, evtWeight);
+    ///fillHisto(outFile_, cutflowType+"/NonIso", "", "RelIso", 100, 0, 1, pfMuons[m_init[0]].pfRelIso, evtWeight);
+    ///fillHisto(outFile_, cutflowType+"/NonIso", "", "RelIso", 100, 0, 1, pfMuons[m_init[1]].pfRelIso, evtWeight);
     
-    //get Medium ID for first electron
-    int e1 = e_init[0];
-    int e2 = e_init[1];
-    //veto first or 2nd electron, if they are fake
-    ///if(looseMuonVeto( e1, pfElectrons, isPFlow) ) continue;
-    ///if(looseMuonVeto( e2, pfElectrons, isPFlow) ) continue;
-    //both electrons should have opposite charge
-    if(pfElectrons[e1].charge == pfElectrons[e2].charge) continue;
+    //get Medium ID for first muon
+    int m1 = m_init[0];
+    bool passID1 = false;
+    string input_file(url);
+    if(input_file.find("RunG") != string::npos 
+		    ||input_file.find("RunH") != string::npos)
+	    passID1 = isMediumMuonGH(&pfMuons[m1], isPFlow);
+    else
+	    passID1 = isMediumMuon(&pfMuons[m1], isPFlow);
+    
+    //get Medium ID for 2nd muon
+    int m2 = m_init[1];
+    bool passID2 = false;
+    if(input_file.find("RunG") != string::npos 
+		    ||input_file.find("RunH") != string::npos)
+	    passID2 = isMediumMuonGH(&pfMuons[m2], isPFlow);
+    else
+	    passID2 = isMediumMuon(&pfMuons[m2], isPFlow);
+    
+    //Make sure that both muon satisfy medium ID
+    if(!passID1) continue;
+    if(!passID2) continue;
+    //veto first or 2nd muon, if they are fake
+    ///if(looseMuonVeto( m1, pfMuons, isPFlow) ) continue;
+    ///if(looseMuonVeto( m2, pfMuons, isPFlow) ) continue;
+    //both muons should have opposite charge
+    if(pfMuons[m1].charge == pfMuons[m2].charge) continue;
 
     nCutPass++; 
     nCutPass_NonIso++;
@@ -220,28 +243,58 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     ///nCutPass_NonIso++;
     ///fillHisto(outFile_, cutflowType+"/Iso", "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
     ///fillHisto(outFile_, cutflowType+"/NonIso", "", "cutflow", 20, 0.5, 20.5, nCutPass_NonIso, evtWeight );
-    int count_electron = e_init.size();
-    ///int eleCharge = pfElectrons[m_i].charge;
-       //---------------------------------------------------//
-    //apply Electron SF to eventWeights 
+    int count_muon = m_init.size();
+    ///int muCharge = pfMuons[m_i].charge;
+    
     //---------------------------------------------------//
-    double eleSF1 =1.0;
-    //Reco, ID, trigger 
-    double ele_recoSF1       = getEleSF(h2_ele_recoSF, pfElectrons[e1].eleSCEta, pfElectrons[e1].p4.pt());
-    double ele_medium_idSF1      = getEleSF(h2_ele_medium_idSF, pfElectrons[e1].eleSCEta, pfElectrons[e1].p4.pt());
-    double ele_trigSF1       = getEleTrigSF(h2_ele_trigSF, pfElectrons[e1].p4.pt(), pfElectrons[e1].eleSCEta);
+    //apply muon SF to eventWeights 
+    //---------------------------------------------------//
+    double lumi_BCDEF = 19.09; double lumi_GH = 16.22;	
+    double lumi = lumi_BCDEF + lumi_GH;
+    //get muon scale factor for fist muon
+    //trigger 	
+    double muSFtrig_BCDEF1 	= getMuonTrigSF(h2_trigSF_BCDEF, pfMuons[m1].p4.eta(), pfMuons[m1].p4.pt());
+    double muSFtrig_GH1 	= getMuonTrigSF(h2_trigSF_GH, pfMuons[m1].p4.eta(), pfMuons[m1].p4.pt());
+    double muSFtrig1 		= (muSFtrig_BCDEF1*lumi_BCDEF + muSFtrig_GH1*lumi_GH)/lumi; 
+    //identification
+    double muSFid_BCDEF1 	= getMuonSF(h2_idSF_BCDEF, pfMuons[m1].p4.eta(), pfMuons[m1].p4.pt());
+    double muSFid_GH1 		= getMuonSF(h2_idSF_GH, pfMuons[m1].p4.eta(), pfMuons[m1].p4.pt());
+    double muSFid1 		= (muSFid_BCDEF1*lumi_BCDEF + muSFid_GH1*lumi_GH)/lumi; 
+    //isolation 
+    double muSFiso_BCDEF1 	= getMuonSF(h2_isoSF_BCDEF, pfMuons[m1].p4.eta(), pfMuons[m1].p4.pt());
+    double muSFiso_GH1 		= getMuonSF(h2_isoSF_GH, pfMuons[m1].p4.eta(), pfMuons[m1].p4.pt());
+    double muSFiso1 		= (muSFiso_BCDEF1*lumi_BCDEF + muSFiso_GH1*lumi_GH)/lumi; 
+    //tracking 
+    double muSFtrack_BCDEF1 	= getMuonTrackSF(tg_trackSF_BCDEF, pfMuons[m1].p4.eta()); 
+    double muSFtrack_GH1 	= getMuonTrackSF(tg_trackSF_GH, pfMuons[m1].p4.eta()); 
+    double muSFtrack1 		= (muSFtrack_BCDEF1*lumi_BCDEF + muSFtrack_GH1*lumi_GH)/lumi;
+    double muSF1 = muSFtrig1*muSFid1*muSFiso1*muSFtrack1;	
+    
+    //get muon scale factor for 2nd muon
+    //trigger 	
+    double muSFtrig_BCDEF2 	= getMuonTrigSF(h2_trigSF_BCDEF, pfMuons[m2].p4.eta(), pfMuons[m2].p4.pt());
+    double muSFtrig_GH2 	= getMuonTrigSF(h2_trigSF_GH, pfMuons[m2].p4.eta(), pfMuons[m2].p4.pt());
+    double muSFtrig2 		= (muSFtrig_BCDEF2*lumi_BCDEF + muSFtrig_GH2*lumi_GH)/lumi; 
+    //identification
+    double muSFid_BCDEF2 	= getMuonSF(h2_idSF_BCDEF, pfMuons[m2].p4.eta(), pfMuons[m2].p4.pt());
+    double muSFid_GH2 		= getMuonSF(h2_idSF_GH, pfMuons[m2].p4.eta(), pfMuons[m2].p4.pt());
+    double muSFid2 		= (muSFid_BCDEF2*lumi_BCDEF + muSFid_GH2*lumi_GH)/lumi; 
+    //isolation 
+    double muSFiso_BCDEF2 	= getMuonSF(h2_isoSF_BCDEF, pfMuons[m2].p4.eta(), pfMuons[m2].p4.pt());
+    double muSFiso_GH2 		= getMuonSF(h2_isoSF_GH, pfMuons[m2].p4.eta(), pfMuons[m2].p4.pt());
+    double muSFiso2 		= (muSFiso_BCDEF2*lumi_BCDEF + muSFiso_GH2*lumi_GH)/lumi; 
+    //tracking 
+    double muSFtrack_BCDEF2 	= getMuonTrackSF(tg_trackSF_BCDEF, pfMuons[m2].p4.eta()); 
+    double muSFtrack_GH2 	= getMuonTrackSF(tg_trackSF_GH, pfMuons[m2].p4.eta()); 
+    double muSFtrack2 		= (muSFtrack_BCDEF2*lumi_BCDEF + muSFtrack_GH2*lumi_GH)/lumi;
+    double muSF2 = muSFtrig2*muSFid2*muSFiso2*muSFtrack2;	
+    
+    //combined SF
+    double muSF =1.0;
     if(!ev->isData){
-      eleSF1 = ele_recoSF1*ele_medium_idSF1*ele_trigSF1;
+      muSF = muSF1*muSF2;	
     }
-    double eleSF2 =1.0;
-    //Reco, ID, trigger 
-    double ele_recoSF2       = getEleSF(h2_ele_recoSF, pfElectrons[e2].eleSCEta, pfElectrons[e2].p4.pt());
-    double ele_medium_idSF2      = getEleSF(h2_ele_medium_idSF, pfElectrons[e2].eleSCEta, pfElectrons[e2].p4.pt());
-    double ele_trigSF2       = getEleTrigSF(h2_ele_trigSF, pfElectrons[e2].p4.pt(), pfElectrons[e2].eleSCEta);
-    if(!ev->isData){
-      eleSF2 = ele_recoSF2*ele_medium_idSF2*ele_trigSF2;
-    }
-    evtWeight *= eleSF1*eleSF2;
+    evtWeight *= muSF;
     nCutPass++;
     nCutPass_NonIso++;
     fillHisto(outFile_, cutflowType+"/Iso", "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
@@ -252,22 +305,22 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     //---------------------------------------------------//
     bool noisofound = false;
     bool isofound = false;
-    double tmp_iso = pfElectrons[e1].relCombPFIsoEA;
-    fillHisto(outFile_, cutflowType, "", "RelIso_ele", 100, 0, 1, tmp_iso, evtWeight );
+    double tmp_iso = pfMuons[m1].pfRelIso;
+    fillHisto(outFile_, cutflowType, "", "RelIso_mu", 100, 0, 1, tmp_iso, evtWeight );
     string cutflowType_(cutflowType);
     cutflowType_ = cutflowType+"/Iso";
     //if(tmp_iso <= 0.15) cutflowType_ = cutflowType+"/Iso";
     //if(tmp_iso > 0.15 && tmp_iso <= 0.4) cutflowType_ = cutflowType+"/NonIso";
     //if(tmp_iso > 0.4) continue;
-    if(tmp_iso > 0.08) continue;
+    if(tmp_iso > 0.15) continue;
     nCutPass++;
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
-    double eRelIso = pfElectrons[e1].relCombPFIsoEA;
+    double mRelIso = pfMuons[m1].pfRelIso;
     
     //---------------------------------------------------//
     //get 4 vector for Z boson
     //---------------------------------------------------//
-    MyLorentzVector vZ = pfElectrons[e1].p4 + pfElectrons[e2].p4;
+    MyLorentzVector vZ = pfMuons[m1].p4 + pfMuons[m2].p4;
     if(vZ.mass() < 60) continue;    
     nCutPass++;
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
@@ -276,15 +329,15 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     //---------------------------------------------------//
     //Fill histos with for Control Plots
     //---------------------------------------------------//
-    //fill histos for electron
-    double electronPt1 = pfElectrons[e1].p4.pt();
-    double electronPt2 = pfElectrons[e2].p4.pt();
-    fillHisto(outFile_, cutflowType_, "ControlP","multi_ele",  15, 0.5, 15.5, count_electron, evtWeight );
-    fillHisto(outFile_, cutflowType_, "ControlP","pt_1stEle", 50, 0, 500, electronPt1, evtWeight );
-    fillHisto(outFile_, cutflowType_, "ControlP","pt_2ndEle", 50, 0, 500, electronPt2, evtWeight );
-    fillHisto(outFile_, cutflowType_, "ControlP","eta_1stEle", 50, -5, 5, pfElectrons[e1].p4.eta(), evtWeight );
-    fillHisto(outFile_, cutflowType_, "ControlP","eta_2ndEle", 50, -5, 5, pfElectrons[e2].p4.eta(), evtWeight );
-    fillHisto(outFile_, cutflowType_, "ControlP","final_RelIso_ele", 100, 0, 1, eRelIso, evtWeight );
+    //fill histos for muon
+    double muonPt1 = muPtWithRochCorr(&pfMuons[m1], ev->isData, u1, u2, 0, 0);
+    double muonPt2 = muPtWithRochCorr(&pfMuons[m2], ev->isData, u1, u2, 0, 0);
+    fillHisto(outFile_, cutflowType_, "ControlP","multi_mu",  15, 0.5, 15.5, count_muon, evtWeight );
+    fillHisto(outFile_, cutflowType_, "ControlP","pt_1stMu", 50, 0, 500, muonPt1, evtWeight );
+    fillHisto(outFile_, cutflowType_, "ControlP","pt_2ndMu", 50, 0, 500, muonPt2, evtWeight );
+    fillHisto(outFile_, cutflowType_, "ControlP","eta_1stMu", 50, -5, 5, pfMuons[m1].p4.eta(), evtWeight );
+    fillHisto(outFile_, cutflowType_, "ControlP","eta_2ndMu", 50, -5, 5, pfMuons[m2].p4.eta(), evtWeight );
+    fillHisto(outFile_, cutflowType_, "ControlP","final_RelIso_mu", 100, 0, 1, mRelIso, evtWeight );
    
     //fill histos for Z boson
     fillHisto(outFile_, cutflowType_, "ControlP","pt_Z",  50, 0, 500, vZ.Pt(), evtWeight );
@@ -316,14 +369,14 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     if(vZ.Pt() < 100) continue;    
     nCutPass++;
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
-    ///if(electronPt1 <100) continue;    
-    //fill histos for electron
-    fillHisto(outFile_, cutflowType_, "PreSel","multi_ele",  15, 0.5, 15.5, count_electron, evtWeight );
-    fillHisto(outFile_, cutflowType_, "PreSel","pt_1stEle", 50, 0, 500, electronPt1, evtWeight );
-    fillHisto(outFile_, cutflowType_, "PreSel","pt_2ndEle", 50, 0, 500, electronPt2, evtWeight );
-    fillHisto(outFile_, cutflowType_, "PreSel","eta_1stEle", 50, -5, 5, pfElectrons[e1].p4.eta(), evtWeight );
-    fillHisto(outFile_, cutflowType_, "PreSel","eta_2ndEle", 50, -5, 5, pfElectrons[e2].p4.eta(), evtWeight );
-    fillHisto(outFile_, cutflowType_, "PreSel","final_RelIso_ele", 100, 0, 1, eRelIso, evtWeight );
+    ///if(muonPt1 <100) continue;    
+    //fill histos for muon
+    fillHisto(outFile_, cutflowType_, "PreSel","multi_mu",  15, 0.5, 15.5, count_muon, evtWeight );
+    fillHisto(outFile_, cutflowType_, "PreSel","pt_1stMu", 50, 0, 500, muonPt1, evtWeight );
+    fillHisto(outFile_, cutflowType_, "PreSel","pt_2ndMu", 50, 0, 500, muonPt2, evtWeight );
+    fillHisto(outFile_, cutflowType_, "PreSel","eta_1stMu", 50, -5, 5, pfMuons[m1].p4.eta(), evtWeight );
+    fillHisto(outFile_, cutflowType_, "PreSel","eta_2ndMu", 50, -5, 5, pfMuons[m2].p4.eta(), evtWeight );
+    fillHisto(outFile_, cutflowType_, "PreSel","final_RelIso_mu", 100, 0, 1, mRelIso, evtWeight );
    
     //fill histos for Z boson
     fillHisto(outFile_, cutflowType_, "PreSel","pt_Z",  50, 0, 500, vZ.Pt(), evtWeight );
@@ -368,25 +421,25 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     }
     
     if(allZjet.size()!=1) continue;
-    MyLorentzVector vZmax =  pfJets[j_final[allZjet[0]]].p4 + pfElectrons[e1].p4;
-    MyLorentzVector vZmin =  pfJets[j_final[allZjet[0]]].p4 + pfElectrons[e2].p4;
+    MyLorentzVector vZmax =  pfJets[j_final[allZjet[0]]].p4 + pfMuons[m1].p4;
+    MyLorentzVector vZmin =  pfJets[j_final[allZjet[0]]].p4 + pfMuons[m2].p4;
     
-    //MyLorentzVector vZmax = pfJets[j_final[0]].p4 + pfJets[j_final[1]].p4 + pfElectrons[e1].p4;
-    //MyLorentzVector vZmin = pfJets[j_final[0]].p4 + pfJets[j_final[1]].p4 + pfElectrons[e2].p4;
+    //MyLorentzVector vZmax = pfJets[j_final[0]].p4 + pfJets[j_final[1]].p4 + pfMuons[m1].p4;
+    //MyLorentzVector vZmin = pfJets[j_final[0]].p4 + pfJets[j_final[1]].p4 + pfMuons[m2].p4;
     
     nCutPass++;
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
-    //fill histos for electron
-    fillHisto(outFile_, cutflowType_, "ZTag","multi_ele",  15, 0.5, 15.5, count_electron, evtWeight );
-    fillHisto(outFile_, cutflowType_, "ZTag","pt_1stEle", 50, 0, 500, electronPt1, evtWeight );
-    fillHisto(outFile_, cutflowType_, "ZTag","pt_2ndEle", 50, 0, 500, electronPt2, evtWeight );
-    fillHisto(outFile_, cutflowType_, "ZTag","eta_1stEle", 50, -5, 5, pfElectrons[e1].p4.eta(), evtWeight );
-    fillHisto(outFile_, cutflowType_, "ZTag","eta_2ndEle", 50, -5, 5, pfElectrons[e2].p4.eta(), evtWeight );
-    fillHisto(outFile_, cutflowType_, "ZTag","final_RelIso_ele", 100, 0, 1, eRelIso, evtWeight );
+    //fill histos for muon
+    fillHisto(outFile_, cutflowType_, "ZTag","multi_mu",  15, 0.5, 15.5, count_muon, evtWeight );
+    fillHisto(outFile_, cutflowType_, "ZTag","pt_1stMu", 50, 0, 500, muonPt1, evtWeight );
+    fillHisto(outFile_, cutflowType_, "ZTag","pt_2ndMu", 50, 0, 500, muonPt2, evtWeight );
+    fillHisto(outFile_, cutflowType_, "ZTag","eta_1stMu", 50, -5, 5, pfMuons[m1].p4.eta(), evtWeight );
+    fillHisto(outFile_, cutflowType_, "ZTag","eta_2ndMu", 50, -5, 5, pfMuons[m2].p4.eta(), evtWeight );
+    fillHisto(outFile_, cutflowType_, "ZTag","final_RelIso_mu", 100, 0, 1, mRelIso, evtWeight );
    
     //fill histos for Z boson
     fillHisto(outFile_, cutflowType_, "ZTag","pt_Z",  50, 0, 500, vZ.Pt(), evtWeight );
-    fillHisto(outFile_, cutflowType_, "ZTag","eta_Z",  50, -5, 5, vZ.Rapidity(), evtWeight );
+    fillHisto(outFile_, cutflowType_, "ZTag","eta_Z",  50, 0, 500, vZ.Rapidity(), evtWeight );
     fillHisto(outFile_, cutflowType_, "ZTag","phi_Z",  50, 0, 500, vZ.Phi(), evtWeight );
     fillHisto(outFile_, cutflowType_, "ZTag","mjj", 200, 0, 1000, vZ.M(), evtWeight );
     fillHisto(outFile_, cutflowType_, "ZTag","mjj_max", 200, 0, 10000, vZmax.M(), evtWeight );
@@ -424,7 +477,10 @@ void Analyzer::processEvents(){
   //Data, MC sample from lxplus and T2
   //CutFlowAnalysis("TTJetsP_MuMC_20171104_Ntuple_1.root", "PF", ""); 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094/", "PF", "");
-  CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_EleMC_20180317/EleMC_20180317/DYJetsToLL_EleMC_20180317/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DYJetsToLL_EleMC_20180317/180317_094707/0000/DYJetsToLL_EleMC_20180317_Ntuple_1.root", "PF", "");
+  CutFlowAnalysis("All_Mu6000_Ntuple.root", "PF", ""); 
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_MuData_20180224/MuData_20180224/MuRunH2v1_MuData_20180224/DoubleMuon/MuRunH2v1_MuData_20180224/180224_185841/0000/MuRunH2v1_MuData_20180224_Ntuple_45.root", "PF", "");
+
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_MuMC_20180224/MuMC_20180224/DYJetsToLL_MuMC_20180224/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DYJetsToLL_MuMC_20180224/180224_185201/0000/DYJetsToLL_MuMC_20180224_Ntuple_1.root", "PF", "");
 
   //====================================
   //condor submission

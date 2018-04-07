@@ -181,10 +181,11 @@ void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vec
     double neutralHadEnFrac = jet->neutralHadronEnergyFraction;
     double neutralEmEnFrac = jet->neutralEmEnergyFraction;
     double chargedHadEnFrac = jet->chargedHadronEnergyFraction;
-
+    double ak8Pmass_ = jet->ak8Pmass;
     ///double pujetid    = int(jet->puIDMVALoose);
     ///if(jetPt > JET_PT_MIN_ && jetEta < JET_ETA_MAX_ && pujetid==1.0  )
-    if(jetPt > 20 && jetEta < 2.5
+    if(jetPt > 100 && ak8Pmass_ > 40 && jetEta < 2.4
+    //if(jetPt > 30 && jetEta < 2.5
       && neutralHadEnFrac < 0.99
       && neutralEmEnFrac  < 0.99
       && chargedHadEnFrac > 0

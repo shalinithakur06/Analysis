@@ -26,7 +26,12 @@ MyJet::MyJet():
   scaleFactor(0.0),
   resolution(0.0),
   triggerJet_pt(-9.),
-  quality(0)
+  quality(0),
+  //subjetiness, pruned mass
+  ak8Tau1(-1),
+  ak8Tau2(-1),
+  ak8Tau3(-1),
+  ak8Pmass(-1)
 {
 }
 
@@ -72,4 +77,9 @@ void MyJet::Reset()
   triggerJet_pt = 0.;
   quality = 0;
 
+  //subjetiness, pruned mass
+  ak8Tau1 = -1;
+  ak8Tau2 = -1;
+  ak8Tau3 = -1;
+  ak8Pmass = -1;
 }
