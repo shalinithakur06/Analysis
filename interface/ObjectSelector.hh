@@ -87,7 +87,7 @@ public :
   bool cutBasedElectronID_Summer16_80X_V1_loose(const MyElectron *e); 
   bool cutBasedElectronID_Summer16_80X_V1_medium(const MyElectron *e); 
   bool cutBasedElectronID_Summer16_80X_V1_tight(const MyElectron *e); 
-
+  bool heepElectronID_HEEPV70(const MyElectron *e);
   // object cleaning
   void ElectronCleaning( const vector<MyElectron> & vE, const vector<MyMuon> & vM, vector<int> * e_old, vector<int> * e_new, vector<int> * mu, double DR );
 

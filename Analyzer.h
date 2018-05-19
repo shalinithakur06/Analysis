@@ -56,6 +56,8 @@ public :
     xss["DY3JetsToLL"]       =  96.6;          evtDBS["DY3JetsToLL"]       =  5856110;
     xss["DY4JetsToLL"]       =  51.4;          evtDBS["DY4JetsToLL"]       =  4197868;
     xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  48103700;
+    xss["DYJetsToLLamcatnlo"]=  6025.2;        evtDBS["DYJetsToLLamcatnlo"]=  115626000;
+    //xss["DYJetsToLLamcatnlo"]=  6025.2;      evtDBS["DYJetsToLLamcatnlo"]=  122055388;
   //xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  49144274;
     xss["QCD_Pt-15to20_Mu"]  =  3819570;       evtDBS["QCD_Pt-15to20_Mu"]  =  4141251;
     xss["QCD_Pt-20to30_Mu"]  =  2960198;       evtDBS["QCD_Pt-20to30_Mu"]  =  31475157;
@@ -69,6 +71,16 @@ public :
     xss["QCD_Pt-600to800_Mu"]=  25.09;         evtDBS["QCD_Pt-600to800_Mu"]=  9981311;
     xss["QCD_Pt-800to1000_Mu"]= 4.70;          evtDBS["QCD_Pt-800to1000_Mu"]=  19767439;
     xss["QCD_Pt-1000toInf_Mu"]= 1.62;          evtDBS["QCD_Pt-1000toInf_Mu"]=  13400031;
+
+    xss["QCD_Pt-15to20_EM"]  =  254600;        evtDBS["QCD_Pt-15to20_EM"]  =  5652601;
+    xss["QCD_Pt-20to30_EM"]  =  5352960;       evtDBS["QCD_Pt-20to30_EM"]  =  9218954;
+    xss["QCD_Pt-30to50_EM"]  =  9928000;       evtDBS["QCD_Pt-30to50_EM"]  =  4730195;
+    xss["QCD_Pt-50to80_EM"]  =  2890800;       evtDBS["QCD_Pt-50to80_EM"]  =  22337070;
+    xss["QCD_Pt-80to120_EM"] =  350000;        evtDBS["QCD_Pt-80to120_EM"] =  35841783;
+    xss["QCD_Pt-120to170_EM"]=  62964;         evtDBS["QCD_Pt-120to170_EM"]=  35817281;
+    xss["QCD_Pt-170to300_EM"]=  18810;         evtDBS["QCD_Pt-170to300_EM"]=  11540163;
+    xss["QCD_Pt-300toInf_EM"]=  1350;          evtDBS["QCD_Pt-300toInf_EM"]=  7373633;
+
     xss["TTJetsP"]           =  831.76;        evtDBS["TTJetsP"]           =  77081156;   
     xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  44813600;
   //xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  45367044;
@@ -87,6 +99,9 @@ public :
     xss["TestLHEGeneration_Mu_4000"]    =  0.1662;      evtDBS["TestLHEGeneration_Mu_4000"]       =  10000;
     xss["TestLHEGeneration_Mu_6000"]    =  0.1662;      evtDBS["TestLHEGeneration_Mu_6000"]       =  10000;
 
+    xss["TestLHEGeneration_Ele_2000"]    =  0.1662;      evtDBS["TestLHEGeneration_Ele_2000"]       =  9648;
+    xss["TestLHEGeneration_Ele_4000"]    =  0.1662;      evtDBS["TestLHEGeneration_Ele_4000"]       =  7980;
+    xss["TestLHEGeneration_Ele_6000"]    =  0.1662;      evtDBS["TestLHEGeneration_Ele_6000"]       =  9440;
 
     //Lumis(inverse pb) of single muon DATA at 13TeV
   };
@@ -110,6 +125,7 @@ private :
   std::map<string, double> xss;
   std::map<string, double> evtDBS;
   std::map<string, double> muSF;
+  std::map<string, double> eleSF;
   /*
   BTagCalibrationReader readCSVfile(const std::string &tagger, const std::string &filename);
   */
@@ -119,6 +135,8 @@ private :
   Double_t getMuonTrackSF(TGraphAsymmErrors *tg, double eta);
   Double_t getEleSF(TH2D *h2, double etaSC, double pt);
   Double_t getEleTrigSF(TH2D *h2, double pt, double etaSC);
+  Double_t getEleHeep1SF(TGraphAsymmErrors *tg, double pt);
+  Double_t getEleHeep2SF(TGraphAsymmErrors *tg, double eta);
   double deltaPhi12(double phi1, double phi2);
   double phi0to2pi(double phi);
 };
@@ -235,6 +253,33 @@ Double_t Analyzer::getEleSF(TH2D *h2, double etaSC, double pt){
     else return 1.0;
   }	  
 }
+Double_t Analyzer::getEleHeep1SF(TGraphAsymmErrors *tg, double pt){
+  Double_t *pt_array = tg->GetX();
+  Double_t *sf_array = tg->GetY();
+  Int_t n_points = tg->GetN();
+  double SF = 1.0;
+if(pt < pt_array[0]) SF = sf_array[0];
+for(Int_t i = 0; i < n_points-1; i++){
+  if(pt >= pt_array[i] && pt < pt_array[i+1]) SF = sf_array[i+1];
+  }
+  if(pt > pt_array[n_points-1]) SF = sf_array[n_points-1];
+  return SF;
+}
+
+Double_t Analyzer::getEleHeep2SF(TGraphAsymmErrors *tg, double etaSC){
+
+  Double_t *eta_array = tg->GetX();
+  Double_t *sf_array = tg->GetY();
+  Int_t n_points = tg->GetN();
+
+double SF = 1.0;
+if(abs(etaSC)<eta_array[0]) SF = sf_array[0];
+for(Int_t i = 0; i < n_points-1; i++){
+  if(abs(etaSC) >= eta_array[i] && abs(etaSC) < eta_array[i+1]) SF = sf_array[i+1];
+  }
+  if(abs(etaSC)>eta_array[n_points-1]) SF = sf_array[n_points -1];
+return SF;
+}
 
 Double_t Analyzer::getEleTrigSF(TH2D *h2, double pt, double etaSC){
   TAxis *xaxis = h2->GetXaxis();
@@ -318,8 +363,17 @@ TFile *f_ele_medium_idSF 	= new TFile("stack/eleSF/ele_medium_idSF.root");
 TH2D *h2_ele_medium_idSF 	= (TH2D*)f_ele_medium_idSF->Get("EGamma_SF2D");
 TFile *f_ele_tight_idSF 	= new TFile("stack/eleSF/ele_tight_idSF.root");
 TH2D *h2_ele_tight_idSF 	= (TH2D*)f_ele_tight_idSF->Get("EGamma_SF2D");
+TFile *f_ele_heep_SF_EE     = new TFile("stack/eleSF/HEEP_SF.root");
+TFile *f_ele_heep_SF_EB     = new TFile("stack/eleSF/HEEP_SF.root");
+TFile *f_ele_heep_SF            = new TFile("stack/eleSF/HEEP_SF.root");
+TGraphAsymmErrors *tg_heep_SF_EE      = (TGraphAsymmErrors*)f_ele_heep_SF_EE->Get("SF_Et_Endcap");
+TGraphAsymmErrors *tg_heep_SF_EB      = (TGraphAsymmErrors*)f_ele_heep_SF_EB->Get("SF_Et_Barrel");
+TGraphAsymmErrors *tg_heep_SF             = (TGraphAsymmErrors*)f_ele_heep_SF->Get("SF_Eta");
+
 //Trigger scale factors
 //https://indico.cern.ch/event/604912/
-TFile *f_ele_trigSF 		= new TFile("stack/eleSF/ele_trigSF_Run2016All_v1.root");
-TH2D *h2_ele_trigSF 		= (TH2D*)f_ele_trigSF->Get("Ele27_WPTight_Gsf");
+//TFile *f_ele_trigSF 		= new TFile("stack/eleSF/ele_trigSF_Run2016All_v1.root");
+//TH2D *h2_ele_trigSF 		= (TH2D*)f_ele_trigSF->Get("Ele27_WPTight_Gsf");
 
+TFile *f_ele_trigSF 		= new TFile("stack/eleSF/MW_2ndleg_EGM2D.root");
+TH2D *h2_ele_trigSF 		= (TH2D*)f_ele_trigSF->Get("EGamma_SF2D");

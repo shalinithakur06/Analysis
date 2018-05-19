@@ -1,7 +1,6 @@
 #include "interface/ObjectSelector.hh"
 #include <iostream>
 #include <iomanip>
-
 ClassImp(ObjectSelector)
 
 using namespace std;
@@ -126,6 +125,41 @@ bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_tight(const MyElectron *
      )passID = true;
   return passID;
 }
+//Electron HEEP ID
+  bool ObjectSelector::heepElectronID_HEEPV70(const MyElectron *e)
+{
+  bool passID = false;
+  float energy2x5Overenergy5x5 = e->energy2x5/e->energy5x5;
+  //for barrel
+  if(abs(e->eleSCEta)                <=1.444
+     && e->isEcalDriven              == 1
+     && abs(e->dEtaInSeed)           < 0.004 
+     && abs(e->dPhiIn)               < 0.06 
+     && e->hadOverEm                 < 1/e->p4.E() + 0.05 
+     && energy2x5Overenergy5x5       > 0.94 
+     && e->GsfEleEmHadD1IsoRhoCut    < 2+0.03*e->p4.pt()+0.28*e->eleRho 
+     && e->eleTrkPt                  < 5  
+     && e->nInnerHits                <=1   //Inner Lost Hits
+     &&e->D0                         < 0.02
+     )passID = true;
+  
+  //endcap
+  double HadDepth = 0.0;
+  if(e->p4.E() < 50) HadDepth = 2.5 +0.28*e->eleRho;
+  else HadDepth = 2.5+0.03*(e->p4.E()-50) +0.28*e->eleRho; 
+  if(abs(e->eleSCEta) > 1.566 && abs(e->eleSCEta) < 2.5
+     && e->isEcalDriven                == 1
+     && abs(e->dEtaInSeed)             < 0.006
+     && abs(e->dPhiIn)                 < 0.06 
+     && e->hadOverEm                   < 5/e->p4.E() + 0.05 
+     && e->sigmaIetaIeta               <0.03 
+     && e->GsfEleEmHadD1IsoRhoCut      < HadDepth
+     && e->eleTrkPt                    < 5
+     && e->nInnerHits                  <=1
+     &&e->D0                           < 0.05
+     )passID = true;
+  return passID; 
+}
 
 void ObjectSelector::preSelectElectrons(vector<int> * e_i, const vector<MyElectron> & vE , MyVertex & vertex, bool isPFlow){
   //https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2#Offline_selection_criteria
@@ -139,10 +173,11 @@ void ObjectSelector::preSelectElectrons(vector<int> * e_i, const vector<MyElectr
     double zelectron 	   = e->vertex.z();
     double dz 		   = fabs(zvertex - zelectron);
     //bool passID = cutBasedElectronID_Summer16_80X_V1_loose(e);
-    bool passID = cutBasedElectronID_Summer16_80X_V1_medium(e);
+    //bool passID = cutBasedElectronID_Summer16_80X_V1_medium(e);
     //bool passID = cutBasedElectronID_Summer16_80X_V1_tight(e);
+    bool passID = heepElectronID_HEEPV70(e); 
     
-    if(passID && ePt >30 && eEta <2.5 && d0 < 0.05 && dz < 0.2){e_i->push_back(i);}
+    if(passID && ePt >35 && eEta <2.5 && d0 < 0.05 && dz < 0.2){e_i->push_back(i);}
   }
 }
 
@@ -184,8 +219,8 @@ void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vec
     double ak8Pmass_ = jet->ak8Pmass;
     ///double pujetid    = int(jet->puIDMVALoose);
     ///if(jetPt > JET_PT_MIN_ && jetEta < JET_ETA_MAX_ && pujetid==1.0  )
-    if(jetPt > 100 && ak8Pmass_ > 40 && jetEta < 2.4
-    //if(jetPt > 30 && jetEta < 2.5
+    //if(jetPt > 100 && ak8Pmass_ > 40 && jetEta < 2.4
+    if(jetPt > 25 && jetEta < 2.5
       && neutralHadEnFrac < 0.99
       && neutralEmEnFrac  < 0.99
       && chargedHadEnFrac > 0

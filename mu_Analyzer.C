@@ -11,7 +11,7 @@ void Analyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
   
   TString outFile("13TeV/outputDir/");
   //TString Filename_ = outFile+evtType+"_8Feb_signal_6000.root";
-  TString Filename_ = outFile+evtType+"_Anal6000.root";
+  TString Filename_ = outFile+evtType+"_Anal.root";
   TFile *outFile_ = TFile::Open( Filename_, "RECREATE" );
   outFile_->SetCompressionLevel( 9 );
   
@@ -120,8 +120,6 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
         if(countZ==0) hepNUP = hepNUP+1;
         double weightK = reweightHEPNUPDYJets(hepNUP) * (lumiTotal/1000.0);
         evtWeight *= weightK;  
-        if(i < 1){
-        }
       }
       //lumi weight
       else {
@@ -324,7 +322,8 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     if(vZ.mass() < 60) continue;    
     nCutPass++;
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
-    
+    double dR1 = 0.0;
+    double dR2 = 0.0;
     int count_jets = j_final.size();
     //---------------------------------------------------//
     //Fill histos with for Control Plots
@@ -332,30 +331,36 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     //fill histos for muon
     double muonPt1 = muPtWithRochCorr(&pfMuons[m1], ev->isData, u1, u2, 0, 0);
     double muonPt2 = muPtWithRochCorr(&pfMuons[m2], ev->isData, u1, u2, 0, 0);
+    //fill histos for jets
+    for(size_t ijet = 0; ijet < j_final.size(); ijet++){
+      int ind_jet = j_final[ijet];
+      double jetPt = jetPtWithJESJER(pfJets[ind_jet], jes, jer);
+      dR1 = DeltaR(pfJets[ind_jet].p4, pfMuons[m1].p4);
+      dR2 = DeltaR(pfJets[ind_jet].p4, pfMuons[m2].p4);
+      fillHisto(outFile_, cutflowType_, "ControlP","dR1", 100, 0, 10, dR1, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ControlP","dR2", 100, 0, 10, dR2, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ControlP","dR", 100, 0, 10, dR1, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ControlP","dR", 100, 0, 10, dR2, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ControlP","pt_jet", 100, 0, 1000, jetPt, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ControlP","eta_jet", 50, -5, 5, pfJets[ind_jet].p4.eta(), evtWeight );
+      fillHisto(outFile_, cutflowType_, "ControlP","phi_jet", 50, -5, 5, pfJets[ind_jet].p4.phi(), evtWeight );
+      fillHisto(outFile_, cutflowType_, "ControlP","ak8Pmass", 500, 0, 5000, pfJets[ind_jet].ak8Pmass, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ControlP","ak8Tau21", 50, 0, 5, pfJets[ind_jet].ak8Tau2/pfJets[ind_jet].ak8Tau1, evtWeight );
+    }
+    fillHisto(outFile_, cutflowType_, "ControlP","final_multi_jet", 15, 0, 15, count_jets, evtWeight );
     fillHisto(outFile_, cutflowType_, "ControlP","multi_mu",  15, 0.5, 15.5, count_muon, evtWeight );
-    fillHisto(outFile_, cutflowType_, "ControlP","pt_1stMu", 50, 0, 500, muonPt1, evtWeight );
-    fillHisto(outFile_, cutflowType_, "ControlP","pt_2ndMu", 50, 0, 500, muonPt2, evtWeight );
+    fillHisto(outFile_, cutflowType_, "ControlP","pt_1stMu", 500, 0, 5000, muonPt1, evtWeight );
+    fillHisto(outFile_, cutflowType_, "ControlP","pt_2ndMu", 500, 0, 5000, muonPt2, evtWeight );
     fillHisto(outFile_, cutflowType_, "ControlP","eta_1stMu", 50, -5, 5, pfMuons[m1].p4.eta(), evtWeight );
     fillHisto(outFile_, cutflowType_, "ControlP","eta_2ndMu", 50, -5, 5, pfMuons[m2].p4.eta(), evtWeight );
     fillHisto(outFile_, cutflowType_, "ControlP","final_RelIso_mu", 100, 0, 1, mRelIso, evtWeight );
    
     //fill histos for Z boson
-    fillHisto(outFile_, cutflowType_, "ControlP","pt_Z",  50, 0, 500, vZ.Pt(), evtWeight );
+    fillHisto(outFile_, cutflowType_, "ControlP","pt_Z",  500, 0, 5000, vZ.Pt(), evtWeight );
     fillHisto(outFile_, cutflowType_, "ControlP","eta_Z", 50, -5, 5, vZ.Rapidity(), evtWeight );
     fillHisto(outFile_, cutflowType_, "ControlP","phi_Z", 50, -5, 5, vZ.Phi(), evtWeight );
     fillHisto(outFile_, cutflowType_, "ControlP","mjj", 200, 0, 1000, vZ.M(), evtWeight );
     
-    //fill histos for jets
-    for(size_t ijet = 0; ijet < j_final.size(); ijet++){
-      int ind_jet = j_final[ijet];
-      double jetPt = jetPtWithJESJER(pfJets[ind_jet], jes, jer);
-      fillHisto(outFile_, cutflowType_, "ControlP","pt_jet", 50, 0, 500, jetPt, evtWeight );
-      fillHisto(outFile_, cutflowType_, "ControlP","eta_jet", 50, -5, 5, pfJets[ind_jet].p4.eta(), evtWeight );
-      fillHisto(outFile_, cutflowType_, "ControlP","phi_jet", 50, -5, 5, pfJets[ind_jet].p4.phi(), evtWeight );
-      fillHisto(outFile_, cutflowType_, "ControlP","ak8Pmass", 50, 0, 500, pfJets[ind_jet].ak8Pmass, evtWeight );
-      fillHisto(outFile_, cutflowType_, "ControlP","ak8Tau21", 50, 0, 5, pfJets[ind_jet].ak8Tau2/pfJets[ind_jet].ak8Tau1, evtWeight );
-    }
-    fillHisto(outFile_, cutflowType_, "ControlP","final_multi_jet", 15, 0, 15, count_jets, evtWeight );
     
     //fill histos for nvtx
     fillHisto(outFile_, cutflowType_, "ControlP","nvtx", 100, 0, 100, pri_vtxs, evtWeight );
@@ -367,34 +372,45 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     //Fill histos with pre-selection
     //---------------------------------------------------//
     if(vZ.Pt() < 100) continue;    
+    //fill histos for jets
+    for(size_t ijet = 0; ijet < j_final.size(); ijet++){
+      int ind_jet = j_final[ijet];
+      double jetPt = jetPtWithJESJER(pfJets[ind_jet], jes, jer);
+      if(jetPt <= 100) continue;    
+      if(fabs(pfJets[ind_jet].p4.eta()) >= 2.4) continue;    
+      if(pfJets[ind_jet].ak8Pmass <= 40) continue;    
+      dR1 = DeltaR(pfJets[ind_jet].p4, pfMuons[m1].p4);
+      dR2 = DeltaR(pfJets[ind_jet].p4, pfMuons[m2].p4);
+      if(dR1 < 0.8 || dR2 < 0.8) continue;    
+      fillHisto(outFile_, cutflowType_, "PreSel","dR1", 100, 0, 10, dR1, evtWeight );
+      fillHisto(outFile_, cutflowType_, "PreSel","dR2", 100, 0, 10, dR2, evtWeight );
+      fillHisto(outFile_, cutflowType_, "PreSel","dR", 100, 0, 10, dR1, evtWeight );
+      fillHisto(outFile_, cutflowType_, "PreSel","dR", 100, 0, 10, dR2, evtWeight );
+      fillHisto(outFile_, cutflowType_, "PreSel","pt_jet", 100, 0, 1000, jetPt, evtWeight );
+      fillHisto(outFile_, cutflowType_, "PreSel","eta_jet", 50, -5, 5, pfJets[ind_jet].p4.eta(), evtWeight );
+      fillHisto(outFile_, cutflowType_, "PreSel","phi_jet", 50, -5, 5, pfJets[ind_jet].p4.phi(), evtWeight );
+      fillHisto(outFile_, cutflowType_, "PreSel","ak8Pmass", 500, 0, 5000, pfJets[ind_jet].ak8Pmass, evtWeight );
+      fillHisto(outFile_, cutflowType_, "PreSel","ak8Tau21", 50, 0, 5, pfJets[ind_jet].ak8Tau2/pfJets[ind_jet].ak8Tau1, evtWeight );
+    }
+    
+    fillHisto(outFile_, cutflowType_, "PreSel","final_multi_jet", 15, 0, 15, count_jets, evtWeight );
     nCutPass++;
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
     ///if(muonPt1 <100) continue;    
     //fill histos for muon
     fillHisto(outFile_, cutflowType_, "PreSel","multi_mu",  15, 0.5, 15.5, count_muon, evtWeight );
-    fillHisto(outFile_, cutflowType_, "PreSel","pt_1stMu", 50, 0, 500, muonPt1, evtWeight );
-    fillHisto(outFile_, cutflowType_, "PreSel","pt_2ndMu", 50, 0, 500, muonPt2, evtWeight );
+    fillHisto(outFile_, cutflowType_, "PreSel","pt_1stMu", 500, 0, 5000, muonPt1, evtWeight );
+    fillHisto(outFile_, cutflowType_, "PreSel","pt_2ndMu", 500, 0, 5000, muonPt2, evtWeight );
     fillHisto(outFile_, cutflowType_, "PreSel","eta_1stMu", 50, -5, 5, pfMuons[m1].p4.eta(), evtWeight );
     fillHisto(outFile_, cutflowType_, "PreSel","eta_2ndMu", 50, -5, 5, pfMuons[m2].p4.eta(), evtWeight );
     fillHisto(outFile_, cutflowType_, "PreSel","final_RelIso_mu", 100, 0, 1, mRelIso, evtWeight );
    
     //fill histos for Z boson
-    fillHisto(outFile_, cutflowType_, "PreSel","pt_Z",  50, 0, 500, vZ.Pt(), evtWeight );
+    fillHisto(outFile_, cutflowType_, "PreSel","pt_Z",  500, 0, 5000, vZ.Pt(), evtWeight );
     fillHisto(outFile_, cutflowType_, "PreSel","eta_Z", 50, -5, -5, vZ.Rapidity(), evtWeight );
     fillHisto(outFile_, cutflowType_, "PreSel","phi_Z", 50, -5, -5, vZ.Phi(), evtWeight );
     fillHisto(outFile_, cutflowType_, "PreSel","mjj", 200, 0, 1000, vZ.M(), evtWeight );
     
-    //fill histos for jets
-    for(size_t ijet = 0; ijet < j_final.size(); ijet++){
-      int ind_jet = j_final[ijet];
-      double jetPt = jetPtWithJESJER(pfJets[ind_jet], jes, jer);
-      fillHisto(outFile_, cutflowType_, "PreSel","pt_jet", 50, 0, 500, jetPt, evtWeight );
-      fillHisto(outFile_, cutflowType_, "PreSel","eta_jet", 50, -5, 5, pfJets[ind_jet].p4.eta(), evtWeight );
-      fillHisto(outFile_, cutflowType_, "PreSel","phi_jet", 50, -5, 5, pfJets[ind_jet].p4.phi(), evtWeight );
-      fillHisto(outFile_, cutflowType_, "PreSel","ak8Pmass", 50, 0, 500, pfJets[ind_jet].ak8Pmass, evtWeight );
-      fillHisto(outFile_, cutflowType_, "PreSel","ak8Tau21", 50, 0, 5, pfJets[ind_jet].ak8Tau2/pfJets[ind_jet].ak8Tau1, evtWeight );
-    }
-    fillHisto(outFile_, cutflowType_, "PreSel","final_multi_jet", 15, 0, 15, count_jets, evtWeight );
     
     //fill histos for nvtx
     fillHisto(outFile_, cutflowType_, "PreSel","nvtx", 100, 0, 100, pri_vtxs, evtWeight );
@@ -431,16 +447,16 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
     //fill histos for muon
     fillHisto(outFile_, cutflowType_, "ZTag","multi_mu",  15, 0.5, 15.5, count_muon, evtWeight );
-    fillHisto(outFile_, cutflowType_, "ZTag","pt_1stMu", 50, 0, 500, muonPt1, evtWeight );
-    fillHisto(outFile_, cutflowType_, "ZTag","pt_2ndMu", 50, 0, 500, muonPt2, evtWeight );
+    fillHisto(outFile_, cutflowType_, "ZTag","pt_1stMu", 500, 0, 5000, muonPt1, evtWeight );
+    fillHisto(outFile_, cutflowType_, "ZTag","pt_2ndMu", 500, 0, 5000, muonPt2, evtWeight );
     fillHisto(outFile_, cutflowType_, "ZTag","eta_1stMu", 50, -5, 5, pfMuons[m1].p4.eta(), evtWeight );
     fillHisto(outFile_, cutflowType_, "ZTag","eta_2ndMu", 50, -5, 5, pfMuons[m2].p4.eta(), evtWeight );
     fillHisto(outFile_, cutflowType_, "ZTag","final_RelIso_mu", 100, 0, 1, mRelIso, evtWeight );
    
     //fill histos for Z boson
-    fillHisto(outFile_, cutflowType_, "ZTag","pt_Z",  50, 0, 500, vZ.Pt(), evtWeight );
-    fillHisto(outFile_, cutflowType_, "ZTag","eta_Z",  50, 0, 500, vZ.Rapidity(), evtWeight );
-    fillHisto(outFile_, cutflowType_, "ZTag","phi_Z",  50, 0, 500, vZ.Phi(), evtWeight );
+    fillHisto(outFile_, cutflowType_, "ZTag","pt_Z",  500, 0, 5000, vZ.Pt(), evtWeight );
+    fillHisto(outFile_, cutflowType_, "ZTag","eta_Z",  500, 0, 5000, vZ.Rapidity(), evtWeight );
+    fillHisto(outFile_, cutflowType_, "ZTag","phi_Z",  500, 0, 5000, vZ.Phi(), evtWeight );
     fillHisto(outFile_, cutflowType_, "ZTag","mjj", 200, 0, 1000, vZ.M(), evtWeight );
     fillHisto(outFile_, cutflowType_, "ZTag","mjj_max", 200, 0, 10000, vZmax.M(), evtWeight );
     fillHisto(outFile_, cutflowType_, "ZTag","mjj_min", 200, 0, 10000, vZmin.M(), evtWeight );
@@ -449,10 +465,16 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     for(size_t ijet = 0; ijet < j_final.size(); ijet++){
       int ind_jet = j_final[ijet];
       double jetPt = jetPtWithJESJER(pfJets[ind_jet], jes, jer);
-      fillHisto(outFile_, cutflowType_, "ZTag","pt_jet", 50, 0, 500, jetPt, evtWeight );
+      dR1 = DeltaR(pfJets[ind_jet].p4, pfMuons[m1].p4);
+      dR2 = DeltaR(pfJets[ind_jet].p4, pfMuons[m2].p4);
+      fillHisto(outFile_, cutflowType_, "PreSel","dR1", 100, 0, 10, dR1, evtWeight );
+      fillHisto(outFile_, cutflowType_, "PreSel","dR2", 100, 0, 10, dR2, evtWeight );
+      fillHisto(outFile_, cutflowType_, "PreSel","dR", 100, 0, 10, dR1, evtWeight );
+      fillHisto(outFile_, cutflowType_, "PreSel","dR", 100, 0, 10, dR2, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ZTag","pt_jet", 100, 0, 1000, jetPt, evtWeight );
       fillHisto(outFile_, cutflowType_, "ZTag","eta_jet", 50, -5, 5, pfJets[ind_jet].p4.eta(), evtWeight );
       fillHisto(outFile_, cutflowType_, "ZTag","phi_jet", 50, -5, 5, pfJets[ind_jet].p4.phi(), evtWeight );
-      fillHisto(outFile_, cutflowType_, "ZTag","ak8Pmass", 50, 0, 500, pfJets[ind_jet].ak8Pmass, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ZTag","ak8Pmass", 500, 0, 5000, pfJets[ind_jet].ak8Pmass, evtWeight );
       fillHisto(outFile_, cutflowType_, "ZTag","ak8Tau21", 50, 0, 5, pfJets[ind_jet].ak8Tau2/pfJets[ind_jet].ak8Tau1, evtWeight );
 
     }
@@ -477,8 +499,7 @@ void Analyzer::processEvents(){
   //Data, MC sample from lxplus and T2
   //CutFlowAnalysis("TTJetsP_MuMC_20171104_Ntuple_1.root", "PF", ""); 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094/", "PF", "");
-  CutFlowAnalysis("All_Mu6000_Ntuple.root", "PF", ""); 
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_MuData_20180224/MuData_20180224/MuRunH2v1_MuData_20180224/DoubleMuon/MuRunH2v1_MuData_20180224/180224_185841/0000/MuRunH2v1_MuData_20180224_Ntuple_45.root", "PF", "");
+  CutFlowAnalysis("All_Mu2000_Ntuple.root", "PF", ""); 
 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_MuMC_20180224/MuMC_20180224/DYJetsToLL_MuMC_20180224/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DYJetsToLL_MuMC_20180224/180224_185201/0000/DYJetsToLL_MuMC_20180224_Ntuple_1.root", "PF", "");
 

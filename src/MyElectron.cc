@@ -18,6 +18,13 @@ MyElectron::MyElectron():
   iEminusiP(-999),
   nInnerHits(-999),
   isPassConVeto(true),
+  nInnerLostHits(-999),
+  isEcalDriven(true),
+  energy5x5(-999),
+  energy2x5(-999),
+  eleRho(-999),
+  eleTrkPt(-999),
+  GsfEleEmHadD1IsoRhoCut(-999),
 
   ///ids
   isEE(-1),
@@ -62,7 +69,13 @@ void MyElectron::Reset()
   iEminusiP = -999.;
   nInnerHits = -999.;
   isPassConVeto = true;
-  
+  isEcalDriven = true;
+  energy5x5 = -999;
+  energy2x5 = -999;
+  eleRho = -999;
+  eleTrkPt= -999;
+  GsfEleEmHadD1IsoRhoCut= -999;
+
   ///ids
   isEE = -1;
   isEB = -1;

@@ -18,7 +18,7 @@ ntupleT2Paths=$1
 
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 eval `scram runtime -sh`
-voms-proxy-init --voms cms
+#voms-proxy-init --voms cms
 
 log="log_20170620_"
 logDir=$log${ntupleT2Paths/.txt/""}
@@ -48,9 +48,10 @@ do
   echo -e "\033[01;32m input ntuple=\033[00m" $count": " $ntupleT2Path
   IFS='/ ' read -r -a array <<< "$ntupleT2Path"
   len=${#array[@]}
+  fifth_last=`expr $len - 4`
   sec_last=`expr $len - 1`
-  #sec_last=`expr $len`
-  ntuple=${array[$sec_last]}
+  #ntuple=${array[$sec_last]}
+  ntuple=${array[$fifth_last]}${array[$sec_last]}
   #echo $ntuple
   iFile=${ntuple/.root/""}
  

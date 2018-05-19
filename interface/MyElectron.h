@@ -39,8 +39,15 @@ class MyElectron
   double hadOverEm;  //H/E 
   double iEminusiP;     //abs(1/E-1/p)
   double nInnerHits;  //expected missing inner hits 
+  double nInnerLostHits;  //expected missing inner hits 
   bool isPassConVeto; //pass conversion veto
-  
+  bool isEcalDriven;  
+  double energy5x5;
+  double energy2x5;
+  double eleRho;
+  double eleTrkPt;
+  double GsfEleEmHadD1IsoRhoCut;
+
   ///ids
   int    isEE;
   int    isEB;
