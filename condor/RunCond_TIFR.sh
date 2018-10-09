@@ -50,18 +50,17 @@ do
   len=${#array[@]}
   fifth_last=`expr $len - 4`
   sec_last=`expr $len - 1`
-  #ntuple=${array[$sec_last]}
-  ntuple=${array[$fifth_last]}${array[$sec_last]}
+  ntuple=${array[$sec_last]}
+  ##ntuple=${array[$fifth_last]}${array[$sec_last]}
   #echo $ntuple
   iFile=${ntuple/.root/""}
- 
   #----------------------------------------------
   #copy condor scripts to each input ntuple dir
   #replace Cond.sub arguments, as per input
   #submit the condor jobs, for each ntuple
   #----------------------------------------------
   
-  mkdir $iFile
+  mkdir -p $iFile
   cp Cond.sub $iFile
   cp Analyzer_TIFR.sh $iFile
   cd $iFile 

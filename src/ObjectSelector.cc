@@ -16,7 +16,7 @@ bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_veto(const MyElectron *e
      && abs(e->dEtaInSeed) 	< 0.00749	
      && abs(e->dPhiIn) 		< 0.228	
      && e->hadOverEm 		< 0.356	
-     //&& e->relCombPFIsoEA 	< 0.175	
+     && e->relCombPFIsoEA 	< 0.175	
      && abs(e->iEminusiP) 	< 0.299	
      && e->nInnerHits       	<= 2
      && e->passConversionVeto  
@@ -28,7 +28,7 @@ bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_veto(const MyElectron *e
      && abs(e->dEtaInSeed) 	< 0.00895	 
      && abs(e->dPhiIn) 		< 0.213	
      && e->hadOverEm 		< 0.211	
-     //&& e->relCombPFIsoEA 	< 0.159	
+     && e->relCombPFIsoEA 	< 0.159	
      && abs(e->iEminusiP) 	< 0.15	
      && e->nInnerHits       	<= 3
      && e->passConversionVeto  
@@ -103,7 +103,7 @@ bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_tight(const MyElectron *
   //barrel
   if(abs(e->eleSCEta) <= 1.479 
      && e->sigmaIetaIeta 	< 0.00998 
-     && abs(e->dEtaInSeed) 	< 0.00308
+     //&& abs(e->dEtaInSeed) 	< 0.00308
      && abs(e->dPhiIn) 		< 0.0816 
      && e->hadOverEm 		< 0.0414 
      && e->relCombPFIsoEA 	< 0.0588
@@ -111,7 +111,6 @@ bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_tight(const MyElectron *
      && e->nInnerHits       	<= 1
      && e->passConversionVeto  
     )passID = true;
-
   //endcap
   if(abs(e->eleSCEta) > 1.479 
      && e->sigmaIetaIeta 	< 0.0292 
@@ -132,7 +131,7 @@ bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_tight(const MyElectron *
   float energy2x5Overenergy5x5 = e->energy2x5/e->energy5x5;
   //for barrel
   if(abs(e->eleSCEta)                <=1.444
-     && e->isEcalDriven              == 1
+     //&& e->isEcalDriven              == 1 //Khatarnak !!!!, sare events kha ja rha hai harami.
      && abs(e->dEtaInSeed)           < 0.004 
      && abs(e->dPhiIn)               < 0.06 
      && e->hadOverEm                 < 1/e->p4.E() + 0.05 
@@ -140,9 +139,8 @@ bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_tight(const MyElectron *
      && e->GsfEleEmHadD1IsoRhoCut    < 2+0.03*e->p4.pt()+0.28*e->eleRho 
      && e->eleTrkPt                  < 5  
      && e->nInnerHits                <=1   //Inner Lost Hits
-     &&e->D0                         < 0.02
+     ///&&e->D0                         < 0.02
      )passID = true;
-  
   //endcap
   double HadDepth = 0.0;
   if(e->p4.E() < 50) HadDepth = 2.5 +0.28*e->eleRho;
@@ -165,7 +163,6 @@ void ObjectSelector::preSelectElectrons(vector<int> * e_i, const vector<MyElectr
   //https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2#Offline_selection_criteria
   for(unsigned int i=0;i<vE.size();i++){
     const MyElectron * e   = &vE[i];
-
     double ePt     	   = TMath::Abs(e->p4.pt());
     double eEta     	   = TMath::Abs(e->p4.eta());
     double d0      	   = fabs(e->D0);
@@ -173,10 +170,9 @@ void ObjectSelector::preSelectElectrons(vector<int> * e_i, const vector<MyElectr
     double zelectron 	   = e->vertex.z();
     double dz 		   = fabs(zvertex - zelectron);
     //bool passID = cutBasedElectronID_Summer16_80X_V1_loose(e);
-    //bool passID = cutBasedElectronID_Summer16_80X_V1_medium(e);
+    ///bool passID = cutBasedElectronID_Summer16_80X_V1_medium(e);
     //bool passID = cutBasedElectronID_Summer16_80X_V1_tight(e);
     bool passID = heepElectronID_HEEPV70(e); 
-    
     if(passID && ePt >35 && eEta <2.5 && d0 < 0.05 && dz < 0.2){e_i->push_back(i);}
   }
 }
@@ -185,21 +181,11 @@ void ObjectSelector::preSelectMuons(vector<int> * m_i, const vector<MyMuon> & vM
   for( int i=0;i< (int) vM.size();i++){
     const MyMuon * m = &vM[i];
     double mEta     = TMath::Abs(m->p4.eta());
-    ///double mPt      = TMath::Abs(m->p4.pt());
     double mD0      = fabs(m->D0);
-    //double mRelIso  = m->pfRelIso;
     double mPt   = muPtWithRochCorr(m, isData, random_u1, random_u2, err_set, err_member); 
-    /*
-    bool isGlobalMuon = m->isGlobalMuon; 
-    bool isPFMuon = m->isPFMuon; 
-    bool passId = (isGlobalMuon && isPFMuon && m->nMuonHits >=1 
-		   && m->nPixelHits >= 1 && m->nMatchedStations >=2 
-		   && m->nTrackerLayers >= 6 && m->normChi2 < 10); 
-    */
     double zvertex   = vertex.XYZ.z();
     double zmuon     = m->vertex.z();
     double dz =  fabs(zvertex-zmuon);
-    
     if(mPt > 35 && mEta < 2.4 && mD0 < 0.2 && dz < 0.5){ 
       m_i->push_back(i);
     }
@@ -207,19 +193,13 @@ void ObjectSelector::preSelectMuons(vector<int> * m_i, const vector<MyMuon> & vM
 }
 
 void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vector<MyJet> & vJ, int jes, int jer){
- 
   for(unsigned int i=0;i<vJ.size();i++){
     const MyJet *jet = &vJ[i];
     double jetEta     = TMath::Abs(jet->p4.eta());
-    //double jetPt      = TMath::Abs(jet->p4.pt());
     double jetPt      = jetPtWithJESJER(vJ[i], jes, jer); 
     double neutralHadEnFrac = jet->neutralHadronEnergyFraction;
     double neutralEmEnFrac = jet->neutralEmEnergyFraction;
     double chargedHadEnFrac = jet->chargedHadronEnergyFraction;
-    double ak8Pmass_ = jet->ak8Pmass;
-    ///double pujetid    = int(jet->puIDMVALoose);
-    ///if(jetPt > JET_PT_MIN_ && jetEta < JET_ETA_MAX_ && pujetid==1.0  )
-    //if(jetPt > 100 && ak8Pmass_ > 40 && jetEta < 2.4
     if(jetPt > 25 && jetEta < 2.5
       && neutralHadEnFrac < 0.99
       && neutralEmEnFrac  < 0.99
@@ -231,70 +211,46 @@ void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vec
 }
 
 //https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2
-bool ObjectSelector::isMediumMuon(const MyMuon * m, bool isPFlow){
-  
-  bool isMedium(false);
-  bool goodGlob = m->isGlobalMuon && 
-	  m->normChi2 <3 && 
-	  m->chi2LocalPosition < 12 && 
-	  m->trkKink < 20; 
-  bool isLooseMuon = m->isPFMuon && 
-          (m->isGlobalMuon || m->isTrackerMuon);
-  isMedium =  isLooseMuon &&  
-	    m->validFraction > 0.8 && 
-	    m->segmentCompatibility >(goodGlob ? 0.303 : 0.451); 
-  return isMedium; 
-}
-
-bool ObjectSelector::isMediumMuonGH(const MyMuon * m, bool isPFlow){
-  
-  bool isMedium(false);
-  bool goodGlob = m->isGlobalMuon && 
-	  m->normChi2 <3 && 
-	  m->chi2LocalPosition < 12 && 
-	  m->trkKink < 20; 
-  bool isLooseMuon = m->isPFMuon && 
-          (m->isGlobalMuon || m->isTrackerMuon);
-  isMedium =  isLooseMuon &&  
-	    m->validFraction > 0.49 && 
-	    m->segmentCompatibility >(goodGlob ? 0.303 : 0.451); 
-  return isMedium; 
+bool ObjectSelector::isHighPtMuon(const MyMuon * m, bool isPFlow){
+  bool isHighPt(false);
+  isHighPt = m->isGlobalMuon &&
+	  m->nMuonHits > 0 && 
+	  m->nMatchedStations >1 &&
+          //m->bestMuPtErr/m->bestMuPtTrack < 0.3 &&
+          m->D0 < 0.2 &&
+          m->Dz < 0.5 &&
+          m->nPixelHits > 0 &&
+          m->nTrackerLayers > 5;
+return isHighPt;
 }
 
 bool ObjectSelector::looseMuonVeto( int selectedMuon, const vector<MyMuon> & vM, bool isPFlow){
-
   bool looseVeto(false);
-  
   for(int i=0;i< (int)vM.size();i++){
-    
     if( i==selectedMuon ){continue;}
     const MyMuon * m = &vM[i];
     bool isGlobalMuon = m->isGlobalMuon; 
     double mEta     = TMath::Abs(m->p4.eta());
     double mPt      = TMath::Abs(m->p4.pt());
     double mRelIso  = m->pfRelIso;
-    
     if(! isGlobalMuon) continue;
-    if(isMediumMuon(m, isPFlow) && mEta<LOOSE_M_ETA_MAX_  && mPt> LOOSE_M_PT_MIN_ && mRelIso < LOOSE_M_RELISO_MAX_ ){ looseVeto = true; }
+    if(mEta<2.1  && mPt> 15 && mRelIso < 0.20 ){ looseVeto = true; }
   }
   return looseVeto;
     
 }
 
 bool ObjectSelector::looseElectronVeto(unsigned long selectedElectron, const vector<MyElectron> & vE, MyVertex & vertex, bool isPFlow){
-
   //https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2#Offline_selection_criteria
   bool looseVeto(false);
   for(unsigned long i=0;i<vE.size();i++){
     const MyElectron * e   = &vE[i];
-
     //double eEta     	   = TMath::Abs(e->p4.eta());
     double ePt     	   = TMath::Abs(e->p4.pt());
     double d0      	   = fabs(e->D0);
     double zvertex   	   = vertex.XYZ.z();
     double zelectron 	   = e->vertex.z();
     double dz 		   = fabs(zvertex - zelectron);
-
     if( i==selectedElectron) continue; 
     bool passID = cutBasedElectronID_Summer16_80X_V1_veto(e);
     if(passID && ePt >15 && d0 < 0.05 && dz < 0.1){looseVeto = true;}
@@ -304,7 +260,6 @@ bool ObjectSelector::looseElectronVeto(unsigned long selectedElectron, const vec
 
 
 void ObjectSelector::ElectronCleaning( const vector<MyElectron> & vE, const vector<MyMuon> & vM, vector<int> * e_old, vector<int> * e_new, vector<int> * mu, double DR ){
-  
   for(size_t i = 0; i < e_old->size(); i++){
     int iele = (*e_old)[i];
     double delR2Mu = 5.0;
@@ -313,13 +268,11 @@ void ObjectSelector::ElectronCleaning( const vector<MyElectron> & vE, const vect
       double delR = DeltaR(vE[iele].p4, vM[imu].p4);
       if(delR < delR2Mu)delR2Mu = delR;
     }
-
     if(delR2Mu > DR) e_new->push_back(iele);
   }
 }
 
 void ObjectSelector::JetCleaning(const vector<MyJet> & vJ, const vector<MyMuon> & vM, const vector<MyElectron> & vE,vector<int> * j_old, vector<int> * j_new, vector<int> * mu, vector<int> * el, double DR){
-
   for(size_t i = 0; i < j_old->size(); i++){
     int ijet = (*j_old)[i];
 
@@ -330,7 +283,6 @@ void ObjectSelector::JetCleaning(const vector<MyJet> & vJ, const vector<MyMuon> 
       double delR = DeltaR(vJ[ijet].p4, vM[imu].p4);
       if(delR < delR2Mu)delR2Mu = delR;
     }
-
     for(size_t k = 0; k < el->size(); k++){
       int iele = (*el)[k];
       double delR = DeltaR(vJ[ijet].p4, vE[iele].p4);
@@ -344,13 +296,10 @@ void ObjectSelector::JetCleaning(const vector<MyJet> & vJ, const vector<MyMuon> 
 }
 
 double ObjectSelector::DeltaR(MyLorentzVector aV, MyLorentzVector bV){
-  
   double deta = TMath::Abs(aV.eta() - bV.eta());
   double dphi = TMath::Abs(aV.phi() - bV.phi());
   if(dphi > M_PI) dphi = 2*M_PI - dphi;
-
   double delR = sqrt(deta*deta + dphi*dphi);
-
   return delR;
 }
 

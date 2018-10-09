@@ -30,6 +30,9 @@ MyMuon::MyMuon():
   nPixelHits(-999),
   nTrackerLayers(-999),
   
+  //High Pt 
+  bestMuPtErr(-999.),
+  bestMuPtTrack(-999.),
   ///iso
   ChHadIso(999.),  
   NeuHadIso(999.),   
@@ -75,6 +78,10 @@ void MyMuon::Reset()
   nMuonHits = -999;
   nPixelHits = -999;
   nTrackerLayers = -999;
+  
+  //High Pt
+  bestMuPtErr = -999.;
+  bestMuPtTrack = -999.;
   
   ///iso
   ChHadIso = 999.;   

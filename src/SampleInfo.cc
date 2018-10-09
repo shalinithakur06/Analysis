@@ -3,7 +3,8 @@
 SampleInfo::SampleInfo()
 {
   sampleName="";
-  mcEvtType = 0;
+  //mcEvtType = 0;
+  gen_weight = 0.0;
   pileup.clear();
   truepileup.clear();
   ///puWeights.clear();

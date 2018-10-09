@@ -31,7 +31,6 @@ void Analyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
   //---------------------------------------------------//
   //for systematics (all sys in one go)
   //---------------------------------------------------//  
-  /*
   if(!ev_->isData){ 
     CutFlowProcessor(url, myKey, "JESPlus", 	outFile_);
     CutFlowProcessor(url, myKey, "JESMinus", 	outFile_);
@@ -39,7 +38,6 @@ void Analyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
     CutFlowProcessor(url, myKey, "JERMinus", 	outFile_);
 
   }
-  */
   outFile_->Write(); 
   outFile_->Close();
   f_->Close();
@@ -94,7 +92,8 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     if (ientry < 0) break;
     ev = evR->GetNewEvent(i);
     if(ev==0) continue;
-    if(i%1000==0) cout<<"\033[01;32mEvent number = \033[00m"<< i << endl;
+    if(i%10000==0) cout<<"\033[01;32mEvent number = \033[00m"<< i << endl;
+    //if(i > 20000) break;
   
     //---------------------------------------------------//
     //apply lumi, k factor and pileup weight
@@ -114,7 +113,7 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
       else if(sampleName.find("DYJetsToLL") != string::npos || sampleName.find("DY1JetsToLL") != string::npos || sampleName.find("DY2JetsToLL") != string::npos || sampleName.find("DY3JetsToLL") != string::npos || sampleName.find("DY4JetsToLL") != string::npos){
         if(sampleName=="DYJetsToLLamcatnlo"){
 	  double sampleWeight = lumiTotal* xss[sampleName]/evtDBS[sampleName];   
-          evtWeight *= sampleWeight;  
+          evtWeight *= sampleWeight; 
 	}
         else{
 	  int hepNUP = ev->sampleInfo.hepNUP;
@@ -151,14 +150,14 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     //---------------------------------------------------//
     //apply electron triggers
     //---------------------------------------------------//
-    bool passTrig = false;
+    /*bool passTrig = false;
     vector<string> trig = ev->hlt;
     for(size_t it = 0; it < trig.size(); it++){
       if(trig[it].find("HLT_DoubleEle33_CaloIdL") != string::npos) {
         passTrig = true;
       }
     }
-    if(!passTrig) continue;
+    if(!passTrig) continue;*/
     double nCutPass = 1.0;
     double nCutPass_NonIso = 1.0;
     fillHisto(outFile_, cutflowType+"/Iso", "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
@@ -448,7 +447,6 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     input_count_ZTag++;
     if(input_count_ZTag%10==0)
     cout << "input count after ZTag: "<< input_count_ZTag << endl;
-    //if(i > 2000) break;
   }//event loop
   f->Close(); 
   delete f;
@@ -459,8 +457,8 @@ void Analyzer::processEvents(){
   //Data, MC sample from lxplus and T2
   //CutFlowAnalysis("TTJetsP_MuMC_20171104_Ntuple_1.root", "PF", ""); 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094/", "PF", "");
- //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_EleMC_20180317/EleMC_20180317/DYJetsToLL_EleMC_20180317/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DYJetsToLL_EleMC_20180317/180317_094707/0000/DYJetsToLL_EleMC_20180317_Ntuple_1.root", "PF", "");
-   CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_EleMC_20180505/EleMC_20180505/DYJetsToLLamcatnlo_EleMC_20180505/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/DYJetsToLLamcatnlo_EleMC_20180505/180505_150933/0000/outFileEle_2000_1.root", "PF", "");
+  CutFlowAnalysis("ntuple_mini_AODSIM_Ele2000.root", "PF", ""); 
+   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_EleMC_20180505/EleMC_20180505/DYJetsToLLamcatnlo_EleMC_20180505/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/DYJetsToLLamcatnlo_EleMC_20180505/180505_150933/0000/outFileEle_2000_1.root", "PF", "");
 
   //====================================
   //condor submission

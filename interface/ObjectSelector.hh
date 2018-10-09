@@ -37,36 +37,6 @@ public :
 
   void setDefaultSelection(){
     defaultSelection_=true;
-
-    //Vertex //////
-    ZMAX_    = 0.5; // initally was using 0.2
-    ///////////////
-
-    // Jets ///////////////////////////////////////////
-    JET_PT_MIN_        = 25;  
-    JET_ETA_MAX_       = 2.4; 
-    JET_EMF_MIN_       = 0.01;
-    JET_LEPTON_DRMIN_  = 0.5;
-    //////////////////////////////////////////////////
-
-    // electron //////////////////////////////////////
-    E_ETA_MAX_          = 2.1;
-    E_PT_MIN_           = 25;
-    E_D0_MAX_           = 0.05;
-    //////////////////////////////////////////////////
-
-
-    // muon //////////////////////////////////////////
-    M_RELISO_MAX_  = 0.15; //sync with muon POG
-    //https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2  
-    M_PT_MIN_      = 25;  
-    M_ETA_MAX_     = 2.1; 
-    M_D0_MAX_      = 0.2; 
-    
-    LOOSE_M_RELISO_MAX_ = 0.25;
-    LOOSE_M_ETA_MAX_    = 2.4;
-    LOOSE_M_PT_MIN_     = 15;
-    ///////////////////////////////////////////////////
   }
 
   // preselection of objects
@@ -78,10 +48,9 @@ public :
   bool looseElectronVeto(unsigned long selectedElectron, const vector<MyElectron> & vE, MyVertex & vertex, bool isPFlow=false);
   bool looseMuonVeto( int selectedMuon, const vector<MyMuon> & vM, bool isPFlow=false);
   
-  //Medium muon ID
-  bool isMediumMuon(const MyMuon * m, bool isPFlow);
-  bool isMediumMuonGH(const MyMuon * m, bool isPFlow);
-  
+  //HighPt Muon ID
+  bool isHighPtMuon(const MyMuon * m, bool isPFlow);
+
   //egmGsfElectronIDs: https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2
   bool cutBasedElectronID_Summer16_80X_V1_veto(const MyElectron *e); 
   bool cutBasedElectronID_Summer16_80X_V1_loose(const MyElectron *e); 
@@ -96,24 +65,7 @@ public :
     
   
 private :
-  // Vertex
-  double ZMAX_;
-
-  // jet
-  double JET_PT_MIN_,JET_ETA_MAX_,JET_LTK_PT_MIN_, JET_BTAGGING_, JET_EMF_MIN_, JET_LTK_,JET_LEPTON_DRMIN_  ;
-  
-  // electron
-  double E_RELISO_MAX_, E_ETA_MAX_, E_D0_MAX_, E_PT_MIN_, E_ET_MIN_,RHO_AEFF_E_;
-  double LOOSE_E_RELISO_MAX_, LOOSE_E_ETA_MAX_, LOOSE_E_D0_MAX_, LOOSE_E_ET_MIN_;
-  
-  
-  // muon
-  double M_RELISO_MAX_, M_ETA_MAX_, M_D0_MAX_, M_PT_MIN_,RHO_AEFF_M_;
-  double LOOSE_M_RELISO_MAX_, LOOSE_M_ETA_MAX_, LOOSE_M_D0_MAX_, LOOSE_M_PT_MIN_;
-  
-  int HPS_ISO_;
   bool defaultSelection_;
-
   ClassDef(ObjectSelector, 1)
 };
 #endif

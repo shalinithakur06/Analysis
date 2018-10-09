@@ -51,14 +51,14 @@ public :
     //https://indico.cern.ch/event/617002/contributions/2490586/attachments/1419016/2173704/update_27022017.pdf
     //evtDBS= event at Data Base Server i.e in DAS (https://cmsweb.cern.ch/das/).
     xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62079400;
-  //xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62627174;
+    //xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62627174;
     xss["DY2JetsToLL"]       =  331.3;         evtDBS["DY2JetsToLL"]       =  19970551;
     xss["DY3JetsToLL"]       =  96.6;          evtDBS["DY3JetsToLL"]       =  5856110;
     xss["DY4JetsToLL"]       =  51.4;          evtDBS["DY4JetsToLL"]       =  4197868;
     xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  48103700;
     xss["DYJetsToLLamcatnlo"]=  6025.2;        evtDBS["DYJetsToLLamcatnlo"]=  115626000;
     //xss["DYJetsToLLamcatnlo"]=  6025.2;      evtDBS["DYJetsToLLamcatnlo"]=  122055388;
-  //xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  49144274;
+    //xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  49144274;
     xss["QCD_Pt-15to20_Mu"]  =  3819570;       evtDBS["QCD_Pt-15to20_Mu"]  =  4141251;
     xss["QCD_Pt-20to30_Mu"]  =  2960198;       evtDBS["QCD_Pt-20to30_Mu"]  =  31475157;
     xss["QCD_Pt-30to50_Mu"]  =  1652471;       evtDBS["QCD_Pt-30to50_Mu"]  =  29954815;
@@ -83,25 +83,28 @@ public :
 
     xss["TTJetsP"]           =  831.76;        evtDBS["TTJetsP"]           =  77081156;   
     xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  44813600;
-  //xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  45367044;
+    //xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  45367044;
     xss["W2JetsToLNu"]       =  3120;          evtDBS["W2JetsToLNu"]       =  29878415;
     xss["W3JetsToLNu"]       =  942.3;         evtDBS["W3JetsToLNu"]       =  19798117;
     xss["W4JetsToLNu"]       =  524.2;         evtDBS["W4JetsToLNu"]       =  9170576;
     xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29181900;
-  //xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29705748;
+    //xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29705748;
     xss["WW"]                =  118.7;         evtDBS["WW"]                =  994012;
     xss["WZ"]                =  46.74;         evtDBS["WZ"]                =  1000000;
     xss["ZZ"]                =  17.72;         evtDBS["ZZ"]                =  990064; 
-    //xss["sampCode_"]         =  1;             evtDBS["sampCode_"]         =  1; 
-    xss["sampCode_"]         =  0.1662;             evtDBS["sampCode_"]         =  10000; 
-  //xss["Signal sample"]
-    xss["TestLHEGeneration_Mu_2000"]    =  0.1662;      evtDBS["TestLHEGeneration_Mu_2000"]       =  10000;
-    xss["TestLHEGeneration_Mu_4000"]    =  0.1662;      evtDBS["TestLHEGeneration_Mu_4000"]       =  10000;
-    xss["TestLHEGeneration_Mu_6000"]    =  0.1662;      evtDBS["TestLHEGeneration_Mu_6000"]       =  10000;
+    //xss["sampCode_"]         =  1;           evtDBS["sampCode_"]         =  1; 
+    xss["sampCode_"]         =   0.00427;      evtDBS["sampCode_"]         =  10000; 
+    //xss["Signal sample"]
+    //xss["TestGenSim_Mu_250"]        =  0.00427;   evtDBS["TestGenSim_Mu_250"]        = 10000;
+    xss["ExcitedLepton_MuMuZ_250"]  =  0.00427;   evtDBS["ExcitedLepton_MuMuZ_250"]  = 198200;
+    xss["ExcitedLepton_MuMuZ_1500"]  = 0.00427;   evtDBS["ExcitedLepton_MuMuZ_1500"] = 190900;
+    xss["ExcitedLepton_MuMuZ_2000"]  = 0.00427;   evtDBS["ExcitedLepton_MuMuZ_2000"] = 200000;
+    xss["ExcitedLepton_MuMuZ_4000"]  = 0.00427;   evtDBS["ExcitedLepton_MuMuZ_4000"] = 192300;
+    //xss["TestLHEGeneration_Mu_6000"]    =  0.1662;      evtDBS["TestLHEGeneration_Mu_6000"] =  10000;
 
-    xss["TestLHEGeneration_Ele_2000"]    =  0.1662;      evtDBS["TestLHEGeneration_Ele_2000"]       =  9648;
-    xss["TestLHEGeneration_Ele_4000"]    =  0.1662;      evtDBS["TestLHEGeneration_Ele_4000"]       =  7980;
-    xss["TestLHEGeneration_Ele_6000"]    =  0.1662;      evtDBS["TestLHEGeneration_Ele_6000"]       =  9440;
+    //xss["TestLHEGeneration_Ele_2000"]    =  0.1662;   evtDBS["TestLHEGeneration_Ele_2000"]  =  9280;
+    //xss["TestLHEGeneration_Ele_4000"]    =  0.1662;   evtDBS["TestLHEGeneration_Ele_4000"]  =  7536;
+    //xss["TestLHEGeneration_Ele_6000"]    =  0.1662;   evtDBS["TestLHEGeneration_Ele_6000"]  =  8848;
 
     //Lumis(inverse pb) of single muon DATA at 13TeV
   };

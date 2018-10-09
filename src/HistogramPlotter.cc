@@ -22,6 +22,33 @@ void HistogramPlotter::add2DHisto(TString name, TString dirname, int range1, dou
   histos2_[fullname] = new TH2D(name.Data(), hname.c_str(), range1, min1, max1, range2, min2, max2);
   histos2_[fullname]->Sumw2();
 }
+void HistogramPlotter::addHisto2D(TString name, TString dirname, int nBin1, double min1, double max1, int nBin2, double min2, double max2)
+{
+  //TString fullname = name+"_"+dirname;
+  TString fullname = dirname+"/"+name;
+  std::string hname(fullname);
+  histos2_[fullname] = new TH2D(name.Data(), hname.c_str(), nBin1, min1, max1, nBin2, min2, max2);
+  histos2_[fullname]->Sumw2();
+}
+void HistogramPlotter::initHisto2D(TFile *file, TString dir, TString subdir, TString histName, int nBin1, double min1, double max1, int nBin2, double min2, double max2){
+  std::string histPath;
+  histPath = std::string(dir+"/"+subdir);
+  TDirectory *d = file->GetDirectory(histPath.c_str());
+  if(!d) file->mkdir(histPath.c_str());
+  file->cd(histPath.c_str());
+  addHisto2D(histName, histPath, nBin1, min1, max1, nBin2, min2, max2);
+}
+
+void HistogramPlotter::fillHisto2D(TFile *file, TString dir, TString subdir, TString histName, int nBin1, double min1, double max1, double value1, int nBin2, double min2, double max2, double value2, double weight)
+{
+  TString fullname = dir+"/"+subdir+"/"+histName;
+  if(!histos2_[fullname]){
+    initHisto2D(file, dir, subdir, histName, nBin1, min1, max1, nBin2, min2, max2);
+  }
+  //then, fill the histogram
+  histos2_[fullname]->Fill(value1, value2, weight);
+}
+
 
 void HistogramPlotter::initHisto(TFile *file, TString dir, TString subdir, TString histName, int Nbin, double min, double max){
   std::string histPath;
