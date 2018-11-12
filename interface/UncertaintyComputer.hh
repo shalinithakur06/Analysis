@@ -45,7 +45,6 @@ public :
    ///~UncertaintyComputer(){
      delete sveffunc;
   }
-  double muPtWithRochCorr(const MyMuon *mu, bool isData=false, double u1=0.5, double u2=0.4, int s=0, int m=0); 
   double metWithJES(const vector<MyJet> & vJ, vector<int> *j, MyMET MET, int jes=0);
   double metWithJER(const vector<MyJet> & vJ, vector<int> *j, MyMET MET, int jer=0);
   double metWithJESJER(const vector<MyJet> & vJ, vector<int> *j, MyMET MET, int jes=0, int jer=0);

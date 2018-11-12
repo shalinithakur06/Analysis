@@ -50,63 +50,40 @@ public :
     //https://github.com/BristolTopGroup/AnalysisSoftware/blob/master/python/DataSetInfo_13TeV_25ns.py
     //https://indico.cern.ch/event/617002/contributions/2490586/attachments/1419016/2173704/update_27022017.pdf
     //evtDBS= event at Data Base Server i.e in DAS (https://cmsweb.cern.ch/das/).
-    xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62079400;
-    //xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62627174;
-    xss["DY2JetsToLL"]       =  331.3;         evtDBS["DY2JetsToLL"]       =  19970551;
-    xss["DY3JetsToLL"]       =  96.6;          evtDBS["DY3JetsToLL"]       =  5856110;
-    xss["DY4JetsToLL"]       =  51.4;          evtDBS["DY4JetsToLL"]       =  4197868;
-    xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  48103700;
-    xss["DYJetsToLLamcatnlo"]=  6025.2;        evtDBS["DYJetsToLLamcatnlo"]=  115626000;
-    //xss["DYJetsToLLamcatnlo"]=  6025.2;      evtDBS["DYJetsToLLamcatnlo"]=  122055388;
-    //xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  49144274;
-    xss["QCD_Pt-15to20_Mu"]  =  3819570;       evtDBS["QCD_Pt-15to20_Mu"]  =  4141251;
-    xss["QCD_Pt-20to30_Mu"]  =  2960198;       evtDBS["QCD_Pt-20to30_Mu"]  =  31475157;
-    xss["QCD_Pt-30to50_Mu"]  =  1652471;       evtDBS["QCD_Pt-30to50_Mu"]  =  29954815;
-    xss["QCD_Pt-50to80_Mu"]  =  437504;        evtDBS["QCD_Pt-50to80_Mu"]  =  19806915;
-    xss["QCD_Pt-80to120_Mu"] =  106033;        evtDBS["QCD_Pt-80to120_Mu"] =  13786971;
-    xss["QCD_Pt-120to170_Mu"]=  25190;         evtDBS["QCD_Pt-120to170_Mu"]=  8042721;
-    xss["QCD_Pt-170to300_Mu"]=  8654;          evtDBS["QCD_Pt-170to300_Mu"]=  7947159;
-    xss["QCD_Pt-300to470_Mu"]=  797;           evtDBS["QCD_Pt-300to470_Mu"]=  7937590;
-    xss["QCD_Pt-470to600_Mu"]=  79 ;           evtDBS["QCD_Pt-470to600_Mu"]=  18976018;
-    xss["QCD_Pt-600to800_Mu"]=  25.09;         evtDBS["QCD_Pt-600to800_Mu"]=  9981311;
-    xss["QCD_Pt-800to1000_Mu"]= 4.70;          evtDBS["QCD_Pt-800to1000_Mu"]=  19767439;
-    xss["QCD_Pt-1000toInf_Mu"]= 1.62;          evtDBS["QCD_Pt-1000toInf_Mu"]=  13400031;
+    //Backgrounds
+    //only 97.3% proccessed, hence less number of events for DYJetsToLL_M50
+    //xss["DYJetsToLL_M50"]         = 5758.4;              evtDBS["DYJetsToLL_M50"]         = 122055388; 
+    xss["DYJetsToLL_M50"]         = 5758.4;              evtDBS["DYJetsToLL_M50"]         = 0.6648* 118692000; 
+    xss["DYJetsToLL_M100to200"]   = 226.6 ;              evtDBS["DYJetsToLL_M100to200"]   = 0.6439* 1083606;
+    xss["DYJetsToLL_M200to400"]   = 7.77 ;               evtDBS["DYJetsToLL_M200to400"]   = 0.5688* 2925885;    
+    xss["DYJetsToLL_M400to500"]   = 0.423;               evtDBS["DYJetsToLL_M400to500"]   = 0.5208* 287262;
+    xss["DYJetsToLL_M500to700"]   = 0.240;               evtDBS["DYJetsToLL_M500to700"]   = 0.5099* 280940;  
+    xss["DYJetsToLL_M700to800"]   = 0.0350;              evtDBS["DYJetsToLL_M700to800"]   = 276235;//no neg weight
+    xss["DYJetsToLL_M800to1000"]  = 0.0300;              evtDBS["DYJetsToLL_M800to1000"]  = 271768;//no neg weight
+    xss["DYJetsToLL_M1000to1500"] = 0.0160;              evtDBS["DYJetsToLL_M1000to1500"] = 258620;//no neg weight
+    xss["DYJetsToLL_M1500to2000"] = 0.0020;              evtDBS["DYJetsToLL_M1500to2000"] = 258625;//no neg weight
+    xss["DYJetsToLL_M2000to3000"] = 0.00054;             evtDBS["DYJetsToLL_M2000to3000"] = 255342;//no neg weight
+    xss["TT"] 			  = 831.76;              evtDBS["TT"] 		          = 77081156;
+    //only 97.7% proccessed, hence less number of events for WJetsToLNu
+    //xss["WJetsToLNu"]		  = 50690;               evtDBS["WJetsToLNu"]	          = 29705748;
+    xss["WJetsToLNu"]		  = 50690;               evtDBS["WJetsToLNu"]	          = 29017600;
+    xss["WW"]			  = 118.7;               evtDBS["WW"]		          = 994012;
+    xss["WZ"]			  = 46.74;	         evtDBS["WZ"]		          = 1000000;
+    xss["ZZ"] 			  = 17.72;               evtDBS["ZZ"] 		          = 990064;
+    //Muon signal
+    xss["ExLepMuMuZ_M250"]	  = 0.00427;             evtDBS["ExLepMuMuZ_M250"]	  = 198200;
+    xss["ExLepMuMuZ_M1500"]	  = 0.0004267;           evtDBS["ExLepMuMuZ_M1500"]	  = 190900;
+    xss["ExLepMuMuZ_M2000"] 	  = 0.00002021;          evtDBS["ExLepMuMuZ_M2000"]       = 200000;
+    xss["ExLepMuMuZ_M2500"] 	  = 0.00006755;          evtDBS["ExLepMuMuZ_M2500"]       = 200000;
+    xss["ExLepMuMuZ_M4000"]       = 0.000003209;         evtDBS["ExLepMuMuZ_M4000"]       = 192300;
+    //Electron signal
+    xss["ExLepEEZ_M250"] 	  = 0.004407;            evtDBS["ExLepEEZ_M250"] 	  = 182100;
+    xss["ExLepEEZ_M2000"] 	  = 0.0001908;	         evtDBS["ExLepEEZ_M2000"] 	  = 189000;
+    xss["ExLepEEZ_M2500"]	  = 0.00005731;          evtDBS["ExLepEEZ_M2500"]	  = 187400;
+    xss["ExLepEEZ_M4000"]	  = 0.000003897;         evtDBS["ExLepEEZ_M4000"]	  = 199800;
+    //Dummy sample
+    xss["sampCode_"]    	  =  1;  	         evtDBS["sampCode_"]              =  1; 
 
-    xss["QCD_Pt-15to20_EM"]  =  254600;        evtDBS["QCD_Pt-15to20_EM"]  =  5652601;
-    xss["QCD_Pt-20to30_EM"]  =  5352960;       evtDBS["QCD_Pt-20to30_EM"]  =  9218954;
-    xss["QCD_Pt-30to50_EM"]  =  9928000;       evtDBS["QCD_Pt-30to50_EM"]  =  4730195;
-    xss["QCD_Pt-50to80_EM"]  =  2890800;       evtDBS["QCD_Pt-50to80_EM"]  =  22337070;
-    xss["QCD_Pt-80to120_EM"] =  350000;        evtDBS["QCD_Pt-80to120_EM"] =  35841783;
-    xss["QCD_Pt-120to170_EM"]=  62964;         evtDBS["QCD_Pt-120to170_EM"]=  35817281;
-    xss["QCD_Pt-170to300_EM"]=  18810;         evtDBS["QCD_Pt-170to300_EM"]=  11540163;
-    xss["QCD_Pt-300toInf_EM"]=  1350;          evtDBS["QCD_Pt-300toInf_EM"]=  7373633;
-
-    xss["TTJetsP"]           =  831.76;        evtDBS["TTJetsP"]           =  77081156;   
-    xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  44813600;
-    //xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  45367044;
-    xss["W2JetsToLNu"]       =  3120;          evtDBS["W2JetsToLNu"]       =  29878415;
-    xss["W3JetsToLNu"]       =  942.3;         evtDBS["W3JetsToLNu"]       =  19798117;
-    xss["W4JetsToLNu"]       =  524.2;         evtDBS["W4JetsToLNu"]       =  9170576;
-    xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29181900;
-    //xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29705748;
-    xss["WW"]                =  118.7;         evtDBS["WW"]                =  994012;
-    xss["WZ"]                =  46.74;         evtDBS["WZ"]                =  1000000;
-    xss["ZZ"]                =  17.72;         evtDBS["ZZ"]                =  990064; 
-    //xss["sampCode_"]         =  1;           evtDBS["sampCode_"]         =  1; 
-    xss["sampCode_"]         =   0.00427;      evtDBS["sampCode_"]         =  10000; 
-    //xss["Signal sample"]
-    //xss["TestGenSim_Mu_250"]        =  0.00427;   evtDBS["TestGenSim_Mu_250"]        = 10000;
-    xss["ExcitedLepton_MuMuZ_250"]  =  0.00427;   evtDBS["ExcitedLepton_MuMuZ_250"]  = 198200;
-    xss["ExcitedLepton_MuMuZ_1500"]  = 0.00427;   evtDBS["ExcitedLepton_MuMuZ_1500"] = 190900;
-    xss["ExcitedLepton_MuMuZ_2000"]  = 0.00427;   evtDBS["ExcitedLepton_MuMuZ_2000"] = 200000;
-    xss["ExcitedLepton_MuMuZ_4000"]  = 0.00427;   evtDBS["ExcitedLepton_MuMuZ_4000"] = 192300;
-    //xss["TestLHEGeneration_Mu_6000"]    =  0.1662;      evtDBS["TestLHEGeneration_Mu_6000"] =  10000;
-
-    //xss["TestLHEGeneration_Ele_2000"]    =  0.1662;   evtDBS["TestLHEGeneration_Ele_2000"]  =  9280;
-    //xss["TestLHEGeneration_Ele_4000"]    =  0.1662;   evtDBS["TestLHEGeneration_Ele_4000"]  =  7536;
-    //xss["TestLHEGeneration_Ele_6000"]    =  0.1662;   evtDBS["TestLHEGeneration_Ele_6000"]  =  8848;
-
-    //Lumis(inverse pb) of single muon DATA at 13TeV
   };
   ~Analyzer() {
     delete evR;
@@ -116,8 +93,6 @@ public :
   void CutFlowProcessor(TString url,  string myKey="PFlow", TString cutflowType="base", TFile *outFile_=0);
   //void CreateAnalHistos(TString flowType, TFile* outFile_);
   void processEvents();
-  float reweightHEPNUPWJets(int hepNUP);
-  float reweightHEPNUPDYJets(int hepNUP);
 private :
   double DRMIN_JET, DRMIN_ELE, METCUT_;
   Reader *evR;
@@ -143,28 +118,6 @@ private :
   double deltaPhi12(double phi1, double phi2);
   double phi0to2pi(double phi);
 };
-
-float Analyzer::reweightHEPNUPWJets(int hepNUP) {
-
-  int nJets = hepNUP-5;
-  if(nJets==0)      return 2.11;
-  else if(nJets==1) return 0.23;
-  else if(nJets==2) return 0.119;
-  else if(nJets==3) return 0.0562;
-  else if(nJets>=4) return 0.0671;
-  else return 1 ;
-}
-
-float Analyzer::reweightHEPNUPDYJets(int hepNUP){
-
-  int nJets = hepNUP-5;
-  if(nJets==0)      return 0.120;
-  else if(nJets==1) return 0.0164;
-  else if(nJets==2) return 0.0168;
-  else if(nJets==3) return 0.0167;
-  else if(nJets>=4) return 0.0128;
-  else return 1 ;
-}
 
 //https://twiki.cern.ch/twiki/bin/view/CMS/MuonWorkInProgressAndPagResults
 Double_t Analyzer::getMuonSF(TH2D *h2, double eta, double pt){
@@ -377,6 +330,5 @@ TGraphAsymmErrors *tg_heep_SF             = (TGraphAsymmErrors*)f_ele_heep_SF->G
 //https://indico.cern.ch/event/604912/
 //TFile *f_ele_trigSF 		= new TFile("stack/eleSF/ele_trigSF_Run2016All_v1.root");
 //TH2D *h2_ele_trigSF 		= (TH2D*)f_ele_trigSF->Get("Ele27_WPTight_Gsf");
-
 TFile *f_ele_trigSF 		= new TFile("stack/eleSF/MW_2ndleg_EGM2D.root");
 TH2D *h2_ele_trigSF 		= (TH2D*)f_ele_trigSF->Get("EGamma_SF2D");

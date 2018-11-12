@@ -41,7 +41,7 @@ public :
 
   // preselection of objects
   void preSelectElectrons(vector<int> * e_i, const vector<MyElectron> & vE , MyVertex & vertex, bool isPFlow=false);
-  void preSelectMuons(vector<int> * m_i, const vector<MyMuon> & vM , MyVertex & vertex, bool isData=false, double random_u1=0.5, double random_u2 =0.4, int err_set=0, int err_member=0);
+  void preSelectMuons(vector<int> * m_i, const vector<MyMuon> & vM , MyVertex & vertex, bool isData=false);
   void preSelectJets( string jetAlgo, vector<int> * j_i, const vector<MyJet> & vJ, int jes=0, int jer=0);
 
   //Loose Lepton veto

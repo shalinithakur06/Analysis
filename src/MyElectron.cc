@@ -17,8 +17,8 @@ MyElectron::MyElectron():
   hadOverEm(-999),
   iEminusiP(-999),
   nInnerHits(-999),
-  isPassConVeto(true),
   nInnerLostHits(-999),
+  isPassConVeto(true),
   isEcalDriven(true),
   energy5x5(-999),
   energy2x5(-999),
@@ -68,6 +68,7 @@ void MyElectron::Reset()
   hadOverEm = -999.;
   iEminusiP = -999.;
   nInnerHits = -999.;
+  nInnerLostHits=-999;
   isPassConVeto = true;
   isEcalDriven = true;
   energy5x5 = -999;

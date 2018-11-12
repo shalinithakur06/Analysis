@@ -131,7 +131,7 @@ bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_tight(const MyElectron *
   float energy2x5Overenergy5x5 = e->energy2x5/e->energy5x5;
   //for barrel
   if(abs(e->eleSCEta)                <=1.444
-     //&& e->isEcalDriven              == 1 //Khatarnak !!!!, sare events kha ja rha hai harami.
+     && e->isEcalDriven              == 1 
      && abs(e->dEtaInSeed)           < 0.004 
      && abs(e->dPhiIn)               < 0.06 
      && e->hadOverEm                 < 1/e->p4.E() + 0.05 
@@ -139,7 +139,7 @@ bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_tight(const MyElectron *
      && e->GsfEleEmHadD1IsoRhoCut    < 2+0.03*e->p4.pt()+0.28*e->eleRho 
      && e->eleTrkPt                  < 5  
      && e->nInnerHits                <=1   //Inner Lost Hits
-     ///&&e->D0                         < 0.02
+     &&e->D0                         < 0.02
      )passID = true;
   //endcap
   double HadDepth = 0.0;
@@ -177,12 +177,12 @@ void ObjectSelector::preSelectElectrons(vector<int> * e_i, const vector<MyElectr
   }
 }
 
-void ObjectSelector::preSelectMuons(vector<int> * m_i, const vector<MyMuon> & vM , MyVertex & vertex, bool isData, double random_u1, double random_u2, int err_member, int err_set){
+void ObjectSelector::preSelectMuons(vector<int> * m_i, const vector<MyMuon> & vM , MyVertex & vertex, bool isDat){
   for( int i=0;i< (int) vM.size();i++){
     const MyMuon * m = &vM[i];
     double mEta     = TMath::Abs(m->p4.eta());
     double mD0      = fabs(m->D0);
-    double mPt   = muPtWithRochCorr(m, isData, random_u1, random_u2, err_set, err_member); 
+    double mPt = TMath::Abs(m->p4.pt());
     double zvertex   = vertex.XYZ.z();
     double zmuon     = m->vertex.z();
     double dz =  fabs(zvertex-zmuon);
@@ -200,12 +200,25 @@ void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vec
     double neutralHadEnFrac = jet->neutralHadronEnergyFraction;
     double neutralEmEnFrac = jet->neutralEmEnergyFraction;
     double chargedHadEnFrac = jet->chargedHadronEnergyFraction;
-    if(jetPt > 25 && jetEta < 2.5
-      && neutralHadEnFrac < 0.99
-      && neutralEmEnFrac  < 0.99
-      && chargedHadEnFrac > 0
-      ){
-      j_i->push_back(i);
+    double chargedEmFrac = jet->chargedEmEnergyFraction;
+    if(jetEta < 2.4){
+      if(jetPt > 25 
+        && neutralHadEnFrac < 0.90
+        && neutralEmEnFrac  < 0.90
+	&& jet->NumConst > 1
+        && chargedHadEnFrac > 0
+	&& chargedEmFrac < 0.99
+	&& jet->chargedMultiplicity > 0){
+        j_i->push_back(i);
+      }
+    }
+    if(jetEta >= 2.4 && jetEta < 2.5){
+      if(jetPt > 25 
+        && neutralHadEnFrac < 0.90
+        && neutralEmEnFrac  < 0.90
+	&& jet->NumConst > 1){
+        j_i->push_back(i);
+      }
     }
   }
 }
@@ -216,7 +229,7 @@ bool ObjectSelector::isHighPtMuon(const MyMuon * m, bool isPFlow){
   isHighPt = m->isGlobalMuon &&
 	  m->nMuonHits > 0 && 
 	  m->nMatchedStations >1 &&
-          //m->bestMuPtErr/m->bestMuPtTrack < 0.3 &&
+          m->bestMuPtErr/m->bestMuPtTrack < 0.3 &&
           m->D0 < 0.2 &&
           m->Dz < 0.5 &&
           m->nPixelHits > 0 &&
