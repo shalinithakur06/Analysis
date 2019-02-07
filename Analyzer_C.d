@@ -298,8 +298,10 @@
 ./Analyzer_C.so: interface/MyElectron.h interface/MyMuon.h
 ./Analyzer_C.so: interface/MyMCParticle.h interface/SampleInfo.h
 ./Analyzer_C.so: interface/ObjectSelector.hh interface/UncertaintyComputer.hh
-./Analyzer_C.so: interface/SVEffUnc.hh
+./Analyzer_C.so: interface/BTagSF.hh
 ./Analyzer_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TRandom3.h
+./Analyzer_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TH2D.h
+./Analyzer_C.so: interface/BTagCalibrationStandalone.h
 ./Analyzer_C.so: interface/MomentumVec.h interface/LumiReweighting.h
 ./Analyzer_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TH1F.h
 ./Analyzer_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TH3.h
@@ -307,5 +309,6 @@
 ./Analyzer_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TRandom1.h
 ./Analyzer_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TStopwatch.h
 ./Analyzer_C.so: interface/HistogramPlotter.hh
+./Analyzer_C.so: interface/BTagCalibrationStandalone.h
 ./Analyzer_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/RVersion.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/RConfig.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TClass.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TDictAttributeMap.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TInterpreter.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TROOT.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TBuffer.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TMemberInspector.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TError.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/RtypesImp.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TIsAProxy.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TFileMergeInfo.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TCollectionProxyInfo.h
 Analyzer_C__ROOTBUILDVERSION= 6.06/01

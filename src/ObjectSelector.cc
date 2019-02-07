@@ -177,7 +177,7 @@ void ObjectSelector::preSelectElectrons(vector<int> * e_i, const vector<MyElectr
   }
 }
 
-void ObjectSelector::preSelectMuons(vector<int> * m_i, const vector<MyMuon> & vM , MyVertex & vertex, bool isDat){
+void ObjectSelector::preSelectMuons(vector<int> * m_i, const vector<MyMuon> & vM , MyVertex & vertex, bool isData){
   for( int i=0;i< (int) vM.size();i++){
     const MyMuon * m = &vM[i];
     double mEta     = TMath::Abs(m->p4.eta());
@@ -202,7 +202,7 @@ void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vec
     double chargedHadEnFrac = jet->chargedHadronEnergyFraction;
     double chargedEmFrac = jet->chargedEmEnergyFraction;
     if(jetEta < 2.4){
-      if(jetPt > 25 
+      if(jetPt > 170 
         && neutralHadEnFrac < 0.90
         && neutralEmEnFrac  < 0.90
 	&& jet->NumConst > 1
@@ -213,7 +213,7 @@ void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vec
       }
     }
     if(jetEta >= 2.4 && jetEta < 2.5){
-      if(jetPt > 25 
+      if(jetPt > 170 
         && neutralHadEnFrac < 0.90
         && neutralEmEnFrac  < 0.90
 	&& jet->NumConst > 1){

@@ -40,7 +40,7 @@ eval `scram runtime -sh`
 echo "OUTPUT: "
 ls ${_CONDOR_SCRATCH_DIR}/CMSSW_8_0_25/src/Analysis/13TeV/$outAnalDir
 
-cp -rf ${_CONDOR_SCRATCH_DIR}/CMSSW_8_0_25/src/Analysis/13TeV/$outAnalDir/* /home/sthakur/xRavindra/condor_out/HISTO_CONDOR_OUT_FILES
+cp -rf ${_CONDOR_SCRATCH_DIR}/CMSSW_8_0_25/src/Analysis/13TeV/$outAnalDir/* /home/sthakur/xRavindra/condor_out/for2016Data/CondorOut
 
 #xrdcp -f -R ${_CONDOR_SCRATCH_DIR}/CMSSW_8_0_25/src/Analysis/13TeV/$outAnalDir root://se01.indiacms.res.in:1094//cms/store/user/rverma/histo_MuMC_MuData_20170608_TIFR/
 cd ${_CONDOR_SCRATCH_DIR}

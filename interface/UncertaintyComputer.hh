@@ -22,7 +22,8 @@
 #else
 #include "interface/Reader.h"
 #endif
-#include "interface/SVEffUnc.hh"
+#include "interface/BTagSF.hh"
+#include "BTagCalibrationStandalone.h"
 
 #endif
 
@@ -38,27 +39,24 @@ class UncertaintyComputer{
 public :
   UncertaintyComputer()
   {
-    sveffunc = new SVEffUnc();
+    btsf = new BTagSF(12345);
   }
 
    virtual ~UncertaintyComputer(){
    ///~UncertaintyComputer(){
-     delete sveffunc;
+     delete btsf;
   }
-  double metWithJES(const vector<MyJet> & vJ, vector<int> *j, MyMET MET, int jes=0);
-  double metWithJER(const vector<MyJet> & vJ, vector<int> *j, MyMET MET, int jer=0);
-  double metWithJESJER(const vector<MyJet> & vJ, vector<int> *j, MyMET MET, int jes=0, int jer=0);
-  double metWithUncl(const vector<MyJet> & vJ, vector<int> *j, const vector<MyMuon> &vMu, vector<int> *m, const vector<MyElectron> &vEle, vector<int> *el, MyMET MET, int unc=0);
   double getJERSF(double eta, int jer=0);
   double jetPtWithJESJER(MyJet jet, int jes=0, int jer=0); 
   void  openCSVfile(const std::string &filename); 
-  double EffUncOnSV(MyJet jet);
   double DeltaR(MyLorentzVector aV, MyLorentzVector bV);
   
+  // bTag SF, by event reweighting
+  double getBTagPmcSys(TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, MyJet jet);
+  double getBTagPdataSys(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, MyJet jet, int scale);
+  
 private :
-  enum BVariation{kNo = 0, kDown = 1, kUp = 2};
-  SVEffUnc* sveffunc;
-
+  BTagSF* btsf;
   ClassDef(UncertaintyComputer, 1)
 };
 #endif

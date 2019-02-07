@@ -50,7 +50,7 @@ namespace std {} using namespace std;
 #include "interface/Reader.h"
 #include "interface/ObjectSelector.hh"
 #include "interface/HistogramPlotter.hh"
-#include "interface/SVEffUnc.hh"
+#include "interface/BTagSF.hh"
 #include "interface/UncertaintyComputer.hh"
 
 // Header files passed via #pragma extra_include
@@ -557,35 +557,35 @@ namespace ROOT {
 } // end of namespace ROOT
 
 namespace ROOT {
-   static void *new_SVEffUnc(void *p = 0);
-   static void *newArray_SVEffUnc(Long_t size, void *p);
-   static void delete_SVEffUnc(void *p);
-   static void deleteArray_SVEffUnc(void *p);
-   static void destruct_SVEffUnc(void *p);
+   static void *new_BTagSF(void *p = 0);
+   static void *newArray_BTagSF(Long_t size, void *p);
+   static void delete_BTagSF(void *p);
+   static void deleteArray_BTagSF(void *p);
+   static void destruct_BTagSF(void *p);
 
    // Function generating the singleton type initializer
-   static TGenericClassInfo *GenerateInitInstanceLocal(const ::SVEffUnc*)
+   static TGenericClassInfo *GenerateInitInstanceLocal(const ::BTagSF*)
    {
-      ::SVEffUnc *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::SVEffUnc >(0);
+      ::BTagSF *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::BTagSF >(0);
       static ::ROOT::TGenericClassInfo 
-         instance("SVEffUnc", ::SVEffUnc::Class_Version(), "interface/SVEffUnc.hh", 12,
-                  typeid(::SVEffUnc), ::ROOT::Internal::DefineBehavior(ptr, ptr),
-                  &::SVEffUnc::Dictionary, isa_proxy, 4,
-                  sizeof(::SVEffUnc) );
-      instance.SetNew(&new_SVEffUnc);
-      instance.SetNewArray(&newArray_SVEffUnc);
-      instance.SetDelete(&delete_SVEffUnc);
-      instance.SetDeleteArray(&deleteArray_SVEffUnc);
-      instance.SetDestructor(&destruct_SVEffUnc);
+         instance("BTagSF", ::BTagSF::Class_Version(), "interface/BTagSF.hh", 15,
+                  typeid(::BTagSF), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  &::BTagSF::Dictionary, isa_proxy, 4,
+                  sizeof(::BTagSF) );
+      instance.SetNew(&new_BTagSF);
+      instance.SetNewArray(&newArray_BTagSF);
+      instance.SetDelete(&delete_BTagSF);
+      instance.SetDeleteArray(&deleteArray_BTagSF);
+      instance.SetDestructor(&destruct_BTagSF);
       return &instance;
    }
-   TGenericClassInfo *GenerateInitInstance(const ::SVEffUnc*)
+   TGenericClassInfo *GenerateInitInstance(const ::BTagSF*)
    {
-      return GenerateInitInstanceLocal((::SVEffUnc*)0);
+      return GenerateInitInstanceLocal((::BTagSF*)0);
    }
    // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::SVEffUnc*)0x0); R__UseDummy(_R__UNIQUE_(Init));
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::BTagSF*)0x0); R__UseDummy(_R__UNIQUE_(Init));
 } // end of namespace ROOT
 
 namespace ROOT {
@@ -601,7 +601,7 @@ namespace ROOT {
       ::UncertaintyComputer *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::UncertaintyComputer >(0);
       static ::ROOT::TGenericClassInfo 
-         instance("UncertaintyComputer", ::UncertaintyComputer::Class_Version(), "interface/UncertaintyComputer.hh", 36,
+         instance("UncertaintyComputer", ::UncertaintyComputer::Class_Version(), "interface/UncertaintyComputer.hh", 37,
                   typeid(::UncertaintyComputer), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &::UncertaintyComputer::Dictionary, isa_proxy, 4,
                   sizeof(::UncertaintyComputer) );
@@ -726,37 +726,37 @@ TClass *HistogramPlotter::Class()
 }
 
 //______________________________________________________________________________
-atomic_TClass_ptr SVEffUnc::fgIsA(0);  // static to hold class pointer
+atomic_TClass_ptr BTagSF::fgIsA(0);  // static to hold class pointer
 
 //______________________________________________________________________________
-const char *SVEffUnc::Class_Name()
+const char *BTagSF::Class_Name()
 {
-   return "SVEffUnc";
+   return "BTagSF";
 }
 
 //______________________________________________________________________________
-const char *SVEffUnc::ImplFileName()
+const char *BTagSF::ImplFileName()
 {
-   return ::ROOT::GenerateInitInstanceLocal((const ::SVEffUnc*)0x0)->GetImplFileName();
+   return ::ROOT::GenerateInitInstanceLocal((const ::BTagSF*)0x0)->GetImplFileName();
 }
 
 //______________________________________________________________________________
-int SVEffUnc::ImplFileLine()
+int BTagSF::ImplFileLine()
 {
-   return ::ROOT::GenerateInitInstanceLocal((const ::SVEffUnc*)0x0)->GetImplFileLine();
+   return ::ROOT::GenerateInitInstanceLocal((const ::BTagSF*)0x0)->GetImplFileLine();
 }
 
 //______________________________________________________________________________
-TClass *SVEffUnc::Dictionary()
+TClass *BTagSF::Dictionary()
 {
-   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::SVEffUnc*)0x0)->GetClass();
+   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::BTagSF*)0x0)->GetClass();
    return fgIsA;
 }
 
 //______________________________________________________________________________
-TClass *SVEffUnc::Class()
+TClass *BTagSF::Class()
 {
-   if (!fgIsA.load()) { R__LOCKGUARD2(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::SVEffUnc*)0x0)->GetClass(); }
+   if (!fgIsA.load()) { R__LOCKGUARD2(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::BTagSF*)0x0)->GetClass(); }
    return fgIsA;
 }
 
@@ -1084,37 +1084,37 @@ namespace ROOT {
 } // end of namespace ROOT for class ::HistogramPlotter
 
 //______________________________________________________________________________
-void SVEffUnc::Streamer(TBuffer &R__b)
+void BTagSF::Streamer(TBuffer &R__b)
 {
-   // Stream an object of class SVEffUnc.
+   // Stream an object of class BTagSF.
 
    if (R__b.IsReading()) {
-      R__b.ReadClassBuffer(SVEffUnc::Class(),this);
+      R__b.ReadClassBuffer(BTagSF::Class(),this);
    } else {
-      R__b.WriteClassBuffer(SVEffUnc::Class(),this);
+      R__b.WriteClassBuffer(BTagSF::Class(),this);
    }
 }
 
 namespace ROOT {
    // Wrappers around operator new
-   static void *new_SVEffUnc(void *p) {
-      return  p ? new(p) ::SVEffUnc : new ::SVEffUnc;
+   static void *new_BTagSF(void *p) {
+      return  p ? new(p) ::BTagSF : new ::BTagSF;
    }
-   static void *newArray_SVEffUnc(Long_t nElements, void *p) {
-      return p ? new(p) ::SVEffUnc[nElements] : new ::SVEffUnc[nElements];
+   static void *newArray_BTagSF(Long_t nElements, void *p) {
+      return p ? new(p) ::BTagSF[nElements] : new ::BTagSF[nElements];
    }
    // Wrapper around operator delete
-   static void delete_SVEffUnc(void *p) {
-      delete ((::SVEffUnc*)p);
+   static void delete_BTagSF(void *p) {
+      delete ((::BTagSF*)p);
    }
-   static void deleteArray_SVEffUnc(void *p) {
-      delete [] ((::SVEffUnc*)p);
+   static void deleteArray_BTagSF(void *p) {
+      delete [] ((::BTagSF*)p);
    }
-   static void destruct_SVEffUnc(void *p) {
-      typedef ::SVEffUnc current_t;
+   static void destruct_BTagSF(void *p) {
+      typedef ::BTagSF current_t;
       ((current_t*)p)->~current_t();
    }
-} // end of namespace ROOT for class ::SVEffUnc
+} // end of namespace ROOT for class ::BTagSF
 
 //______________________________________________________________________________
 void UncertaintyComputer::Streamer(TBuffer &R__b)
@@ -2172,7 +2172,7 @@ namespace {
 "interface/Reader.h",
 "interface/ObjectSelector.hh",
 "interface/HistogramPlotter.hh",
-"interface/SVEffUnc.hh",
+"interface/BTagSF.hh",
 "interface/UncertaintyComputer.hh",
 0
     };
@@ -2202,7 +2202,7 @@ class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  MyEvent;
 class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  Reader;
 class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  ObjectSelector;
 class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  HistogramPlotter;
-class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  SVEffUnc;
+class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  BTagSF;
 class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  UncertaintyComputer;
 )DICTFWDDCLS";
     static const char* payloadCode = R"DICTPAYLOAD(
@@ -2225,12 +2225,13 @@ class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  UncertaintyComp
 #include "interface/Reader.h"
 #include "interface/ObjectSelector.hh"
 #include "interface/HistogramPlotter.hh"
-#include "interface/SVEffUnc.hh"
+#include "interface/BTagSF.hh"
 #include "interface/UncertaintyComputer.hh"
 
 #undef  _BACKWARD_BACKWARD_WARNING_H
 )DICTPAYLOAD";
     static const char* classesHeaders[]={
+"BTagSF", payloadCode, "@",
 "HistogramPlotter", payloadCode, "@",
 "MyElectron", payloadCode, "@",
 "MyEvent", payloadCode, "@",
@@ -2242,7 +2243,6 @@ class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  UncertaintyComp
 "MyVertex", payloadCode, "@",
 "ObjectSelector", payloadCode, "@",
 "Reader", payloadCode, "@",
-"SVEffUnc", payloadCode, "@",
 "SampleInfo", payloadCode, "@",
 "UncertaintyComputer", payloadCode, "@",
 nullptr};

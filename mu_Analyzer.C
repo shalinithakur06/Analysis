@@ -31,6 +31,8 @@ void Analyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
     CutFlowProcessor(url, myKey, "JESMinus", 	outFile_);
     CutFlowProcessor(url, myKey, "JERPlus", 	outFile_);
     CutFlowProcessor(url, myKey, "JERMinus", 	outFile_);
+    CutFlowProcessor(url, myKey, "bTagPlus", 	outFile_);
+    CutFlowProcessor(url, myKey, "bTagMinus", 	outFile_);
   }
   outFile_->Write(); 
   outFile_->Close();
@@ -48,14 +50,14 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
   string eAlgo("Electrons"), mAlgo("Muons"), jAlgo("Jets"), metAlgo("METs");
   
   //Uncertainty variations, JES, JER, MET unclustered, bTag
-  int jes = 0, jer = 0, metuc = 0, bscale = 0, minMET =20, minMT =0;
-  //to estimate unc in the data-driven qcd 
-  bool isLowMET = false, isIso20 = false;
+  int jes = 0, jer = 0, metuc = 0, bScale = 0;
 
   if(cutflowType.Contains("JESPlus"))jes = 1;
   else if (cutflowType.Contains("JESMinus"))jes = -1;
   else if (cutflowType.Contains("JERPlus"))jer = 1;
   else if (cutflowType.Contains("JERMinus"))jer = -1;
+  else if (cutflowType.Contains("bTagPlus"))bScale = 1;
+  else if (cutflowType.Contains("bTagMinus"))bScale = -1; 
   
   evR = new Reader();
   TFile *f = TFile::Open(url);
@@ -66,7 +68,7 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
   //get initial number of events, from ntuples
   //store initial informations, in a txt file
   //---------------------------------------------------//
-  double lumiTotal = 35365;
+  double lumiTotal = 35860;
   int nEntries = evR->AssignEventTreeFrom(f);
   if(nEntries == 0) {return; }
   TH1F* inputcf = (TH1F*)(f->Get("allEventsFilter/totalEvents"));
@@ -74,20 +76,54 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
   cout<<"\033[01;32m input file: \033[00m"<<url<<"\n"<<endl;
   fillHisto(outFile_, cutflowType, "", "totalEvents", 10, 0, 10000000000, initialEvents, 1 );
   MyEvent *ev;
+ 
+  //---------------------------------------------------//
+  //BTag SF: read CSV file for SF, 2D histos for eff 
+  //---------------------------------------------------//      
+  //https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation80XReReco#Data_MC_Scale_Factors_period_dep
+  const std::string & bTagCSVfile 	= "stack/CSVv2_Moriond17_B_H.csv";
+  const std::string & bTagName 		= "CSVv2";
+  const std::string & bTagSys 		= "central"; 
+  if(bScale==1) const std::string &bTagSys 		= "up"; 
+  if(bScale==-1)const std::string &bTagSys 		= "down"; 
+  const std::vector<std::string> & otherSysTypes = {"up", "down"};
+  //b-quark
+  BTagCalibrationReader readBTagCSV_bT= readCSV(bTagCSVfile, bTagName, BTagEntry::OP_TIGHT,
+    	      "comb", bTagSys, otherSysTypes, BTagEntry::FLAV_B);
+  //c-quark
+  BTagCalibrationReader readBTagCSV_cT= readCSV(bTagCSVfile, bTagName, BTagEntry::OP_TIGHT,
+    	      "comb", bTagSys, otherSysTypes, BTagEntry::FLAV_C);
+  //other(light) quarks and gluon
+  BTagCalibrationReader readBTagCSV_lT= readCSV(bTagCSVfile, bTagName, BTagEntry::OP_TIGHT,
+    	      "incl", bTagSys, otherSysTypes, BTagEntry::FLAV_UDSG);
   
+  //getBTagEffHistos(f);
+  TString histPath("myMiniTreeProducer/Jets/");
+  TH2D* h2_BTagEff_Denom_b 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Denom_b"));
+  TH2D* h2_BTagEff_Denom_c 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Denom_c"));
+  TH2D* h2_BTagEff_Denom_udsg 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Denom_udsg")); 
+  TH2D* h2_BTagEff_Num_bT 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Num_bT"));
+  TH2D* h2_BTagEff_Num_cT 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Num_cT"));
+  TH2D* h2_BTagEff_Num_udsgT 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Num_udsgT")); 
+ 
   //---------------------------------------------------//
   //loop over each event, of the ntuple
   //---------------------------------------------------//
   double kfCount = 0;
   double n_negEvt = 0.0;
   double n_posEvt = 0.0;
+  double n_noCharge = 0.0;
+  double n_oppCharge = 0.0;
+  double n_sameCharge = 0.0;
+  double n_oneTrig = 0.0;
+  double n_twoTrig = 0.0;
   for(int i=0; i<nEntries; ++i){
     Long64_t ientry = evR->LoadTree(i);
     if (ientry < 0) break;
     ev = evR->GetNewEvent(i);
     if(ev==0) continue;
     if(i%1000==0) cout<<"\033[01;32mEvent number = \033[00m"<< i << endl;
-    ///if(i > 100000) break; 
+    //if(i > 1000) break; 
     //---------------------------------------------------//
     //apply lumi, k factor and pileup weight
     //---------------------------------------------------//
@@ -118,7 +154,15 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
         evtWeight *= weightPU;  
         fillHisto(outFile_, cutflowType, "", "puWeight", 1000, 0, 100, weightPU, 1 );
       }
+      if(i==0){
+        double sampleWeight(1.0);
+        sampleWeight = lumiTotal* xss[sampleName]/evtDBS[sampleName];
+	fillHisto(outFile_, cutflowType, "", "totalYield", 10, 0, 2, 1, initialEvents*sampleWeight);
+      }
     } 
+    else{ 
+      if(i==0)fillHisto(outFile_, cutflowType, "", "totalYield", 10, 0, 2, 1, initialEvents);
+    }
     
     //---------------------------------------------------//
     //apply muon triggers
@@ -128,13 +172,21 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     //HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v5
     //HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v6
     bool passTrig = false;
+    bool passOneTrig = false;
     vector<string> trig = ev->hlt;
     for(size_t it = 0; it < trig.size(); it++){
-      if(trig[it].find("HLT_Mu17_TrkIsoVVL") != string::npos) {
+      if(trig[it].find("HLT_IsoMu24") != string::npos || 
+		      trig[it].find("HLT_IsoTkMu") != string::npos) {
         passTrig = true;
       }
     } 
-    if(!passTrig) continue;
+    for(size_t it = 0; it < trig.size(); it++){
+      if(trig[it].find("HLT_IsoMu24") != string::npos) passOneTrig = true;
+    } 
+    if(passTrig)n_twoTrig++;
+    if(passOneTrig) n_oneTrig++;
+    
+    if(!passOneTrig) continue;
 
     double nCutPass = 1.0;
     fillHisto(outFile_, cutflowType+"/Iso", "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
@@ -186,6 +238,11 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     passID2 = isHighPtMuon(&pfMuons[m2], isPFlow);
     if(!passID1) continue;
     if(!passID2) continue; 
+
+    //charge selection
+    n_noCharge++ ;
+    if(pfMuons[m1].charge == pfMuons[m2].charge) n_sameCharge++;
+    if(pfMuons[m1].charge != pfMuons[m2].charge) n_oppCharge++;
     //both muons should have opposite charge
     if(pfMuons[m1].charge == pfMuons[m2].charge) continue;
 
@@ -252,8 +309,6 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     cutflowType_ = cutflowType+"/Iso";
     if(m1RelIso > 0.15) continue;
     if(m2RelIso > 0.15) continue;
-    nCutPass++;
-    fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
     
     //---------------------------------------------------//
     //get 4 vector for Z boson
@@ -302,12 +357,71 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     fillHisto(outFile_, cutflowType_, "ControlP","phi_Z", 50, -5, 5, vZ.Phi(), evtWeight );
     fillHisto(outFile_, cutflowType_, "ControlP","mll", 500, 0, 10000, vZ.M(), evtWeight );
     
-    
     //fill histos for nvtx
     fillHisto(outFile_, cutflowType_, "ControlP","nvtx", 100, 0, 100, pri_vtxs, evtWeight );
     for(std::size_t n=0; n<Vertices.size(); n++){
       fillHisto(outFile_, cutflowType_, "ControlP","rhoAll", 100, 0, 100, Vertices[n].rhoAll, evtWeight );
     }
+    nCutPass++;
+    fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
+     
+    //---------------------------------------------------//
+    //apply B-tagging
+    //---------------------------------------------------//
+    double pfCISV = 0.0; //pfCombinedInclusiveSecondaryVertexV2BJetTags
+    double pfCMVA = 0.0; //pfCombinedMVAV2BJetTags
+    int count_CSVT_SF = 0; 
+    for(size_t ijet = 0; ijet < j_final.size(); ijet++){
+      int ind_jet = j_final[ijet];
+      pfCISV = pfJets[ind_jet].bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"];
+      pfCMVA = pfJets[ind_jet].bDiscriminator["pfCombinedMVAV2BJetTags"];
+      fillHisto(outFile_, cutflowType_, "ControlP", "pfCISV", 100, -2, 2, pfCISV, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ControlP", "pfCMVA", 100, -2, 2, pfCMVA, evtWeight );
+      //https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagMCTools
+      if(pfCISV > 0.9535){
+        count_CSVT_SF++; 
+        double jetPt = jetPtWithJESJER(pfJets[ijet], jes, jer);
+        fillHisto(outFile_, cutflowType_, "BTag", "pt_bjet", 100, 0, 1000, jetPt, evtWeight );
+        fillHisto(outFile_, cutflowType_, "BTag", "eta_bjet", 50, -5, 5, pfJets[ijet].p4.eta(), evtWeight );
+      }
+    }
+    fillHisto(outFile_, cutflowType_, "BTag","multi_bjet",  15, 0.5, 15.5, count_CSVT_SF, evtWeight );
+    if(count_CSVT_SF !=0) continue; // reject events if there is any b-jet
+
+    //Apply b-tag SF
+    //https://twiki.cern.ch/twiki/bin/view/CMS/BTagSFMethods#1a)%20Event%20reweighting%20using%20scal
+    double pmc_btag = 1.0;
+    double pdata_btag = 1.0;
+    double bTagWt = 1.0; 
+    if(!ev->isData){
+      for(size_t ijet = 0; ijet < j_final.size(); ijet++){
+        int ind_jet = j_final[ijet];
+        double pMC_ = 1.0;
+        double pData_ = 1.0;
+        //b-quark
+        if(abs(pfJets[ind_jet].partonFlavour) ==5){
+          pMC_ = getBTagPmcSys(h2_BTagEff_Num_bT, h2_BTagEff_Denom_b, pfJets[ind_jet]); 
+          pData_ = getBTagPdataSys(readBTagCSV_bT, h2_BTagEff_Num_bT, h2_BTagEff_Denom_b, pfJets[ind_jet],bScale);
+        }
+        //c-quark
+        else if(abs(pfJets[ind_jet].partonFlavour) ==4){ 
+          pMC_ = getBTagPmcSys(h2_BTagEff_Num_cT, h2_BTagEff_Denom_c, pfJets[ind_jet]); 
+          pData_ = getBTagPdataSys(readBTagCSV_cT, h2_BTagEff_Num_cT, h2_BTagEff_Denom_c, pfJets[ind_jet],bScale);
+        }
+        //other quarks and gluon
+        else{ 
+          pMC_ = getBTagPmcSys(h2_BTagEff_Num_udsgT, h2_BTagEff_Denom_udsg, pfJets[ind_jet]); 
+          pData_ = getBTagPdataSys(readBTagCSV_lT, h2_BTagEff_Num_udsgT, h2_BTagEff_Denom_udsg, pfJets[ind_jet], bScale); 
+        }
+        pmc_btag = pmc_btag*pMC_;
+        pdata_btag = pdata_btag*pData_;
+      }
+    bTagWt = pdata_btag/pmc_btag;
+    }
+    evtWeight *= bTagWt;
+    nCutPass++;
+    fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight);
+    fillHisto(outFile_, cutflowType, "", "bTagWeight", 100, 0, 2, bTagWt, 1);
 
     //---------------------------------------------------//
     //Fill histos with pre-selection
@@ -334,7 +448,7 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
       fillHisto(outFile_, cutflowType_, "PreSel","ak8Tau21", 50, 0, 5, pfJets[ind_jet].ak8Tau2/pfJets[ind_jet].ak8Tau1, evtWeight );
     }
     fillHisto(outFile_, cutflowType_, "PreSel","final_multi_jet", 15, 0, 15, count_jets, evtWeight );
-    fillHisto(outFile_, cutflowType_, "PreSel","pfJets_size", 15, 0, 15, pfJets.size(), evtWeight );
+    //fillHisto(outFile_, cutflowType_, "PreSel","pfJets_size", 15, 0, 15, pfJets.size(), evtWeight );
     nCutPass++;
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
     ///if(muonPt1 <100) continue;    
@@ -374,10 +488,67 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
       double ak8Pmass_ = pfJets[ind_jet].ak8Pmass;
       double ak8Tau21 = pfJets[ind_jet].ak8Tau2/pfJets[ind_jet].ak8Tau1;
       double jetPt = jetPtWithJESJER(pfJets[ind_jet], jes, jer);
-      if(vZ.M()> 200 && jetPt >200 && ak8Pmass_ > 70 && ak8Pmass_ < 110 && ak8Tau21 < 0.5){ 
-	allZjet.push_back(ijet);
+      if(vZ.M()> 200 && jetPt >200 && ak8Pmass_ > 70 && ak8Pmass_ < 110){ 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "totalEvt", 20, -1, 1, 0, evtWeight);
+	if(ak8Tau21<0.45) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.45, evtWeight);
+	if(ak8Tau21<0.46) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.46, evtWeight);
+	if(ak8Tau21<0.47) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.47, evtWeight);
+	if(ak8Tau21<0.48) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.48, evtWeight);
+	if(ak8Tau21<0.49) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.49, evtWeight);
+	if(ak8Tau21<0.50) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.50, evtWeight);
+	if(ak8Tau21<0.51) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.51, evtWeight);
+	if(ak8Tau21<0.52) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.52, evtWeight);
+	if(ak8Tau21<0.53) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.53, evtWeight);
+	if(ak8Tau21<0.54) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.54, evtWeight);
+	if(ak8Tau21<0.55) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.55, evtWeight);
+	if(ak8Tau21<0.56) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.56, evtWeight);
+	if(ak8Tau21<0.57) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.57, evtWeight);
+	if(ak8Tau21<0.58) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.58, evtWeight);
+	if(ak8Tau21<0.59) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.59, evtWeight);
+	if(ak8Tau21<0.60) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.60, evtWeight);
+	if(ak8Tau21<0.61) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.61, evtWeight);
+	if(ak8Tau21<0.62) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.62, evtWeight);
+	if(ak8Tau21<0.63) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.63, evtWeight);
+	if(ak8Tau21<0.64) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.64, evtWeight);
+	if(ak8Tau21<0.65) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.65, evtWeight);
+	if(ak8Tau21<0.66) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.66, evtWeight);
+	if(ak8Tau21<0.67) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.67, evtWeight);
+	if(ak8Tau21<0.68) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.68, evtWeight);
+	if(ak8Tau21<0.69) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.69, evtWeight);
+	if(ak8Tau21<0.70) 
+	  fillHisto(outFile_, cutflowType_, "ZTag", "passedEvt", 26, 0.445, 0.705, 0.70, evtWeight);
+	if(ak8Tau21 < 0.60) allZjet.push_back(ijet);
       }
     }
+    //apply tau21 scale factor
+    //https://twiki.cern.ch/twiki/bin/view/CMS/JetWtagging#2016_scale_factors_and_correctio
+    if(!ev->isData) evtWeight *= 1.11; 
+
     if(allZjet.size()==0) continue;
     MyLorentzVector vZmax =  pfJets[j_final[allZjet[0]]].p4 + pfMuons[m1].p4;
     MyLorentzVector vZmin =  pfJets[j_final[allZjet[0]]].p4 + pfMuons[m2].p4;
@@ -424,9 +595,29 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
       fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig250", 500, 0, 10000, mlZmin, evtWeight );
       fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig250", 500, 0, 10000, mlZmax, evtWeight );
     }
+    if(mlZmax > 450 && mlZmin < 560){
+      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig500", 500, 0, 10000, mlZmin, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig500", 500, 0, 10000, mlZmax, evtWeight );
+    }
+    if(mlZmax > 700 && mlZmin < 900){
+      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig750", 500, 0, 10000, mlZmin, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig750", 500, 0, 10000, mlZmax, evtWeight );
+    }
+    if(mlZmax > 950 && mlZmin < 1080){
+      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig1000", 500, 0, 10000, mlZmin, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig1000", 500, 0, 10000, mlZmax, evtWeight );
+    }
+    if(mlZmax > 1200 && mlZmin < 1370){
+      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig1250", 500, 0, 10000, mlZmin, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig1250", 500, 0, 10000, mlZmax, evtWeight );
+    }
     if(mlZmax > 1300 && mlZmin < 1700){
       fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig1500", 500, 0, 10000, mlZmin, evtWeight );
       fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig1500", 500, 0, 10000, mlZmax, evtWeight );
+    }
+    if(mlZmax > 1300 && mlZmin < 1950){
+      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig1750", 500, 0, 10000, mlZmin, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig1750", 500, 0, 10000, mlZmax, evtWeight );
     }
     if(mlZmax > 1300 && mlZmin < 2200){
       fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig2000", 500, 0, 10000, mlZmin, evtWeight );
@@ -436,9 +627,25 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
       fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig2500", 500, 0, 10000, mlZmin, evtWeight );
       fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig2500", 500, 0, 10000, mlZmax, evtWeight );
     }
+    if(mlZmax > 1300 && mlZmin < 3200){
+      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig3000", 500, 0, 10000, mlZmin, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig3000", 500, 0, 10000, mlZmax, evtWeight );
+    }
+    if(mlZmax > 1300 && mlZmin < 3700){
+      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig3500", 500, 0, 10000, mlZmin, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig3500", 500, 0, 10000, mlZmax, evtWeight );
+    }
     if(mlZmax > 1300 && mlZmin < 4200){
       fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig4000", 500, 0, 10000, mlZmin, evtWeight );
       fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig4000", 500, 0, 10000, mlZmax, evtWeight );
+    }
+    if(mlZmax > 1300 && mlZmin < 4700){
+      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig4500", 500, 0, 10000, mlZmin, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig4500", 500, 0, 10000, mlZmax, evtWeight );
+    }
+    if(mlZmax > 1300 && mlZmin < 5200){
+      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig5000", 500, 0, 10000, mlZmin, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig5000", 500, 0, 10000, mlZmax, evtWeight );
     }
     //fill histos for jets
     for(size_t ijet = 0; ijet < j_final.size(); ijet++){
@@ -471,10 +678,16 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
   cout<<"Total events  = "<<nEntries<<endl;
   cout<<"Total events with negative weight = "<<n_negEvt<<endl;
   cout<<"Total events with positive weight = "<<n_posEvt<<endl;
-  double effective_evt = (n_posEvt-n_negEvt)/nEntries;
-  double amcnlo_weght = 1.0;
-  if(effective_evt !=0) amcnlo_weght = 1/effective_evt;
-  fillHisto(outFile_, cutflowType, "", "amcnlo_weght", 10, 0, 2, amcnlo_weght, 1 );
+
+  double effective_evt = (n_posEvt-n_negEvt);
+  double amcnlo_weight = 1.0;
+  if(effective_evt !=0) amcnlo_weight = effective_evt/nEntries;
+  fillHisto(outFile_, cutflowType, "", "amcnlo_weight", 10, 0, 1, amcnlo_weight, 1 );
+  fillHisto(outFile_, cutflowType, "", "noCharge", 10, -2, 2, 0, n_noCharge);
+  fillHisto(outFile_, cutflowType, "", "oppCharge", 10, -2, 2, -1, n_oppCharge);
+  fillHisto(outFile_, cutflowType, "", "sameCharge", 10, -2, 2, 1, n_sameCharge);
+  fillHisto(outFile_, cutflowType, "", "oneTrig", 10, -2, 4, 1, n_oneTrig);
+  fillHisto(outFile_, cutflowType, "", "twoTrig", 10, -2, 4, 2, n_twoTrig);
   f->Close(); 
   delete f;
 }
@@ -483,9 +696,8 @@ void Analyzer::processEvents(){
   //Data, MC sample from lxplus and T2
   //CutFlowAnalysis("TTJetsP_MuMC_20171104_Ntuple_1.root", "PF", ""); 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094/", "PF", "");
-  ///CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_for2016Data_MuMC_20181104/MuMC_20181104/TT_MuMC_20181104/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_MuMC_20181104/181104_111129/0000/TT_MuMC_20181104_Ntuple_97.root", "PF", "");
 
-  ///CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_for2016Data_MuMC_20181104/MuMC_20181104/ExLepMuMuZ_M2500_MuMC_20181104/ExcitedLepton_MuMuZ-2500_TuneCUETP8M1_13TeV-pythia8/ExLepMuMuZ_M2500_MuMC_20181104/181104_111026/0000/ExLepMuMuZ_M2500_MuMC_20181104_Ntuple_1.root", "PF", "");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_for2016Data_MuMC_20190117/MuMC_20190117/DYJetsToLL_M50_MuMC_20190117/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/DYJetsToLL_M50_MuMC_20190117/190117_091524/0000/DYJetsToLL_M50_MuMC_20190117_Ntuple_10.root" , "PF", "");
 
    //====================================
   //condor submission

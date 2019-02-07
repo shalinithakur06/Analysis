@@ -38,7 +38,7 @@ public :
   void fillHisto(TFile *file, TString dir, TString subdir, TString histName, int Nbin, double min, double max, double value, double weight);
   TH1* getHisto(TString name, TString dirname);
   TH2* getHisto2d(TString name, TString dirname);
-
+ 
 private :
   std::map<TString, TH1*> histos1_;
   std::map<TString, TH2*> histos2_;

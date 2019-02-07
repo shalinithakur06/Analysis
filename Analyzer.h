@@ -20,6 +20,7 @@
 #include "interface/LumiReweighting.h"
 #include "interface/UncertaintyComputer.hh"
 #include "interface/HistogramPlotter.hh"
+#include "interface/BTagCalibrationStandalone.h"
 
 
 //---------------------------------------------------//
@@ -53,36 +54,54 @@ public :
     //Backgrounds
     //only 97.3% proccessed, hence less number of events for DYJetsToLL_M50
     //xss["DYJetsToLL_M50"]         = 5758.4;              evtDBS["DYJetsToLL_M50"]         = 122055388; 
-    xss["DYJetsToLL_M50"]         = 5758.4;              evtDBS["DYJetsToLL_M50"]         = 0.6648* 118692000; 
-    xss["DYJetsToLL_M100to200"]   = 226.6 ;              evtDBS["DYJetsToLL_M100to200"]   = 0.6439* 1083606;
-    xss["DYJetsToLL_M200to400"]   = 7.77 ;               evtDBS["DYJetsToLL_M200to400"]   = 0.5688* 2925885;    
-    xss["DYJetsToLL_M400to500"]   = 0.423;               evtDBS["DYJetsToLL_M400to500"]   = 0.5208* 287262;
-    xss["DYJetsToLL_M500to700"]   = 0.240;               evtDBS["DYJetsToLL_M500to700"]   = 0.5099* 280940;  
-    xss["DYJetsToLL_M700to800"]   = 0.0350;              evtDBS["DYJetsToLL_M700to800"]   = 276235;//no neg weight
-    xss["DYJetsToLL_M800to1000"]  = 0.0300;              evtDBS["DYJetsToLL_M800to1000"]  = 271768;//no neg weight
-    xss["DYJetsToLL_M1000to1500"] = 0.0160;              evtDBS["DYJetsToLL_M1000to1500"] = 258620;//no neg weight
-    xss["DYJetsToLL_M1500to2000"] = 0.0020;              evtDBS["DYJetsToLL_M1500to2000"] = 258625;//no neg weight
-    xss["DYJetsToLL_M2000to3000"] = 0.00054;             evtDBS["DYJetsToLL_M2000to3000"] = 255342;//no neg weight
-    xss["TT"] 			  = 831.76;              evtDBS["TT"] 		          = 77081156;
+    xss["DYJetsToLL_M50"]         = 5758.4;         evtDBS["DYJetsToLL_M50"]         = 0.6720* 118692000; 
+    xss["DYJetsToLL_Pt100To250"]  = 81.22  ;        evtDBS["DYJetsToLL_Pt100To250"]  = 0.3611* 2040596 ; 
+    xss["DYJetsToLL_Pt250To400"]  = 2.991  ;        evtDBS["DYJetsToLL_Pt250To400"]  = 0.3717* 423976  ;
+    xss["DYJetsToLL_Pt400To650"]  = 0.3882 ;        evtDBS["DYJetsToLL_Pt400To650"]  = 0.3878* 432056  ;
+    xss["DYJetsToLL_Pt50To100"]   = 354.8  ;        evtDBS["DYJetsToLL_Pt50To100"]   = 0.3710* 21890432;
+    xss["DYJetsToLL_Pt650ToInf"]  = 0.03737;        evtDBS["DYJetsToLL_Pt650ToInf"]  = 0.4168* 430691  ;
+    xss["TT"] 			  = 831.76;         evtDBS["TT"] 		     = 77081156;
     //only 97.7% proccessed, hence less number of events for WJetsToLNu
-    //xss["WJetsToLNu"]		  = 50690;               evtDBS["WJetsToLNu"]	          = 29705748;
-    xss["WJetsToLNu"]		  = 50690;               evtDBS["WJetsToLNu"]	          = 29017600;
-    xss["WW"]			  = 118.7;               evtDBS["WW"]		          = 994012;
-    xss["WZ"]			  = 46.74;	         evtDBS["WZ"]		          = 1000000;
-    xss["ZZ"] 			  = 17.72;               evtDBS["ZZ"] 		          = 990064;
+    //xss["WJetsToLNu"]		  = 50690;          evtDBS["WJetsToLNu"]	     = 29705748;
+    xss["WJetsToLNu"]		  = 50690;          evtDBS["WJetsToLNu"]	     = 29017600;
+    xss["WW"]			  = 118.7;          evtDBS["WW"]		     = 994012;
+    xss["WZ"]			  = 46.74;	    evtDBS["WZ"]		     = 1000000;
+    xss["ZZ"] 			  = 17.72;          evtDBS["ZZ"] 		     = 990064;
+
     //Muon signal
-    xss["ExLepMuMuZ_M250"]	  = 0.00427;             evtDBS["ExLepMuMuZ_M250"]	  = 198200;
-    xss["ExLepMuMuZ_M1500"]	  = 0.0004267;           evtDBS["ExLepMuMuZ_M1500"]	  = 190900;
-    xss["ExLepMuMuZ_M2000"] 	  = 0.00002021;          evtDBS["ExLepMuMuZ_M2000"]       = 200000;
-    xss["ExLepMuMuZ_M2500"] 	  = 0.00006755;          evtDBS["ExLepMuMuZ_M2500"]       = 200000;
-    xss["ExLepMuMuZ_M4000"]       = 0.000003209;         evtDBS["ExLepMuMuZ_M4000"]       = 192300;
+    xss["ExLepMuMuZ_M250"]        = 0.00427    ;   evtDBS["ExLepMuMuZ_M250"]         = 198200;
+    xss["ExLepMuMuZ_M500"]        = 0.00291    ;   evtDBS["ExLepMuMuZ_M500"]         = 200000;
+    xss["ExLepMuMuZ_M750"]        = 0.001761   ;   evtDBS["ExLepMuMuZ_M750"]         = 191400;
+    xss["ExLepMuMuZ_M1000"]       = 0.001177   ;   evtDBS["ExLepMuMuZ_M1000"]        = 191300;
+    xss["ExLepMuMuZ_M1250"]       = 0.0007263  ;   evtDBS["ExLepMuMuZ_M1250"]        = 181400;
+    xss["ExLepMuMuZ_M1500"]       = 0.0004267  ;   evtDBS["ExLepMuMuZ_M1500"]        = 190900;
+    xss["ExLepMuMuZ_M1750"]       = 0.0002654  ;   evtDBS["ExLepMuMuZ_M1750"]        = 192200;
+    xss["ExLepMuMuZ_M2000"]       = 0.0002021  ;   evtDBS["ExLepMuMuZ_M2000"]        = 200000;
+    xss["ExLepMuMuZ_M2500"]       = 0.00006755 ;   evtDBS["ExLepMuMuZ_M2500"]        = 200000;
+    xss["ExLepMuMuZ_M3000"]       = 0.00002223 ;   evtDBS["ExLepMuMuZ_M3000"]        = 200000;
+    xss["ExLepMuMuZ_M3500"]       = 0.000008166;   evtDBS["ExLepMuMuZ_M3500"]        = 200000;
+    xss["ExLepMuMuZ_M4000"]       = 0.000003209;   evtDBS["ExLepMuMuZ_M4000"]        = 192300;
+    xss["ExLepMuMuZ_M4500"]       = 0.000001133;   evtDBS["ExLepMuMuZ_M4500"]        = 200000;
+    xss["ExLepMuMuZ_M5000"]       = 0.000000452;   evtDBS["ExLepMuMuZ_M5000"]        = 192500;
+
     //Electron signal
-    xss["ExLepEEZ_M250"] 	  = 0.004407;            evtDBS["ExLepEEZ_M250"] 	  = 182100;
-    xss["ExLepEEZ_M2000"] 	  = 0.0001908;	         evtDBS["ExLepEEZ_M2000"] 	  = 189000;
-    xss["ExLepEEZ_M2500"]	  = 0.00005731;          evtDBS["ExLepEEZ_M2500"]	  = 187400;
-    xss["ExLepEEZ_M4000"]	  = 0.000003897;         evtDBS["ExLepEEZ_M4000"]	  = 199800;
+    xss["ExLepEEZ_M250"]          = 0.004407   ;    evtDBS["ExLepEEZ_M250"]             = 182100;
+    xss["ExLepEEZ_M500"]          = 0.002916   ;    evtDBS["ExLepEEZ_M500"]             = 200000;
+    xss["ExLepEEZ_M750"]          = 0.001607   ;    evtDBS["ExLepEEZ_M750"]             = 192800;
+    xss["ExLepEEZ_M1000"]         = 0.001079   ;    evtDBS["ExLepEEZ_M1000"]            = 197600;
+    xss["ExLepEEZ_M1250"]         = 0.0007171  ;    evtDBS["ExLepEEZ_M1250"]            = 200000;
+    xss["ExLepEEZ_M1500"]         = 0.0004856  ;    evtDBS["ExLepEEZ_M1500"]            = 41900 ;
+    xss["ExLepEEZ_M1750"]         = 0.0002907  ;    evtDBS["ExLepEEZ_M1750"]            = 192400;
+    xss["ExLepEEZ_M2000"]         = 0.0001908  ;    evtDBS["ExLepEEZ_M2000"]            = 189000;
+    xss["ExLepEEZ_M2500"]         = 0.00005731 ;    evtDBS["ExLepEEZ_M2500"]            = 187400;
+    xss["ExLepEEZ_M3000"]         = 0.00002497 ;    evtDBS["ExLepEEZ_M3000"]            = 192800;
+    xss["ExLepEEZ_M3500"]         = 0.000009023;    evtDBS["ExLepEEZ_M3500"]            = 170000;
+    xss["ExLepEEZ_M4000"]         = 0.000003897;    evtDBS["ExLepEEZ_M4000"]            = 199800;
+    xss["ExLepEEZ_M4500"]         = 0.000001243;    evtDBS["ExLepEEZ_M4500"]            = 187400;
+    xss["ExLepEEZ_M5000"]         = 0.000000461;    evtDBS["ExLepEEZ_M5000"]            = 167000;
+
     //Dummy sample
-    xss["sampCode_"]    	  =  1;  	         evtDBS["sampCode_"]              =  1; 
+    xss["sampCode_"]    	  =  1;  	         evtDBS["sampCode_"]         =  1; 
 
   };
   ~Analyzer() {
@@ -104,9 +123,8 @@ private :
   std::map<string, double> evtDBS;
   std::map<string, double> muSF;
   std::map<string, double> eleSF;
-  /*
-  BTagCalibrationReader readCSVfile(const std::string &tagger, const std::string &filename);
-  */
+  
+  BTagCalibrationReader readCSV(const std::string &filename,const std::string &tagger, BTagEntry::OperatingPoint op, const std::string & measurementType, const std::string & sysType, const std::vector<std::string> & otherSysTypes, BTagEntry::JetFlavor jf);
   ofstream outfile_;
   Double_t getMuonSF(TH2D *h2, double eta, double pt);
   Double_t getMuonTrigSF(TH2D *h2, double eta, double pt);
@@ -119,6 +137,19 @@ private :
   double phi0to2pi(double phi);
 };
 
+BTagCalibrationReader Analyzer::readCSV(const std::string &filename, const std::string &tagger,  
+		BTagEntry::OperatingPoint op, 
+		const std::string & measurementType,
+		const std::string & sysType, 
+		const std::vector<std::string> & otherSysTypes, 
+		BTagEntry::JetFlavor jf
+		)
+{ 
+  BTagCalibration calib(tagger, filename);
+  BTagCalibrationReader reader(op, sysType, otherSysTypes);      
+  reader.load(calib, jf, measurementType); 
+  return reader;
+}
 //https://twiki.cern.ch/twiki/bin/view/CMS/MuonWorkInProgressAndPagResults
 Double_t Analyzer::getMuonSF(TH2D *h2, double eta, double pt){
   
