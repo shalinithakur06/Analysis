@@ -2,7 +2,7 @@
 #include <fstream>
 #include <iomanip>
 
-void makeLimitTable(TString CHANNEL,
+void makeLimitTable(TString CHANNEL, TString zTagDir,
          bool obs, bool isOut, ofstream & outFile)
   {
 
@@ -43,7 +43,7 @@ void makeLimitTable(TString CHANNEL,
   
   double maxY = 1.0;
   for(unsigned int i = 0 ; i < nMassPoints; i++){
-    TFile f("output/"+CHANNEL+"/"+massFiles[i],"READ"); 
+    TFile f("output/"+CHANNEL+"/"+zTagDir+"/"+massFiles[i],"READ"); 
     if(f.IsZombie()){
       cout << "Cannot open file for " << string(CHANNEL.Data()) << " and mass " << X[i] << endl;
       continue;
@@ -118,15 +118,19 @@ void makeLimitTable(TString CHANNEL,
     if(massFiles[i].Contains("5000")) maxY = expY2sH[i];
   }
   cout<<std::setprecision(4)<<endl;
+  cout<<"===========: " <<zTagDir<<endl;
   cout<<"Mass:"<<setw(15)<<"base value"<<setw(15)<<"-2 #sigma"<<setw(15)<<"-1 #sigma"<<setw(15)<<"+1 #sigma"<<setw(15)<<"+2 #sigma"<<endl; 
 
   //make table
   outFile<<"\\begin{table}"<<endl; 
   outFile<<"\\begin{center}"<<endl; 
-  outFile<<"\\begin{tabular}{ |l|l|l|l|l|l|}"<<endl; 
+  outFile<<"\\begin{tabular}{cccccc}"<<endl; 
+  //outFile<<"\\begin{tabular}{ |l|l|l|l|l|l|}"<<endl; 
+  outFile<<"\\hline "<<endl;
   outFile<<"\\hline "<<endl;
   outFile<<"$M_{l^*}$"<<" & "<< "-2$\\sigma$ & -1$\\sigma$ & median & +1$\\sigma$ & +1$\\sigma$\\\\ "<<endl;
   outFile<<"(GeV) & "<< "(fb) & "<< "(fb) & "<< "(fb) & "<<"(fb) & "<<"(fb) "<<" \\\\ "<<endl;
+  outFile<<"\\hline "<<endl;
   outFile<<"\\hline "<<endl;
   for(int i1 = 0 ; i1 < nMassPoints ; i1++){
   cout<<X[i1]<<setw(15)<<expY[i1]<<setw(15)<<expY2sL[i1]<<setw(15)<< expY1sL[i1]<<setw(15)<<expY1sH[i1]<<setw(15)<<expY2sH[i1]<<endl; 
@@ -160,9 +164,19 @@ void MyMakeLimitTable(){
   outFile<<"\\begin{document}"<<endl;  
   outFile<<""<<endl;
   //muon 
-  makeLimitTable("mu",  false, true, outFile);
+  /*
+  makeLimitTable("mu", "ZTag1",  false, true, outFile);
+  makeLimitTable("mu", "ZTag2",  false, true, outFile);
+  makeLimitTable("mu", "ZTag3",  false, true, outFile);
+  makeLimitTable("mu", "ZTag4",  false, true, outFile);
+  makeLimitTable("mu", "ZTag5",  false, true, outFile);
+  makeLimitTable("mu", "ZTag6",  false, true, outFile);
+  makeLimitTable("mu", "ZTag7",  false, true, outFile);
+  makeLimitTable("mu", "ZTag8",  false, true, outFile);
+  */
+  makeLimitTable("mu", "ZTag9",  false, true, outFile);
   //electron 
-  //makeLimitTable("ele", false, true, outFile);
+  makeLimitTable("ele", "ZTag9",  false, true, outFile);
   //lepton 
   //makeLimitTable("mu_ele", false, true, outFile);
   outFile<<"\\end{document}"<<endl;  

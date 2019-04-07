@@ -23,7 +23,7 @@
 
 using namespace std;
 
-void LimitPlotter(TString CHANNEL="mu",
+void LimitPlotter(TString CHANNEL="mu", TString zTagDir="ZTag1",
          bool obs= false, bool isOut= true )
   {
   gStyle->SetFrameLineWidth(2);
@@ -72,11 +72,26 @@ void LimitPlotter(TString CHANNEL="mu",
   
   double maxY = 1.0;
   for(unsigned int i = 0 ; i < nMassPoints; i++){
-    TFile f("output/"+CHANNEL+"/"+massFiles[i],"READ"); 
+    TFile f("output/"+CHANNEL+"/"+zTagDir+"/"+massFiles[i],"READ"); 
     if(f.IsZombie()){
       cout << "Cannot open file for " << string(CHANNEL.Data()) << " and mass " << X[i] << endl;
       continue;
     }
+    vector<double> sigMass;
+    sigMass.push_back(250); 
+    sigMass.push_back(500); 
+    sigMass.push_back(750); 
+    sigMass.push_back(1000); 
+    sigMass.push_back(1250); 
+    sigMass.push_back(1500); 
+    sigMass.push_back(1750); 
+    sigMass.push_back(2000); 
+    sigMass.push_back(2500); 
+    sigMass.push_back(3000); 
+    sigMass.push_back(3500); 
+    sigMass.push_back(4000); 
+    sigMass.push_back(4500); 
+    sigMass.push_back(5000);
     vector<double>sigXss;
     if(CHANNEL=="mu"){
       sigXss.push_back(0.00427)    ;
@@ -207,8 +222,8 @@ void LimitPlotter(TString CHANNEL="mu",
   gPad->Modified();
   gPad->SetBottomMargin(0.12);
   gPad->SetLeftMargin(0.15);
-  gPad->SetGridy();
-  gPad->SetGridx();
+  //gPad->SetGridy();
+  //gPad->SetGridx();
   gPad->SetRightMargin(0.05);
   gStyle->SetFrameLineWidth(3);
   //mg->SetMinimum(1.0);
@@ -232,6 +247,7 @@ void LimitPlotter(TString CHANNEL="mu",
   mg->GetYaxis()->SetTitleOffset(1.20);
   mg->GetYaxis()->SetNdivisions(6);
   mg->GetXaxis()->SetNdivisions(11);
+  mg->GetYaxis()->SetRangeUser(0.01, 100);
   mg->GetXaxis()->SetTitleOffset(1.15);
   mg->GetYaxis()->SetTitle("#sigma (fb) #times BR("+fullProcess+")");
   mg->GetYaxis()->SetTitleSize(0.06);   
@@ -241,9 +257,9 @@ void LimitPlotter(TString CHANNEL="mu",
   mg->GetXaxis()->SetTickLength(0.04);
   mg->GetYaxis()->SetTickLength(0.04);
 
-  TLegend* leg = new TLegend(0.55,0.60,0.75,0.87,NULL,"brNDC");
+  TLegend* leg = new TLegend(0.65,0.60,0.85,0.87,NULL,"brNDC");
   leg->SetBorderSize(0);
-  leg->SetTextSize(0.05);
+  leg->SetTextSize(0.04);
   leg->SetFillColor(0);
   leg->SetHeader("95% CL upper limits");
   leg->AddEntry(expected,"Median expected","LP");
@@ -289,10 +305,41 @@ void LimitPlotter(TString CHANNEL="mu",
   ch->Draw("SAME");
   leg->Draw("SAME");
   
+  //-------------------------------
+  //Draw theoretical limit
+  //-------------------------------
+  TFile fTh("theoryXss.root","READ");
+  TGraph *graphLamb500 = (TGraph*)(fTh.Get("lambda_500"));
+  TGraph *graphLamb2000 = (TGraph*)(fTh.Get("lambda_2000"));
+  TGraph *graphLamb4000 = (TGraph*)(fTh.Get("lambda_4000"));
+  TGraph *graphLamb10000 = (TGraph*)(fTh.Get("lambda_10000"));
+  graphLamb500->SetLineColor(kRed);
+  graphLamb2000->SetLineColor(kCyan);
+  graphLamb4000->SetLineColor(kGray);
+  graphLamb10000->SetLineColor(kViolet);
+  graphLamb500->SetLineWidth(3);
+  graphLamb2000->SetLineWidth(3);
+  graphLamb4000->SetLineWidth(3);
+  graphLamb10000->SetLineWidth(3);
+  graphLamb500->Draw("SAME");
+  graphLamb2000->Draw("SAME");
+  graphLamb4000->Draw("SAME");
+  graphLamb10000->Draw("SAME");
+  TLegend* grapLeg = new TLegend(0.15,0.18,0.50,0.28,NULL,"brNDC");
+  grapLeg->SetNColumns(2);
+  grapLeg->SetBorderSize(0);
+  grapLeg->SetTextSize(0.03);
+  grapLeg->SetFillColor(0);
+  grapLeg->AddEntry(graphLamb500, "#Lambda = 0.5 TeV", "L");
+  grapLeg->AddEntry(graphLamb2000, "#Lambda = 2 TeV", "L");
+  grapLeg->AddEntry(graphLamb4000, "#Lambda = 4 TeV", "L");
+  grapLeg->AddEntry(graphLamb10000, "#Lambda = 10 TeV", "L");
+  grapLeg->Draw();
+
   gPad->RedrawAxis();
   TString outFile = "output_"+CHANNEL;
   TString outDir = "output/"+CHANNEL;
-  gPad->SaveAs(outDir+"/"+outFile+".png");
+  gPad->SaveAs(outDir+"/"+outFile+".pdf");
   if(isOut){
     TFile *fout = new TFile(outDir+"/"+outFile+".root", "RECREATE");
     expected->Write("expected");
@@ -304,7 +351,7 @@ void LimitPlotter(TString CHANNEL="mu",
 }
 
 void MyLimitPlotter(){
-  LimitPlotter("mu",  false, true);
-  //LimitPlotter("ele", false, true );
+  LimitPlotter("mu", "ZTag9",  false, true);
+  LimitPlotter("ele","ZTag9", false, true );
   //LimitPlotter("mu_ele", false, true );
 }

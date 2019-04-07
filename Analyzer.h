@@ -43,7 +43,33 @@ public :
     LumiWeights_ = reweight::LumiReWeighting("stack/lumiRewgt/trueInTimePU_mcDY.root","stack/lumiRewgt/trueMinBiasPU_dataMu.root", "pileup", "pileup");
     PShiftDown_ = reweight::PoissonMeanShifter(-0.5);
     PShiftUp_ = reweight::PoissonMeanShifter(0.5);
+
+    double evt_M50   = 0.6720* 118692000;
+    double evt_Pt50  = 0.3710* 21890432;
+    double evt_Pt100 = 0.3611* 2040596;
+    double evt_Pt250 = 0.3717* 423976;
+    double evt_Pt400 = 0.3878* 432056;
+    double evt_Pt650 = 0.4168* 430691;
     
+    double xss_M50   = 5758.4; 
+    double xss_Pt50  = 81.22  ;
+    double xss_Pt100 = 2.991  ;
+    double xss_Pt250 = 0.3882 ;
+    double xss_Pt400 = 354.8  ;
+    double xss_Pt650 = 0.03737;
+
+    double lumiDY_M50  	= evt_M50/xss_M50;
+    double lumiDY_Pt50  = evt_Pt50/xss_Pt50 ;
+    double lumiDY_Pt100 = evt_Pt100/xss_Pt100;
+    double lumiDY_Pt250 = evt_Pt250/xss_Pt250;
+    double lumiDY_Pt400 = evt_Pt400/xss_Pt400;
+    double lumiDY_Pt650 = evt_Pt650/xss_Pt650;
+
+    double normDY_Pt50  = 1/(lumiDY_M50 + lumiDY_Pt50 );
+    double normDY_Pt100 = 1/(lumiDY_M50 + lumiDY_Pt100);
+    double normDY_Pt250 = 1/(lumiDY_M50 + lumiDY_Pt250);
+    double normDY_Pt400 = 1/(lumiDY_M50 + lumiDY_Pt400);
+    double normDY_Pt650 = 1/(lumiDY_M50 + lumiDY_Pt650);
     //---------------------------------------------------//
     //MC cross sections at 13 TeV 
     //---------------------------------------------------//
@@ -54,12 +80,13 @@ public :
     //Backgrounds
     //only 97.3% proccessed, hence less number of events for DYJetsToLL_M50
     //xss["DYJetsToLL_M50"]         = 5758.4;              evtDBS["DYJetsToLL_M50"]         = 122055388; 
-    xss["DYJetsToLL_M50"]         = 5758.4;         evtDBS["DYJetsToLL_M50"]         = 0.6720* 118692000; 
-    xss["DYJetsToLL_Pt100To250"]  = 81.22  ;        evtDBS["DYJetsToLL_Pt100To250"]  = 0.3611* 2040596 ; 
-    xss["DYJetsToLL_Pt250To400"]  = 2.991  ;        evtDBS["DYJetsToLL_Pt250To400"]  = 0.3717* 423976  ;
-    xss["DYJetsToLL_Pt400To650"]  = 0.3882 ;        evtDBS["DYJetsToLL_Pt400To650"]  = 0.3878* 432056  ;
-    xss["DYJetsToLL_Pt50To100"]   = 354.8  ;        evtDBS["DYJetsToLL_Pt50To100"]   = 0.3710* 21890432;
-    xss["DYJetsToLL_Pt650ToInf"]  = 0.03737;        evtDBS["DYJetsToLL_Pt650ToInf"]  = 0.4168* 430691  ;
+    xss["DYJetsToLL_M50"]         = xss_M50;      		evtDBS["DYJetsToLL_M50"]         = evt_M50  ; 
+    xss["DYJetsToLL_Pt50To100"]   = normDY_Pt50 * xss_Pt50 ;    evtDBS["DYJetsToLL_Pt50To100"]   = evt_Pt50 ;
+    xss["DYJetsToLL_Pt100To250"]  = normDY_Pt100* xss_Pt100;    evtDBS["DYJetsToLL_Pt100To250"]  = evt_Pt100; 
+    xss["DYJetsToLL_Pt250To400"]  = normDY_Pt250* xss_Pt250;    evtDBS["DYJetsToLL_Pt250To400"]  = evt_Pt250;
+    xss["DYJetsToLL_Pt400To650"]  = normDY_Pt400* xss_Pt400;    evtDBS["DYJetsToLL_Pt400To650"]  = evt_Pt400;
+    xss["DYJetsToLL_Pt650ToInf"]  = normDY_Pt650* xss_Pt650;    evtDBS["DYJetsToLL_Pt650ToInf"]  = evt_Pt650;
+
     xss["TT"] 			  = 831.76;         evtDBS["TT"] 		     = 77081156;
     //only 97.7% proccessed, hence less number of events for WJetsToLNu
     //xss["WJetsToLNu"]		  = 50690;          evtDBS["WJetsToLNu"]	     = 29705748;

@@ -49,14 +49,14 @@ public :
   bool looseMuonVeto( int selectedMuon, const vector<MyMuon> & vM, bool isPFlow=false);
   
   //HighPt Muon ID
-  bool isHighPtMuon(const MyMuon * m, bool isPFlow);
+  bool isHighPtMuon(const MyMuon * m);
 
   //egmGsfElectronIDs: https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2
   bool cutBasedElectronID_Summer16_80X_V1_veto(const MyElectron *e); 
   bool cutBasedElectronID_Summer16_80X_V1_loose(const MyElectron *e); 
   bool cutBasedElectronID_Summer16_80X_V1_medium(const MyElectron *e); 
   bool cutBasedElectronID_Summer16_80X_V1_tight(const MyElectron *e); 
-  bool heepElectronID_HEEPV70(const MyElectron *e);
+  bool heepElectronID_HEEPV70(const MyElectron *e, MyVertex & vertex);
   // object cleaning
   void ElectronCleaning( const vector<MyElectron> & vE, const vector<MyMuon> & vM, vector<int> * e_old, vector<int> * e_new, vector<int> * mu, double DR );
 

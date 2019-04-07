@@ -26,7 +26,7 @@ void Analyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
   //---------------------------------------------------//
   //for systematics (all sys in one go)
   //---------------------------------------------------//  
-  if(!ev_->isData){ 
+ if(!ev_->isData){ 
     CutFlowProcessor(url, myKey, "JESPlus", 	outFile_);
     CutFlowProcessor(url, myKey, "JESMinus", 	outFile_);
     CutFlowProcessor(url, myKey, "JERPlus", 	outFile_);
@@ -150,6 +150,7 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
         double weightPU = LumiWeights_.weight(npu);
         evtWeight *= weightPU;  
         fillHisto(outFile_, cutflowType, "", "puWeight", 1000, 0, 100, weightPU, 1 );
+	//////cout<<"evtWeight="<< weightPU<<endl;
       }
       if(i==0){
         double sampleWeight(1.0);
@@ -171,7 +172,7 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
         passTrig = true;
       }
     }
-    if(!passTrig) continue;
+    if(!passTrig) continue; 
     double nCutPass = 1.0;
     fillHisto(outFile_, cutflowType+"/Iso", "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
    
@@ -256,7 +257,6 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     if(!ev->isData) eleSF = eleSF1*eleSF2;
     evtWeight *= eleSF;
     fillHisto(outFile_, cutflowType, "", "eleSF", 1000, 0, 100, eleSF, 1 );
-
     //---------------------------------------------------//
     // Iso(<0.15) and Non-iso(>0.15) region 
     //---------------------------------------------------//
@@ -389,7 +389,7 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
       int ind_jet = j_final[ijet];
       double jetPt = jetPtWithJESJER(pfJets[ind_jet], jes, jer);
       if(jetPt <= 100) continue;    
-      if(fabs(pfJets[ind_jet].p4.eta()) >= 2.4) continue;    
+      if(fabs(pfJets[ind_jet].p4.eta()) >= 2.5) continue;    
       if(pfJets[ind_jet].ak8Pmass <= 40) continue;    
       dR1 = DeltaR(pfJets[ind_jet].p4, pfElectrons[e1].p4);
       dR2 = DeltaR(pfJets[ind_jet].p4, pfElectrons[e2].p4);
@@ -444,6 +444,12 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
       double ak8Pmass_ = pfJets[ind_jet].ak8Pmass;
       double ak8Tau21 = pfJets[ind_jet].ak8Tau2/pfJets[ind_jet].ak8Tau1;
       double jetPt = jetPtWithJESJER(pfJets[ind_jet], jes, jer);
+      if(jetPt <= 100) continue;    
+      if(fabs(pfJets[ind_jet].p4.eta()) >= 2.5) continue;    
+      if(pfJets[ind_jet].ak8Pmass <= 40) continue;    
+      dR1 = DeltaR(pfJets[ind_jet].p4, pfElectrons[e1].p4);
+      dR2 = DeltaR(pfJets[ind_jet].p4, pfElectrons[e2].p4);
+      if(dR1 < 0.8 || dR2 < 0.8) continue;    
       if(vZ.M()> 200 && jetPt >200 && ak8Pmass_ > 70 && ak8Pmass_ < 110){ 
 	  fillHisto(outFile_, cutflowType_, "ZTag", "totalEvt", 20, -1, 1, 0, evtWeight);
 	if(ak8Tau21<0.45) 
@@ -509,12 +515,12 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     if(allZjet.size()==0) continue;
     double tau21 = pfJets[j_final[allZjet[0]]].ak8Tau2/pfJets[j_final[allZjet[0]]].ak8Tau1;
     fillHisto2D(outFile_, cutflowType_,"", "tau21_mll", 500, 0, 1, tau21, 50, 0, 1000,  vZ.M(), 1);
-    /*
+    /*////////////////////////
     if(vZ.M() > 200 && tau21 < 0.5) cutflowType_ = cutflowType_+"/RegionA";
     if(vZ.M() < 200 && tau21 < 0.5) cutflowType_ = cutflowType_+"/RegionB";
     if(vZ.M() < 200 && tau21 > 0.5) cutflowType_ = cutflowType_+"/RegionC";
     if(vZ.M() < 200 && tau21 > 0.5) cutflowType_ = cutflowType_+"/RegionC";
-    */
+    */////////////////////
     MyLorentzVector vZmax =  pfJets[j_final[allZjet[0]]].p4 + pfElectrons[e1].p4;
     MyLorentzVector vZmin =  pfJets[j_final[allZjet[0]]].p4 + pfElectrons[e2].p4;
     
@@ -639,7 +645,7 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     input_count_ZTag++;
     if(input_count_ZTag%10==0)
     cout << "input count after ZTag: "<< input_count_ZTag << endl;
-    //if(i > 200000) break;
+    //if(i > 200000) break;*/
   }//event loop
   cout<<"Total events  = "<<nEntries<<endl;
   cout<<"Total events with negative weight = "<<n_negEvt<<endl;
@@ -651,7 +657,6 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
   fillHisto(outFile_, cutflowType, "", "noCharge", 10, -2, 2, 0, n_noCharge);
   fillHisto(outFile_, cutflowType, "", "oppCharge", 10, -2, 2, -1, n_oppCharge);
   fillHisto(outFile_, cutflowType, "", "sameCharge", 10, -2, 2, 1, n_sameCharge);
- 
   f->Close(); 
   delete f;
 }
@@ -659,12 +664,13 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
 void Analyzer::processEvents(){ 
   
   //Data, MC sample from lxplus and T2
-  //CutFlowAnalysis("TTJetsP_MuMC_20171104_Ntuple_1.root", "PF", ""); 
+  //CutFlowAnalysis("DYJetsToLL_M50_EleMC_20190117_Ntuple_8.root", "PF", ""); 
+  ///CutFlowAnalysis("TT_EleMC_20190117_Ntuple_7.root", "PF", "");
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094/", "PF", "");
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_for2016Data_EleMC_20190117/EleMC_20190117/TT_EleMC_20190117/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_EleMC_20190117/190117_103502/0000/TT_EleMC_20190117_Ntuple_1.root", "PF", "");
+  CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_for2016Data_EleMC_20190117/EleMC_20190117/TT_EleMC_20190117/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_EleMC_20190117/190117_103502/0000/TT_EleMC_20190117_Ntuple_1.root", "PF", "");
 
   //====================================
   //condor submission
-  CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
+  ////CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
   //====================================
 } 

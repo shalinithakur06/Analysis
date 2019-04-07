@@ -10,7 +10,8 @@
 
 using namespace std;
 double totLumi = 35.9;
-TString inFileDir="stack_for2016Data_20190117_Mu_Sys";
+TString inFileDir="stack_tmp_Mu_Sys";
+//TString inFileDir="stack_for2016Data_20190117_Mu_Sys";
 //TString histname="mlZ_max_sig1500";
 bool isMuChannel = true;
 bool isEleChannel = false;

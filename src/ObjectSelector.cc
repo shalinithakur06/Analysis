@@ -125,9 +125,17 @@ bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_tight(const MyElectron *
   return passID;
 }
 //Electron HEEP ID
-  bool ObjectSelector::heepElectronID_HEEPV70(const MyElectron *e)
+  bool ObjectSelector::heepElectronID_HEEPV70(const MyElectron *e, MyVertex & vertex)
 {
   bool passID = false;
+  double vX       = vertex.XYZ.x();
+  double vY       = vertex.XYZ.y();
+  double vZ       = vertex.XYZ.z();
+  double eVx      = e->vertex.x();
+  double eVy      = e->vertex.y();
+  double eVz      = e->vertex.z();
+  double d0       = fabs(std::sqrt((vX - eVx)*(vX - eVx) + (vY - eVy)*(vY- eVy)));
+  double dz       = fabs(vZ - eVz);
   float energy2x5Overenergy5x5 = e->energy2x5/e->energy5x5;
   //for barrel
   if(abs(e->eleSCEta)                <=1.444
@@ -139,7 +147,7 @@ bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_tight(const MyElectron *
      && e->GsfEleEmHadD1IsoRhoCut    < 2+0.03*e->p4.pt()+0.28*e->eleRho 
      && e->eleTrkPt                  < 5  
      && e->nInnerHits                <=1   //Inner Lost Hits
-     &&e->D0                         < 0.02
+     && d0                         < 0.02
      )passID = true;
   //endcap
   double HadDepth = 0.0;
@@ -154,7 +162,7 @@ bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_tight(const MyElectron *
      && e->GsfEleEmHadD1IsoRhoCut      < HadDepth
      && e->eleTrkPt                    < 5
      && e->nInnerHits                  <=1
-     &&e->D0                           < 0.05
+     && d0                           < 0.05
      )passID = true;
   return passID; 
 }
@@ -165,28 +173,40 @@ void ObjectSelector::preSelectElectrons(vector<int> * e_i, const vector<MyElectr
     const MyElectron * e   = &vE[i];
     double ePt     	   = TMath::Abs(e->p4.pt());
     double eEta     	   = TMath::Abs(e->p4.eta());
-    double d0      	   = fabs(e->D0);
-    double zvertex   	   = vertex.XYZ.z();
-    double zelectron 	   = e->vertex.z();
-    double dz 		   = fabs(zvertex - zelectron);
     //bool passID = cutBasedElectronID_Summer16_80X_V1_loose(e);
     ///bool passID = cutBasedElectronID_Summer16_80X_V1_medium(e);
     //bool passID = cutBasedElectronID_Summer16_80X_V1_tight(e);
-    bool passID = heepElectronID_HEEPV70(e); 
-    if(passID && ePt >35 && eEta <2.5 && d0 < 0.05 && dz < 0.2){e_i->push_back(i);}
+    bool passID = heepElectronID_HEEPV70(e, vertex); 
+    if(passID && ePt >35 && eEta <2.5 ){e_i->push_back(i);}
   }
 }
 
+//https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2
+bool ObjectSelector::isHighPtMuon(const MyMuon * m){
+  bool isHighPt(false);
+  isHighPt = m->isGlobalMuon &&
+	  m->nMuonHits > 0 && 
+	  m->nMatchedStations >1 &&
+          m->bestMuPtErr/m->bestMuPtTrack < 0.3 &&
+          m->nPixelHits > 0 &&
+          m->nTrackerLayers > 5;
+return isHighPt;
+}
 void ObjectSelector::preSelectMuons(vector<int> * m_i, const vector<MyMuon> & vM , MyVertex & vertex, bool isData){
   for( int i=0;i< (int) vM.size();i++){
     const MyMuon * m = &vM[i];
     double mEta     = TMath::Abs(m->p4.eta());
-    double mD0      = fabs(m->D0);
     double mPt = TMath::Abs(m->p4.pt());
-    double zvertex   = vertex.XYZ.z();
-    double zmuon     = m->vertex.z();
-    double dz =  fabs(zvertex-zmuon);
-    if(mPt > 35 && mEta < 2.4 && mD0 < 0.2 && dz < 0.5){ 
+    double vX       = vertex.XYZ.x();
+    double vY       = vertex.XYZ.y();
+    double vZ       = vertex.XYZ.z();
+    double mVx      = m->vertex.x();
+    double mVy      = m->vertex.y();
+    double mVz      = m->vertex.z();
+    double d0       = fabs(std::sqrt((vX - mVx)*(vX - mVx) + (vY - mVy)*(vY- mVy)));
+    bool passID = isHighPtMuon(m);
+    double dz       = fabs(vZ - mVz);
+    if(passID && mPt > 35 && mEta < 2.4 && d0 < 0.2 && dz < 0.5){ 
       m_i->push_back(i);
     }
   }
@@ -223,19 +243,6 @@ void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vec
   }
 }
 
-//https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2
-bool ObjectSelector::isHighPtMuon(const MyMuon * m, bool isPFlow){
-  bool isHighPt(false);
-  isHighPt = m->isGlobalMuon &&
-	  m->nMuonHits > 0 && 
-	  m->nMatchedStations >1 &&
-          m->bestMuPtErr/m->bestMuPtTrack < 0.3 &&
-          m->D0 < 0.2 &&
-          m->Dz < 0.5 &&
-          m->nPixelHits > 0 &&
-          m->nTrackerLayers > 5;
-return isHighPt;
-}
 
 bool ObjectSelector::looseMuonVeto( int selectedMuon, const vector<MyMuon> & vM, bool isPFlow){
   bool looseVeto(false);
@@ -247,7 +254,7 @@ bool ObjectSelector::looseMuonVeto( int selectedMuon, const vector<MyMuon> & vM,
     double mPt      = TMath::Abs(m->p4.pt());
     double mRelIso  = m->pfRelIso;
     if(! isGlobalMuon) continue;
-    if(mEta<2.1  && mPt> 15 && mRelIso < 0.20 ){ looseVeto = true; }
+    if(mEta<2.4  && mPt> 15 && mRelIso < 0.20 ){ looseVeto = true; }
   }
   return looseVeto;
     

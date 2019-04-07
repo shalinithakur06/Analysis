@@ -601,7 +601,7 @@ namespace ROOT {
       ::UncertaintyComputer *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::UncertaintyComputer >(0);
       static ::ROOT::TGenericClassInfo 
-         instance("UncertaintyComputer", ::UncertaintyComputer::Class_Version(), "interface/UncertaintyComputer.hh", 37,
+         instance("UncertaintyComputer", ::UncertaintyComputer::Class_Version(), "interface/UncertaintyComputer.hh", 30,
                   typeid(::UncertaintyComputer), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &::UncertaintyComputer::Dictionary, isa_proxy, 4,
                   sizeof(::UncertaintyComputer) );

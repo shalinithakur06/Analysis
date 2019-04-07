@@ -82,7 +82,7 @@ def calcCombinedLimit(CHANNEL_ARRAY, IN_FILE_DIR_ARRAY, HIST_ARRAY,  MASS_ARRAY,
         HIST_ARRAY_.append(HIST_ARRAY[HIST][1])
     COMB_HIST_NAME = '_'.join(HIST_ARRAY_)
     for MASS in range(len(MASS_ARRAY)):
-        LIMIT_DIR = "output/"+COMB_CHANNEL_NAME+"/"+"Mass"+str(MASS_ARRAY[MASS])
+        LIMIT_DIR = "output/"+COMB_CHANNEL_NAME+"/"+HIST_ARRAY[0][0]+"/Mass"+str(MASS_ARRAY[MASS])
         if not isCondSub: execme('mkdir -p '+LIMIT_DIR)
         getCardsToBeCombined_ = getCardsToBeCombined(CHANNEL_ARRAY, IN_FILE_DIR_ARRAY, HIST_ARRAY, MASS_ARRAY[MASS])
         sortCardsForCombine_ = sortCardsForCombine(getCardsToBeCombined_, CHANNEL_ARRAY, HIST_ARRAY, MASS)
@@ -102,6 +102,7 @@ if __name__=="__main__":
     parser.add_argument("--cat", default=1, help="Type of event category")
     parser.add_argument("--mass", default=250, help="Mass of the excited lepton")
     parser.add_argument("--allMass", default=False, help="Mass of the excited lepton")
+    parser.add_argument("--histDir",  default="ZTag1", help="histogram directory")
     parser.add_argument("--batch", default=False, help="Want to submit condor jobs")
     parser.add_argument("--isGOF", default=False, help="Want to determine the goodness-of-fit")
     args = parser.parse_args()
@@ -110,11 +111,14 @@ if __name__=="__main__":
     #USERS INPUTS
     #---------------------------------------------
     path_file_dir="/home/sthakur/t3store2/xRavindra/CMSSW_8_1_0/src/HiggsAnalysis/LimitCompExLepton/for2016Data/Limits/"
-    muon_file_dir=path_file_dir+"stack_for2016Data_20190117_Mu_Sys"
-    ele_file_dir=path_file_dir+"stack_for2016Data_20190117_Ele_Sys"
+    muon_file_dir=path_file_dir+"stack_tmp_Mu_Sys"
+    ele_file_dir=path_file_dir+"stack_tmp_Ele_Sys"
+    #muon_file_dir=path_file_dir+"stack_for2016Data_20190117_Mu_Sys"
+    #ele_file_dir=path_file_dir+"stack_for2016Data_20190117_Ele_Sys"
 
     hist_array = []
-    hist_array.append(["ZTag", "mlZ_max_sig"])
+    #hist_array.append(["ZTag", "mlZ_max_sig"])
+    hist_array.append([args.histDir, "mlZ_max_sig"])
 
     #mass_array = [250, 500]
     mass_array = [250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2500, 3000, 3500, 4000, 4500, 5000]

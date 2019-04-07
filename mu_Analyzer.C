@@ -186,7 +186,7 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     if(passTrig)n_twoTrig++;
     if(passOneTrig) n_oneTrig++;
     
-    if(!passOneTrig) continue;
+    if(!passTrig) continue;
 
     double nCutPass = 1.0;
     fillHisto(outFile_, cutflowType+"/Iso", "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
@@ -231,14 +231,6 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     fillHisto(outFile_, cutflowType, "", "m1RelIso", 100, 0, 1, m1RelIso, evtWeight);
     fillHisto(outFile_, cutflowType, "", "m2RelIso", 100, 0, 1, m2RelIso, evtWeight);
     
-    //Apply High pT muon ID
-    bool passID1 = false;
-    passID1 = isHighPtMuon(&pfMuons[m1], isPFlow);  
-    bool passID2 = false;
-    passID2 = isHighPtMuon(&pfMuons[m2], isPFlow);
-    if(!passID1) continue;
-    if(!passID2) continue; 
-
     //charge selection
     n_noCharge++ ;
     if(pfMuons[m1].charge == pfMuons[m2].charge) n_sameCharge++;
@@ -426,17 +418,19 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     //---------------------------------------------------//
     //Fill histos with pre-selection
     //---------------------------------------------------//
+    bool isPreSel = false;
     if(vZ.Pt() < 100) continue;    
     //fill histos for jets
     for(size_t ijet = 0; ijet < j_final.size(); ijet++){
       int ind_jet = j_final[ijet];
       double jetPt = jetPtWithJESJER(pfJets[ind_jet], jes, jer);
       if(jetPt <= 100) continue;    
-      if(fabs(pfJets[ind_jet].p4.eta()) >= 2.4) continue;    
+      if(fabs(pfJets[ind_jet].p4.eta()) >= 2.5) continue;    
       if(pfJets[ind_jet].ak8Pmass <= 40) continue;    
       dR1 = DeltaR(pfJets[ind_jet].p4, pfMuons[m1].p4);
       dR2 = DeltaR(pfJets[ind_jet].p4, pfMuons[m2].p4);
       if(dR1 < 0.8 || dR2 < 0.8) continue;    
+      isPreSel = true;
       fillHisto(outFile_, cutflowType_, "PreSel","dR1", 100, 0, 10, dR1, evtWeight );
       fillHisto(outFile_, cutflowType_, "PreSel","dR2", 100, 0, 10, dR2, evtWeight );
       fillHisto(outFile_, cutflowType_, "PreSel","dR", 100, 0, 10, dR1, evtWeight );
@@ -447,6 +441,7 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
       fillHisto(outFile_, cutflowType_, "PreSel","ak8Pmass", 500, 0, 5000, pfJets[ind_jet].ak8Pmass, evtWeight );
       fillHisto(outFile_, cutflowType_, "PreSel","ak8Tau21", 50, 0, 5, pfJets[ind_jet].ak8Tau2/pfJets[ind_jet].ak8Tau1, evtWeight );
     }
+    if(isPreSel){
     fillHisto(outFile_, cutflowType_, "PreSel","final_multi_jet", 15, 0, 15, count_jets, evtWeight );
     //fillHisto(outFile_, cutflowType_, "PreSel","pfJets_size", 15, 0, 15, pfJets.size(), evtWeight );
     nCutPass++;
@@ -477,6 +472,7 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     input_count_PreSel++;
     if(input_count_PreSel%10==0)
     cout << "input count after PreSel: "<< input_count_PreSel << endl;
+    }
 
     //---------------------------------------------------//
     // fill histo after ZTag:
@@ -488,6 +484,12 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
       double ak8Pmass_ = pfJets[ind_jet].ak8Pmass;
       double ak8Tau21 = pfJets[ind_jet].ak8Tau2/pfJets[ind_jet].ak8Tau1;
       double jetPt = jetPtWithJESJER(pfJets[ind_jet], jes, jer);
+      if(jetPt <= 100) continue;    
+      if(fabs(pfJets[ind_jet].p4.eta()) >= 2.5) continue;    
+      if(pfJets[ind_jet].ak8Pmass <= 40) continue;    
+      dR1 = DeltaR(pfJets[ind_jet].p4, pfMuons[m1].p4);
+      dR2 = DeltaR(pfJets[ind_jet].p4, pfMuons[m2].p4);
+      if(dR1 < 0.8 || dR2 < 0.8) continue;    
       if(vZ.M()> 200 && jetPt >200 && ak8Pmass_ > 70 && ak8Pmass_ < 110){ 
 	  fillHisto(outFile_, cutflowType_, "ZTag", "totalEvt", 20, -1, 1, 0, evtWeight);
 	if(ak8Tau21<0.45) 
@@ -545,11 +547,11 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
 	if(ak8Tau21 < 0.60) allZjet.push_back(ijet);
       }
     }
+    if(allZjet.size()==0) continue;
     //apply tau21 scale factor
     //https://twiki.cern.ch/twiki/bin/view/CMS/JetWtagging#2016_scale_factors_and_correctio
     if(!ev->isData) evtWeight *= 1.11; 
 
-    if(allZjet.size()==0) continue;
     MyLorentzVector vZmax =  pfJets[j_final[allZjet[0]]].p4 + pfMuons[m1].p4;
     MyLorentzVector vZmin =  pfJets[j_final[allZjet[0]]].p4 + pfMuons[m2].p4;
     
@@ -587,66 +589,65 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     fillHisto2D(outFile_, cutflowType_,"ZTag", "mlZmin_mlZmax",500, 0, 10000, mlZmin, 500, 0, 10000, mlZmax, 1);
 
     //L-cut
-    double mlZmax_low  = 0.0;
-    double mlZmax_high = 0.0;
-    double mlZmin_low  = 0.0;
-    double mlZmin_high = 0.0;
-    if(mlZmax > 440 && mlZmin < 300){
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig250", 500, 0, 10000, mlZmin, evtWeight );
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig250", 500, 0, 10000, mlZmax, evtWeight );
+    vector<string> sigMass;
+    vector<double> lCutMin;
+    vector<double> lCutMax;
+    sigMass.push_back("250");   lCutMax.push_back(440);  lCutMin.push_back(300);
+    sigMass.push_back("500");   lCutMax.push_back(450);  lCutMin.push_back(560);
+    sigMass.push_back("750");   lCutMax.push_back(700);  lCutMin.push_back(900);
+    sigMass.push_back("1000");  lCutMax.push_back(950);  lCutMin.push_back(1080);
+    sigMass.push_back("1250");  lCutMax.push_back(1200); lCutMin.push_back(1370);
+    sigMass.push_back("1500");  lCutMax.push_back(1300); lCutMin.push_back(1700);
+    sigMass.push_back("1750");  lCutMax.push_back(1300); lCutMin.push_back(1950);
+    sigMass.push_back("2000");  lCutMax.push_back(1300); lCutMin.push_back(2200);
+    sigMass.push_back("2500");  lCutMax.push_back(1300); lCutMin.push_back(2700);
+    sigMass.push_back("3000");  lCutMax.push_back(1300); lCutMin.push_back(3200);
+    sigMass.push_back("3500");  lCutMax.push_back(1300); lCutMin.push_back(3700);
+    sigMass.push_back("4000");  lCutMax.push_back(1300); lCutMin.push_back(4200);
+    sigMass.push_back("4500");  lCutMax.push_back(1300); lCutMin.push_back(4700);
+    sigMass.push_back("5000");  lCutMax.push_back(1300); lCutMin.push_back(5200);
+    for(int l =0; l<sigMass.size(); l++){
+      double max = lCutMax[l];
+      double min = lCutMin[l];
+      TString mass = sigMass[l];
+      if(mlZmax > max && mlZmin < min){
+      fillHisto(outFile_, cutflowType_, "ZTag1","mlZ_min_sig"+mass, 500, 0, 10000, mlZmin, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ZTag1","mlZ_max_sig"+mass, 500, 0, 10000, mlZmax, evtWeight );
+      }
+      if(mlZmax > (max + 50) && mlZmin < (min - 50) ){
+      fillHisto(outFile_, cutflowType_, "ZTag2","mlZ_min_sig"+mass, 500, 0, 10000, mlZmin, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ZTag2","mlZ_max_sig"+mass, 500, 0, 10000, mlZmax, evtWeight );
+      }
+      if(mlZmax > (max + 100) && mlZmin < (min - 100) ){
+      fillHisto(outFile_, cutflowType_, "ZTag3","mlZ_min_sig"+mass, 500, 0, 10000, mlZmin, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ZTag3","mlZ_max_sig"+mass, 500, 0, 10000, mlZmax, evtWeight );
+      }
+      if(mlZmax > (max - 50) && mlZmin < (min + 50) ){
+      fillHisto(outFile_, cutflowType_, "ZTag4","mlZ_min_sig"+mass, 500, 0, 10000, mlZmin, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ZTag4","mlZ_max_sig"+mass, 500, 0, 10000, mlZmax, evtWeight );
+      }
+      if(mlZmax > (max - 100) && mlZmin < (min + 100) ){
+      fillHisto(outFile_, cutflowType_, "ZTag5","mlZ_min_sig"+mass, 500, 0, 10000, mlZmin, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ZTag5","mlZ_max_sig"+mass, 500, 0, 10000, mlZmax, evtWeight );
+      }
+      if(mlZmax > (max) && mlZmin < (min - 50) ){
+      fillHisto(outFile_, cutflowType_, "ZTag6","mlZ_min_sig"+mass, 500, 0, 10000, mlZmin, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ZTag6","mlZ_max_sig"+mass, 500, 0, 10000, mlZmax, evtWeight );
+      }
+      if(mlZmax > (max) && mlZmin < (min - 100) ){
+      fillHisto(outFile_, cutflowType_, "ZTag7","mlZ_min_sig"+mass, 500, 0, 10000, mlZmin, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ZTag7","mlZ_max_sig"+mass, 500, 0, 10000, mlZmax, evtWeight );
+      }
+      if(mlZmax > (max + 50) && mlZmin < (min) ){
+      fillHisto(outFile_, cutflowType_, "ZTag8","mlZ_min_sig"+mass, 500, 0, 10000, mlZmin, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ZTag8","mlZ_max_sig"+mass, 500, 0, 10000, mlZmax, evtWeight );
+      }
+      if(mlZmax > (max + 100) && mlZmin < (min) ){
+      fillHisto(outFile_, cutflowType_, "ZTag9","mlZ_min_sig"+mass, 500, 0, 10000, mlZmin, evtWeight );
+      fillHisto(outFile_, cutflowType_, "ZTag9","mlZ_max_sig"+mass, 500, 0, 10000, mlZmax, evtWeight );
+      }
     }
-    if(mlZmax > 450 && mlZmin < 560){
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig500", 500, 0, 10000, mlZmin, evtWeight );
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig500", 500, 0, 10000, mlZmax, evtWeight );
-    }
-    if(mlZmax > 700 && mlZmin < 900){
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig750", 500, 0, 10000, mlZmin, evtWeight );
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig750", 500, 0, 10000, mlZmax, evtWeight );
-    }
-    if(mlZmax > 950 && mlZmin < 1080){
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig1000", 500, 0, 10000, mlZmin, evtWeight );
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig1000", 500, 0, 10000, mlZmax, evtWeight );
-    }
-    if(mlZmax > 1200 && mlZmin < 1370){
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig1250", 500, 0, 10000, mlZmin, evtWeight );
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig1250", 500, 0, 10000, mlZmax, evtWeight );
-    }
-    if(mlZmax > 1300 && mlZmin < 1700){
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig1500", 500, 0, 10000, mlZmin, evtWeight );
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig1500", 500, 0, 10000, mlZmax, evtWeight );
-    }
-    if(mlZmax > 1300 && mlZmin < 1950){
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig1750", 500, 0, 10000, mlZmin, evtWeight );
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig1750", 500, 0, 10000, mlZmax, evtWeight );
-    }
-    if(mlZmax > 1300 && mlZmin < 2200){
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig2000", 500, 0, 10000, mlZmin, evtWeight );
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig2000", 500, 0, 10000, mlZmax, evtWeight );
-    }
-    if(mlZmax > 1300 && mlZmin < 2700){
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig2500", 500, 0, 10000, mlZmin, evtWeight );
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig2500", 500, 0, 10000, mlZmax, evtWeight );
-    }
-    if(mlZmax > 1300 && mlZmin < 3200){
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig3000", 500, 0, 10000, mlZmin, evtWeight );
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig3000", 500, 0, 10000, mlZmax, evtWeight );
-    }
-    if(mlZmax > 1300 && mlZmin < 3700){
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig3500", 500, 0, 10000, mlZmin, evtWeight );
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig3500", 500, 0, 10000, mlZmax, evtWeight );
-    }
-    if(mlZmax > 1300 && mlZmin < 4200){
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig4000", 500, 0, 10000, mlZmin, evtWeight );
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig4000", 500, 0, 10000, mlZmax, evtWeight );
-    }
-    if(mlZmax > 1300 && mlZmin < 4700){
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig4500", 500, 0, 10000, mlZmin, evtWeight );
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig4500", 500, 0, 10000, mlZmax, evtWeight );
-    }
-    if(mlZmax > 1300 && mlZmin < 5200){
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_min_sig5000", 500, 0, 10000, mlZmin, evtWeight );
-      fillHisto(outFile_, cutflowType_, "ZTag","mlZ_max_sig5000", 500, 0, 10000, mlZmax, evtWeight );
-    }
+
     //fill histos for jets
     for(size_t ijet = 0; ijet < j_final.size(); ijet++){
       int ind_jet = j_final[ijet];
@@ -697,10 +698,12 @@ void Analyzer::processEvents(){
   //CutFlowAnalysis("TTJetsP_MuMC_20171104_Ntuple_1.root", "PF", ""); 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094/", "PF", "");
 
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_for2016Data_MuMC_20190117/MuMC_20190117/DYJetsToLL_M50_MuMC_20190117/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/DYJetsToLL_M50_MuMC_20190117/190117_091524/0000/DYJetsToLL_M50_MuMC_20190117_Ntuple_10.root" , "PF", "");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_for2016Data_MuMC_20190117/MuMC_20190117/DYJetsToLL_M50_MuMC_20190117/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/DYJetsToLL_M50_MuMC_20190117/190117_091524/0000/DYJetsToLL_M50_MuMC_20190117_Ntuple_1.root" , "PF", "");
 
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_for2016Data_MuMC_20190117/MuMC_20190117/TT_MuMC_20190117/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_MuMC_20190117/190117_092153/0000/TT_MuMC_20190117_Ntuple_92.root", "PF", "MuRunB2v2_MuData_20190117_Ntuple_87");
    //====================================
   //condor submission
+
   CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
   //====================================
 } 

@@ -13,9 +13,9 @@
 //make data card for each mass
 //----------------------------------------//
 MyExLepDataCardMaker DC;
-void MyExLepDataCardMaker(TString inFileDir="stack_for2016Data_20190117_Mu", 
-        TString histSubDir_="ZTag", 
-        TString histName="mlZ_max", 
+void MyExLepDataCardMaker(TString inFileDir="stack_tmp_Mu_Sys", 
+        TString histSubDir_="ZTag1", 
+        TString histName="mlZ_max_sig250", 
         TString channelName="mu", 
         int mass = 250, 
         TString label="ExLep250", 
