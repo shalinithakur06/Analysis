@@ -614,35 +614,35 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
       fillHisto(outFile_, cutflowType_, "ZTag1","mlZ_min_sig"+mass, 500, 0, 10000, mlZmin, evtWeight );
       fillHisto(outFile_, cutflowType_, "ZTag1","mlZ_max_sig"+mass, 500, 0, 10000, mlZmax, evtWeight );
       }
-      if(mlZmax > (max + 50) && mlZmin < (min - 50) ){
+      if(mlZmax > (max + 100)){
       fillHisto(outFile_, cutflowType_, "ZTag2","mlZ_min_sig"+mass, 500, 0, 10000, mlZmin, evtWeight );
       fillHisto(outFile_, cutflowType_, "ZTag2","mlZ_max_sig"+mass, 500, 0, 10000, mlZmax, evtWeight );
       }
-      if(mlZmax > (max + 100) && mlZmin < (min - 100) ){
+      if(mlZmax > (max + 200)){
       fillHisto(outFile_, cutflowType_, "ZTag3","mlZ_min_sig"+mass, 500, 0, 10000, mlZmin, evtWeight );
       fillHisto(outFile_, cutflowType_, "ZTag3","mlZ_max_sig"+mass, 500, 0, 10000, mlZmax, evtWeight );
       }
-      if(mlZmax > (max - 50) && mlZmin < (min + 50) ){
+      if(mlZmax > (max + 350)){
       fillHisto(outFile_, cutflowType_, "ZTag4","mlZ_min_sig"+mass, 500, 0, 10000, mlZmin, evtWeight );
       fillHisto(outFile_, cutflowType_, "ZTag4","mlZ_max_sig"+mass, 500, 0, 10000, mlZmax, evtWeight );
       }
-      if(mlZmax > (max - 100) && mlZmin < (min + 100) ){
+      if(mlZmax > (max + 400)){
       fillHisto(outFile_, cutflowType_, "ZTag5","mlZ_min_sig"+mass, 500, 0, 10000, mlZmin, evtWeight );
       fillHisto(outFile_, cutflowType_, "ZTag5","mlZ_max_sig"+mass, 500, 0, 10000, mlZmax, evtWeight );
       }
-      if(mlZmax > (max) && mlZmin < (min - 50) ){
+      if(mlZmax > (max + 500)){
       fillHisto(outFile_, cutflowType_, "ZTag6","mlZ_min_sig"+mass, 500, 0, 10000, mlZmin, evtWeight );
       fillHisto(outFile_, cutflowType_, "ZTag6","mlZ_max_sig"+mass, 500, 0, 10000, mlZmax, evtWeight );
       }
-      if(mlZmax > (max) && mlZmin < (min - 100) ){
+      if(mlZmax > (max + 600)){
       fillHisto(outFile_, cutflowType_, "ZTag7","mlZ_min_sig"+mass, 500, 0, 10000, mlZmin, evtWeight );
       fillHisto(outFile_, cutflowType_, "ZTag7","mlZ_max_sig"+mass, 500, 0, 10000, mlZmax, evtWeight );
       }
-      if(mlZmax > (max + 50) && mlZmin < (min) ){
+      if(mlZmax > (max + 700)){
       fillHisto(outFile_, cutflowType_, "ZTag8","mlZ_min_sig"+mass, 500, 0, 10000, mlZmin, evtWeight );
       fillHisto(outFile_, cutflowType_, "ZTag8","mlZ_max_sig"+mass, 500, 0, 10000, mlZmax, evtWeight );
       }
-      if(mlZmax > (max + 100) && mlZmin < (min) ){
+      if(mlZmax > (max + 800)){
       fillHisto(outFile_, cutflowType_, "ZTag9","mlZ_min_sig"+mass, 500, 0, 10000, mlZmin, evtWeight );
       fillHisto(outFile_, cutflowType_, "ZTag9","mlZ_max_sig"+mass, 500, 0, 10000, mlZmax, evtWeight );
       }
@@ -696,11 +696,12 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
 void Analyzer::processEvents(){ 
   //Data, MC sample from lxplus and T2
   //CutFlowAnalysis("TTJetsP_MuMC_20171104_Ntuple_1.root", "PF", ""); 
+  //CutFlowAnalysis("outFile_.root", "PF", ""); 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094/", "PF", "");
 
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_for2016Data_MuMC_20190117/MuMC_20190117/DYJetsToLL_M50_MuMC_20190117/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/DYJetsToLL_M50_MuMC_20190117/190117_091524/0000/DYJetsToLL_M50_MuMC_20190117_Ntuple_1.root" , "PF", "");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_for2016Data_MuMC_20190117/MuMC_20190117/TT_MuMC_20190117/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_MuMC_20190117/190117_092153/0000/TT_MuMC_20190117_Ntuple_1.root" , "PF", "");
 
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_for2016Data_MuMC_20190117/MuMC_20190117/TT_MuMC_20190117/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_MuMC_20190117/190117_092153/0000/TT_MuMC_20190117_Ntuple_92.root", "PF", "MuRunB2v2_MuData_20190117_Ntuple_87");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_for2016Data_MuData_20190410/MuData_20190410/sMuRunEv1_MuData_20190410/SingleMuon/sMuRunEv1_MuData_20190410/190410_163727/0000/sMuRunEv1_MuData_20190410_Ntuple_62.root");
    //====================================
   //condor submission
 

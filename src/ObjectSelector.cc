@@ -128,14 +128,6 @@ bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_tight(const MyElectron *
   bool ObjectSelector::heepElectronID_HEEPV70(const MyElectron *e, MyVertex & vertex)
 {
   bool passID = false;
-  double vX       = vertex.XYZ.x();
-  double vY       = vertex.XYZ.y();
-  double vZ       = vertex.XYZ.z();
-  double eVx      = e->vertex.x();
-  double eVy      = e->vertex.y();
-  double eVz      = e->vertex.z();
-  double d0       = fabs(std::sqrt((vX - eVx)*(vX - eVx) + (vY - eVy)*(vY- eVy)));
-  double dz       = fabs(vZ - eVz);
   float energy2x5Overenergy5x5 = e->energy2x5/e->energy5x5;
   //for barrel
   if(abs(e->eleSCEta)                <=1.444
@@ -147,7 +139,7 @@ bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_tight(const MyElectron *
      && e->GsfEleEmHadD1IsoRhoCut    < 2+0.03*e->p4.pt()+0.28*e->eleRho 
      && e->eleTrkPt                  < 5  
      && e->nInnerHits                <=1   //Inner Lost Hits
-     && d0                         < 0.02
+     && abs(e->D0)                   < 0.02
      )passID = true;
   //endcap
   double HadDepth = 0.0;
@@ -162,7 +154,7 @@ bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_tight(const MyElectron *
      && e->GsfEleEmHadD1IsoRhoCut      < HadDepth
      && e->eleTrkPt                    < 5
      && e->nInnerHits                  <=1
-     && d0                           < 0.05
+     && abs(e->D0)                     < 0.05
      )passID = true;
   return passID; 
 }
@@ -197,16 +189,10 @@ void ObjectSelector::preSelectMuons(vector<int> * m_i, const vector<MyMuon> & vM
     const MyMuon * m = &vM[i];
     double mEta     = TMath::Abs(m->p4.eta());
     double mPt = TMath::Abs(m->p4.pt());
-    double vX       = vertex.XYZ.x();
-    double vY       = vertex.XYZ.y();
-    double vZ       = vertex.XYZ.z();
-    double mVx      = m->vertex.x();
-    double mVy      = m->vertex.y();
-    double mVz      = m->vertex.z();
-    double d0       = fabs(std::sqrt((vX - mVx)*(vX - mVx) + (vY - mVy)*(vY- mVy)));
     bool passID = isHighPtMuon(m);
-    double dz       = fabs(vZ - mVz);
-    if(passID && mPt > 35 && mEta < 2.4 && d0 < 0.2 && dz < 0.5){ 
+    double iso = m->pfRelIso;
+    if(passID && mPt > 35 && mEta < 2.4 && 
+		    abs(m->D0) < 0.2 && abs(m->Dz) < 0.5 && iso < 0.15){ 
       m_i->push_back(i);
     }
   }
