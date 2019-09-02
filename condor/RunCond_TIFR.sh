@@ -22,7 +22,7 @@ eval `scram runtime -sh`
 
 log="log_20170620_"
 logDir=$log${ntupleT2Paths/.txt/""}
-baseDir="/home/sthakur/xRavindra/condor_log/"
+baseDir="/home/sthakur/t3store3/xRavindra/condor_log/for2016Data"
 mkdir -p $baseDir$logDir
 outcond="$baseDir$logDir"
 

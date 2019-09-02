@@ -157,7 +157,7 @@ private :
   Double_t getMuonTrigSF(TH2D *h2, double eta, double pt);
   Double_t getMuonTrackSF(TGraphAsymmErrors *tg, double eta);
   Double_t getEleSF(TH2D *h2, double etaSC, double pt);
-  Double_t getEleTrigSF(TH2D *h2, double pt, double etaSC);
+  Double_t getEleTrigSF(TH2D *h2, double etaSC, double pt);
   Double_t getEleHeep1SF(TGraphAsymmErrors *tg, double pt);
   Double_t getEleHeep2SF(TGraphAsymmErrors *tg, double eta);
   double deltaPhi12(double phi1, double phi2);
@@ -245,7 +245,6 @@ Double_t Analyzer::getMuonTrackSF(TGraphAsymmErrors *tg, double eta){
 }
 
 Double_t Analyzer::getEleSF(TH2D *h2, double etaSC, double pt){
-  
   TAxis *xaxis = h2->GetXaxis();
   TAxis *yaxis = h2->GetYaxis();
   //since the Pt range of 2D histo is <500
@@ -295,22 +294,22 @@ for(Int_t i = 0; i < n_points-1; i++){
 return SF;
 }
 
-Double_t Analyzer::getEleTrigSF(TH2D *h2, double pt, double etaSC){
+Double_t Analyzer::getEleTrigSF(TH2D *h2, double etaSC, double pt){
   TAxis *xaxis = h2->GetXaxis();
   TAxis *yaxis = h2->GetYaxis();
-  //since the Pt range of 2D histo is <120
-  //for Pt >120, we use SF of Pt = 120
-  if(pt<=200){
-    Int_t binX = xaxis->FindBin(pt);
-    Int_t binY = yaxis->FindBin(etaSC);
+  //since the Pt range of 2D histo is <500
+  //for Pt >500, we use SF of Pt = 500
+  if(pt<=500){
+    Int_t binX = xaxis->FindBin(etaSC);
+    Int_t binY = yaxis->FindBin(pt);
     double sf = h2->GetBinContent(binX, binY);
     double err = h2->GetBinError(binX, binY);
     if(sf!=0) return sf;
     else return 1.0;
   }
   else{
-    Int_t binX = xaxis->FindBin(200);
-    Int_t binY = yaxis->FindBin(etaSC);
+    Int_t binX = xaxis->FindBin(etaSC);
+    Int_t binY = yaxis->FindBin(500);
     double sf = h2->GetBinContent(binX, binY);
     double err = h2->GetBinError(binX, binY);
     if(sf!=0) return sf;
