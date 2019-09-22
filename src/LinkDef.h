@@ -13,11 +13,8 @@
 //#pragma link C++ class LorentzVector+;
 //#pragma link C++ class Point3D+;
 #pragma link C++ class MyMCParticle+;
-#pragma link C++ class std::vector<MyMCParticle>;
 #pragma link C++ class MyVertex+;
 #pragma link C++ class std::vector<MyVertex>;
-#pragma link C++ class MyTrack+;
-#pragma link C++ class std::vector<MyTrack>;
 #pragma link C++ class MyMET+;
 #pragma link C++ class std::vector<MyMET>;
 #pragma link C++ class MyJet+;

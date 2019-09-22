@@ -17,8 +17,8 @@
 
 void MyCheckProEvent(){
 
-  bool is2016Data = false;
-  bool is2017Data = true;
+  bool is2016Data = true;
+  bool is2017Data = false;
 
   if(is2016Data){	
     bool isMC = true;
@@ -228,14 +228,14 @@ void MyCheckProEvent(){
     }
 
     std::map<std::string, double> muDataEvtDBS;
-    muDataEvtDBS["MuRunBv1_Merged.root"] = 13572040;  
+    muDataEvtDBS["MuRunB2v2_Merged.root"] = 13572040;  
     muDataEvtDBS["MuRunCv1_Merged.root"] = 46273101;
     muDataEvtDBS["MuRunDv1_Merged.root"] = 22646081;
     muDataEvtDBS["MuRunEv1_Merged.root"] = 50596536;
     muDataEvtDBS["MuRunFv1_Merged.root"]  =75301738;
-    //muDataEvtDBS["MuRunGv1_Merged.root"]  =44581284 ;
-    //muDataEvtDBS["MuRunH2v1_Merged.root"] =46463367 ; 
-    //muDataEvtDBS["MuRunH3v1_Merged.root"] =1218674 ;
+    muDataEvtDBS["MuRunGv1_Merged.root"]  =44581284 ;
+    muDataEvtDBS["MuRunH2v1_Merged.root"] =46463367 ; 
+    muDataEvtDBS["MuRunH3v1_Merged.root"] =1218674 ;
     
     std::map<std::string, double>::iterator itr_mudata;
     if(isMuData){ 

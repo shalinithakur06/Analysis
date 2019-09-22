@@ -16,31 +16,34 @@ MyMuon::MyMuon():
   isTrackerMuon(true),
   
   //Medium
-  chi2LocalPosition(-999.),
-  normChi2(-999.),
-  segmentCompatibility(-999.),
-  trkKink(-999.),
-  validFraction(-999.),
+  chi2LocalPosition(-9.),
+  normChi2(-9.),
+  segmentCompatibility(-9.),
+  trkKink(-9.),
+  validFraction(-9.),
  
   //Tight
-  D0(-999.),
-  Dz(-999.),
-  nMatchedStations(-999),
-  nMuonHits(-999),
-  nPixelHits(-999),
-  nTrackerLayers(-999),
-  
-  //High Pt 
-  bestMuPtErr(-999.),
-  bestMuPtTrack(-999.),
-  ///iso
-  ChHadIso(999.),  
-  NeuHadIso(999.),   
-  pfRelIso(999.), 
-  PhotonIso(999.),   
-  PileupIso(999.), 
-  trigger_mu_pt(0),
-  quality(0)
+  D0(-9.),
+  Dz(-9.),
+  nMatchedStations(-9),
+  nMuonHits(-9),
+  nMuonHitsTuneP(-9),
+  nPixelHits(-9),
+  nTrackerLayers(-9),
+ 
+  //High Pt
+  bestMuPtErr(-9),
+  bestMuPtTrack(-9),
+  //iso
+  ChHadIso(-9.),  
+  NeuHadIso(-9.),   
+  PhotonIso(-9.),   
+  PileupIso(-9.), 
+  pfRelIso(-9.), 
+  trkRelIso(-9.), 
+  expectedMatchedStations(-9.),
+  nStationMask(-9.),
+  nRPCLayers(-9.)
 {
 }
 
@@ -57,6 +60,7 @@ void MyMuon::Reset()
   gen_mother_id = 0;
   muName = "";
   p4.SetCoordinates(0.0, 0.0, 0.0, 0.0);
+  Genp4.SetCoordinates(0.0, 0.0, 0.0, 0.0);
   type = 0;
   vertex.SetCoordinates(0.0, 0.0, 0.0);
   
@@ -66,29 +70,31 @@ void MyMuon::Reset()
   isPFMuon = true;
   isTrackerMuon = true;
   //Medium
-  chi2LocalPosition = -999.;
-  normChi2 = -999.;
-  segmentCompatibility = -999.;
-  trkKink = -999.;
-  validFraction = -999.;
+  chi2LocalPosition = -9.;
+  normChi2 = -9.;
+  segmentCompatibility = -9.;
+  trkKink = -9.;
+  validFraction = -9.;
   //Tight
-  D0 = -999.;
-  Dz = -999.;
-  nMatchedStations = -999;
-  nMuonHits = -999;
-  nPixelHits = -999;
-  nTrackerLayers = -999;
+  D0 = -9.;
+  Dz = -9.;
+  nMatchedStations = -9;
+  nMuonHits = -9;
+  nMuonHitsTuneP = -9;
+  nPixelHits = -9;
+  nTrackerLayers = -9;
   
   //High Pt
-  bestMuPtErr = -999.;
-  bestMuPtTrack = -999.;
-  
+  bestMuPtErr = -9;
+  bestMuPtTrack = -9;
   ///iso
-  ChHadIso = 999.;   
-  NeuHadIso = 999.;    
-  pfRelIso = 999.;  
-  PhotonIso = 999.;    
-  PileupIso = 999.;  
-  trigger_mu_pt = 0;
-  quality = 0;
+  ChHadIso = -9.;   
+  NeuHadIso = -9.;    
+  PhotonIso = -9.;    
+  PileupIso = -9.;  
+  pfRelIso = -9.;  
+  trkRelIso = -9.;  
+  expectedMatchedStations = -9.;
+  nStationMask = -9.;
+  nRPCLayers = -9.;
 }

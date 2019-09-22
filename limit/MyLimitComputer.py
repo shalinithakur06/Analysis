@@ -1,6 +1,6 @@
 #//////////////////////////////////////////////////
 #                                                 #
-# 	Limit computation at 13 TeV 		          #
+# 	Limit computation at 13 TeV 		  #
 #                                                 #
 #//////////////////////////////////////////////////
 # python MyLimitComputer.py --ch mu  --mass 250
@@ -76,6 +76,7 @@ def sortCardsForCombine(COMB_CARD_CHANNEL_HIST_MASS_ARRAY, CHANNEL_ARRAY, HIST_A
 #function to calculate combined limits
 #---------------------------------------------------
 def calcCombinedLimit(CHANNEL_ARRAY, IN_FILE_DIR_ARRAY, HIST_ARRAY,  MASS_ARRAY, isCondSub, isGOF):
+    #print IN_FILE_DIR_ARRAY, HIST_ARRAY, MASS_ARRAY
     COMB_CHANNEL_NAME = '_'.join(CHANNEL_ARRAY)
     HIST_ARRAY_ = []
     for HIST in range(len(HIST_ARRAY)):
@@ -111,14 +112,14 @@ if __name__=="__main__":
     #USERS INPUTS
     #---------------------------------------------
     path_file_dir="/home/sthakur/t3store2/xRavindra/CMSSW_8_1_0/src/HiggsAnalysis/LimitCompExLepton/for2016Data/Limits/"
-    muon_file_dir=path_file_dir+"stack_tmp_Mu_Sys"
-    ele_file_dir=path_file_dir+"stack_tmp_Ele_Sys"
+    muon_file_dir=path_file_dir+"stack_tmp_mu_new"
+    ele_file_dir=path_file_dir+"stack_tmp_ele_new"
     #muon_file_dir=path_file_dir+"stack_for2016Data_20190117_Mu_Sys"
     #ele_file_dir=path_file_dir+"stack_for2016Data_20190117_Ele_Sys"
 
     hist_array = []
-    #hist_array.append(["ZTag", "mlZ_max_sig"])
-    hist_array.append([args.histDir, "mlZ_max_sig"])
+    #hist_array.append([args.histDir, "mlZ_max_sig"])
+    hist_array.append([args.histDir, "A_mlZ_max_sig"])
 
     #mass_array = [250, 500]
     mass_array = [250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2500, 3000, 3500, 4000, 4500, 5000]

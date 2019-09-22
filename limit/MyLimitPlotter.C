@@ -23,7 +23,7 @@
 
 using namespace std;
 
-void LimitPlotter(TString CHANNEL="mu", TString zTagDir="ZTag1",
+void LimitPlotter(TString CHANNEL="mu", TString zTagDir="ZTag3",
          bool obs= false, bool isOut= true )
   {
   gStyle->SetFrameLineWidth(2);
@@ -248,6 +248,7 @@ void LimitPlotter(TString CHANNEL="mu", TString zTagDir="ZTag1",
   mg->GetYaxis()->SetNdivisions(6);
   mg->GetXaxis()->SetNdivisions(11);
   mg->GetYaxis()->SetRangeUser(0.01, 100);
+  mg->GetYaxis()->SetMoreLogLabels(true);
   mg->GetXaxis()->SetTitleOffset(1.15);
   mg->GetYaxis()->SetTitle("#sigma (fb) #times BR("+fullProcess+")");
   mg->GetYaxis()->SetTitleSize(0.06);   
@@ -279,27 +280,28 @@ void LimitPlotter(TString CHANNEL="mu", TString zTagDir="ZTag1",
   pl2->AddText("BR(H^{+} #rightarrow c#bar{s}) = 1");
  
   //pave text CMS box
-  TPaveText *pt = new TPaveText(0.20,0.9354,0.50,0.9362, "brNDC"); // good_v1
+  TPaveText *pt = new TPaveText(0.15,0.9354,0.65,0.9362, "brNDC"); // good_v1
   pt->SetBorderSize(1);
   pt->SetFillColor(19);
   pt->SetFillStyle(0);
   pt->SetTextSize(0.06);
   pt->SetLineColor(0);
   pt->SetTextFont(132);
-  TText *text = pt->AddText("#sqrt{s}=13 TeV, 35.9 fb^{-1} ");
+  //TText *text = pt->AddText("#sqrt{s}=13 TeV, 160 fb^{-1} ");
+  TText *text = pt->AddText("CMS Preliminary, 13 TeV (35.9 fb^{-1}) ");
   //TText *text = pt->AddText(dir+":  CMS Preliminary,    #sqrt{s} = 13 TeV,    35.45 fb^{-1}; ");
   text->SetTextAlign(11);
   
   //pave text channel box
-  TPaveText *ch = new TPaveText(0.80,0.9154898,0.8510067,0.9762187,"brNDC");
+  TPaveText *ch = new TPaveText(0.85,0.9154898,0.9010067,0.9762187,"brNDC");
   ch->SetFillColor(19);
   ch->SetFillStyle(0);
   ch->SetLineColor(0);
-  ch->SetTextSize(0.08);
+  ch->SetTextSize(0.06);
   ch->SetBorderSize(1);
-  if(CHANNEL=="mu")ch->AddText("#mu-channel");
-  if(CHANNEL=="ele") ch->AddText("e-channel");
-  if(CHANNEL=="mu_ele") ch->AddText("l-channel");
+  if(CHANNEL=="mu")ch->AddText("#mu + jets");
+  if(CHANNEL=="ele") ch->AddText("e + jets");
+  if(CHANNEL=="mu_ele") ch->AddText("l + jets");
   //pl2->Draw("SAME");
   pt->Draw("SAME");
   ch->Draw("SAME");
@@ -313,20 +315,37 @@ void LimitPlotter(TString CHANNEL="mu", TString zTagDir="ZTag1",
   TGraph *graphLamb2000 = (TGraph*)(fTh.Get("lambda_2000"));
   TGraph *graphLamb4000 = (TGraph*)(fTh.Get("lambda_4000"));
   TGraph *graphLamb10000 = (TGraph*)(fTh.Get("lambda_10000"));
-  graphLamb500->SetLineColor(kRed);
+  TGraph *graphLambMlstar = (TGraph*)(fTh.Get("lambda_Mlstar"));
+  graphLamb500->SetLineColor(kBlue);
   graphLamb2000->SetLineColor(kCyan);
   graphLamb4000->SetLineColor(kGray);
   graphLamb10000->SetLineColor(kViolet);
+  graphLambMlstar->SetLineColor(kRed);
   graphLamb500->SetLineWidth(3);
   graphLamb2000->SetLineWidth(3);
   graphLamb4000->SetLineWidth(3);
   graphLamb10000->SetLineWidth(3);
+  graphLambMlstar->SetLineWidth(4);
+  //TMultiGraph *mg2 = new TMultiGraph();
   graphLamb500->Draw("SAME");
   graphLamb2000->Draw("SAME");
   graphLamb4000->Draw("SAME");
   graphLamb10000->Draw("SAME");
-  TLegend* grapLeg = new TLegend(0.15,0.18,0.50,0.28,NULL,"brNDC");
-  grapLeg->SetNColumns(2);
+  graphLambMlstar->Draw("SAME");
+  //graphLambMlstar->SetLineColor(2);
+  //graphLambMlstar->SetLineWidth(1504);
+  //graphLambMlstar->SetFillStyle(3005);
+  //graphLambMlstar->SetFillColor(45);
+  //graphLambMlstar->SetFillStyle(3004);
+  //mg2->Add(graphLamb500);
+  //mg2->Add(graphLamb2000);
+  //mg2->Add(graphLamb4000);
+  //mg2->Add(graphLamb10000);
+  //mg2->Add(graphLambMlstar);
+  //mg2->Draw("BC");
+
+  TLegend* grapLeg = new TLegend(0.30,0.60,0.40,0.80,NULL,"brNDC");
+  //grapLeg->SetNColumns(2);
   grapLeg->SetBorderSize(0);
   grapLeg->SetTextSize(0.03);
   grapLeg->SetFillColor(0);
@@ -334,12 +353,13 @@ void LimitPlotter(TString CHANNEL="mu", TString zTagDir="ZTag1",
   grapLeg->AddEntry(graphLamb2000, "#Lambda = 2 TeV", "L");
   grapLeg->AddEntry(graphLamb4000, "#Lambda = 4 TeV", "L");
   grapLeg->AddEntry(graphLamb10000, "#Lambda = 10 TeV", "L");
+  grapLeg->AddEntry(graphLambMlstar, "#Lambda = M_{l^{*}}", "L");
   grapLeg->Draw();
 
   gPad->RedrawAxis();
   TString outFile = "output_"+CHANNEL;
   TString outDir = "output/"+CHANNEL;
-  gPad->SaveAs(outDir+"/"+outFile+".pdf");
+  gPad->SaveAs(outDir+"/"+outFile+".png");
   if(isOut){
     TFile *fout = new TFile(outDir+"/"+outFile+".root", "RECREATE");
     expected->Write("expected");
@@ -351,7 +371,7 @@ void LimitPlotter(TString CHANNEL="mu", TString zTagDir="ZTag1",
 }
 
 void MyLimitPlotter(){
-  LimitPlotter("mu", "ZTag9",  false, true);
-  LimitPlotter("ele","ZTag9", false, true );
+  LimitPlotter("mu", "ZTag3",  false, false);
+  LimitPlotter("ele","ZTag1", false, false);
   //LimitPlotter("mu_ele", false, true );
 }

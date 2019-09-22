@@ -17,14 +17,9 @@ class MyMET
   
   void Reset();
   
-  double emEtFraction;
-  double hadEtFraction;
-  bool isPFMET;
   std::string metName;
-  double metSignificance;
-  double muonEtFraction;
-  MyLorentzVector p4;         // missing Et vector -->> 4D vector since no 2D object available in [root/5.14.00f-CMS3q] ...
   double sumEt;
+  MyLorentzVector p4;         // missing Et vector -->> 4D vector since no 2D object available in [root/5.14.00f-CMS3q] ...
   
  private :
 

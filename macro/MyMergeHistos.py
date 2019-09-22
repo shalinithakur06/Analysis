@@ -16,13 +16,13 @@ def execme(command):
     os.system(command)
 
 #USERS INPUTS
-is2016Data = False
-is2017Data = True
+is2016Data = True
+is2017Data = False
 
 if(is2016Data):
     #USERS INPUTS
     isMuData = True
-    isMuMC = True
+    isMuMC = False
     isEleData = False
     isEleMC = False
     mc = []
@@ -53,7 +53,7 @@ if(is2016Data):
         mc.append("ExLepMuMuZ_M500") 
         mc.append("ExLepMuMuZ_M5000")
         mc.append("ExLepMuMuZ_M750") 
-    else:
+    if(isEleMC):
         mc.append("ExLepEEZ_M1000")
         mc.append("ExLepEEZ_M1250")
         mc.append("ExLepEEZ_M1500")
@@ -70,7 +70,7 @@ if(is2016Data):
         mc.append("ExLepEEZ_M750") 
 
     if(isMuData):
-    	data = ["MuRunB2v2", "MuRunCv1", "MuRunDv1", "MuRunEv1", "MuRunFv1", "MuRunGv1", "MuRunH2v1", "MuRunH3v1"]
+    	data = ["sMuRunB2v2", "sMuRunCv1", "sMuRunDv1", "sMuRunEv1", "sMuRunFv1", "sMuRunGv1", "sMuRunH2v1", "sMuRunH3v1"]
     
     if(isEleData): 
     	data = ["EleRunBver2v2", "EleRunCv1", "EleRunDv1", "EleRunEv1", "EleRunFv1", "EleRunGv1", "EleRunHver2v1"]
@@ -94,13 +94,14 @@ if(is2016Data):
             execme("hadd -k "+str(data[samp])+"_Merged.root "+str(data[samp])+"*")
         execme("hadd -k all_Data.root EleRun*_Merged.root")
     
-    execme("hadd -k all_DY_Pt.root DY*_Pt*Merged.root")
-    execme("hadd -k all_DY_M50.root DYJetsToLL_M50_Merged.root")
-    execme("hadd -k all_DY.root all_DY_Pt.root all_DY_M50.root")
-    execme("hadd -k all_TT.root TT_Merged.root")
-    execme("hadd -k all_WJets.root  WJ*_Merged.root")
-    execme("hadd -k all_VV.root WW_Merged.root WZ_Merged.root ZZ_Merged.root")
-    execme("hadd -k all_Bkg.root all_DY_M50.root all_TT.root all_WJets.root all_VV.root")
+    if(isMuMC or isEleMC):
+    	execme("hadd -k all_DY_Pt.root DY*_Pt*Merged.root")
+    	execme("hadd -k all_DY_M50.root DYJetsToLL_M50_Merged.root")
+    	execme("hadd -k all_DY.root all_DY_Pt.root all_DY_M50.root")
+    	execme("hadd -k all_TT.root TT_Merged.root")
+    	execme("hadd -k all_WJets.root  WJ*_Merged.root")
+    	execme("hadd -k all_VV.root WW_Merged.root WZ_Merged.root ZZ_Merged.root")
+    	execme("hadd -k all_Bkg.root all_DY_M50.root all_TT.root all_WJets.root all_VV.root")
     if(isMuMC):
         execme("hadd -k all_ExLep_M250.root ExLepMuMuZ_M250_Merged.root")
         execme("hadd -k all_ExLep_M500.root ExLepMuMuZ_M500_Merged.root")
@@ -116,7 +117,7 @@ if(is2016Data):
         execme("hadd -k all_ExLep_M4000.root ExLepMuMuZ_M4000_Merged.root")
         execme("hadd -k all_ExLep_M4500.root ExLepMuMuZ_M4500_Merged.root")
         execme("hadd -k all_ExLep_M5000.root ExLepMuMuZ_M5000_Merged.root")
-    else:
+    if(isEleMC):
         execme("hadd -k all_ExLep_M250.root ExLepEEZ_M250_Merged.root")
         execme("hadd -k all_ExLep_M500.root ExLepEEZ_M500_Merged.root")
         execme("hadd -k all_ExLep_M750.root ExLepEEZ_M750_Merged.root")

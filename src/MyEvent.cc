@@ -11,7 +11,6 @@ MyEvent::MyEvent() :
   mets.clear();
   //tracks.clear();
   PrimaryVtxs.clear();
-  mcParticles.clear();
 }
 
 MyEvent::~MyEvent()
@@ -33,7 +32,6 @@ void MyEvent::Reset()
   mets.clear();
   //tracks.clear();
   PrimaryVtxs.clear();
-  mcParticles.clear();
   eventQuality = -1;
 }
 

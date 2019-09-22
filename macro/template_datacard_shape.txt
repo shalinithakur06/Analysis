@@ -1,0 +1,38 @@
+Date: XXX
+Description: H+, mu+jets, mass YYY GeV, lumi=ZZZ fb-1
+--------------------------------------------------------------------------------------------------
+imax   1  number of channels
+jmax   *  number of backgrounds
+kmax   *  number of nuisance parameters
+-------------------------------------------------------------------------------------------------
+shapes * * XXX.root $PROCESS $PROCESS_$SYSTEMATIC
+-------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------
+Observation    XXX
+-------------------------------------------------------------------------------------------------
+bin                     cat1      cat1        cat1          cat1        cat1        cat1      cat1
+process                 HHXXX     WHYYY       ttbar         wjet        zjet        diboson   qcd
+process                  -1         0          1             2           3            4        5
+--------------------------------------------------------------------------------------------------
+rate                        
+--------------------------------------------------------------------------------------------------
+lumi               lnN   1.00      1.027      1.027        1.027        1.027     1.027   1.00  Luminosity Error
+CMS_eff_mu         lnN   1.00      1.031      1.031        1.031        1.031     1.031   1.00  Lepton Efficiency
+CMS_stat_hh        lnN   1.00      1.00       1.00         1.00         1.00      1.00    1.00  HH MC stat
+CMS_stat_wh        lnN   1.00      XXXX       1.00         1.00         1.00      1.00    1.00  WH MC stat
+CMS_stat_tt        lnN   1.00      1.00       XXXX         1.00         1.00      1.00    1.00  ttbar MC stat
+CMS_stat_wjet      lnN   1.00      1.00       1.00         XXXX         1.00      1.00    1.00  W+jets MC stat
+CMS_stat_zjet      lnN   1.00      1.00       1.00         1.00         XXXX      1.00    1.00  Zjet MC stat
+CMS_stat_stop      lnN   1.00      1.00       1.00         1.00         1.00      1.00    1.00  single top MC stat
+CMS_stat_vv        lnN   1.00      1.00       1.00         1.00         1.00      XXXX    1.00  diboson MC stat
+CMS_stat_qcd       lnN   1.00      1.00       1.00         1.00         1.00      1.00    XXXX  qcd data-driven stat
+CMS_norm_tt        lnN   1.00      1.061      1.061        1.00         1.00      1.00    1.00  ttbar cross-section
+CMS_norm_stop      lnN   1.00      1.00       1.00         1.00         1.00      1.00    1.00  singleTop cross-section
+CMS_norm_wjet      lnN   1.00      1.00       1.00         1.045        1.00      1.00    1.00  Z->ll cross section
+CMS_norm_zjet      lnN   1.00      1.00       1.00         1.00         1.05      1.00    1.00  Z->ll cross section
+CMS_norm_qcd       lnN   1.00      1.00       1.00         1.00         1.00      1.00    1.60  qcd cross section data-driven
+CMS_norm_vv        lnN   1.00      1.00       1.00         1.00         1.00      1.04    1.00  VV cross section
+CMS_pileup         lnN   1.00      1.033      1.033        1.033        1.033     1.033   1.00  pileup
+JES               shape  1.00      1.00       1.00         1.00         1.00      1.00     -    JES Up/Down    
+JER               shape  1.00      1.00       1.00         1.00         1.00      1.00     -    JER Up/Down
+* autoMCStats 0

@@ -26,6 +26,7 @@ void Analyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
   //---------------------------------------------------//
   //for systematics (all sys in one go)
   //---------------------------------------------------//  
+  /*
  if(!ev_->isData){ 
     CutFlowProcessor(url, myKey, "JESPlus", 	outFile_);
     CutFlowProcessor(url, myKey, "JESMinus", 	outFile_);
@@ -36,6 +37,7 @@ void Analyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
     CutFlowProcessor(url, myKey, "TopPtPlus", 	outFile_);
     CutFlowProcessor(url, myKey, "TopPtMinus", 	outFile_);
   }
+  */
   outFile_->Write(); 
   outFile_->Close();
   f_->Close();
@@ -100,7 +102,7 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     	      "incl", bTagSys, otherSysTypes, BTagEntry::FLAV_UDSG);
   
   //getBTagEffHistos(f);
-  TString histPath("myMiniTreeProducer/Jets/");
+  TString histPath("myMiniTreeProducer/MCINFO/");
   TH2D* h2_BTagEff_Denom_b 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Denom_b"));
   TH2D* h2_BTagEff_Denom_c 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Denom_c"));
   TH2D* h2_BTagEff_Denom_udsg 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Denom_udsg")); 
@@ -113,9 +115,6 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
   double kfCount = 0;
   double n_negEvt = 0.0;
   double n_posEvt = 0.0;
-  double n_noCharge = 0.0;
-  double n_oppCharge = 0.0;
-  double n_sameCharge = 0.0;
   for(int i=0; i<nEntries; ++i){
     Long64_t ientry = evR->LoadTree(i);
     if (ientry < 0) break;
@@ -245,9 +244,11 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     ///if(looseMuonVeto( e2, pfElectrons, isPFlow) ) continue;
     //both electrons should have opposite charge
     //charge selection
-    n_noCharge++ ;
-    if(pfElectrons[e1].charge == pfElectrons[e2].charge) n_sameCharge++;
-    if(pfElectrons[e1].charge != pfElectrons[e2].charge) n_oppCharge++;
+    fillHisto(outFile_, cutflowType, "", "noCharge", 10, -2, 2, 1, evtWeight);
+    if(pfElectrons[e1].charge == pfElectrons[e2].charge)
+      fillHisto(outFile_, cutflowType, "", "sameCharge", 10, -2, 2, 1, evtWeight);
+    if(pfElectrons[e1].charge != pfElectrons[e2].charge) 
+      fillHisto(outFile_, cutflowType, "", "oppCharge", 10, -2, 2, 1, evtWeight);
     //both muons should have opposite charge
     //if(pfElectrons[e1].charge == pfElectrons[e2].charge) continue; // to be consistent with other AN
      
@@ -273,11 +274,18 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     double ele_trigSF2       = getEleTrigSF(h2_ele_trigSF, pfElectrons[e2].eleSCEta,  pfElectrons[e2].p4.pt());
     double ele_heep_SF2      = getEleHeep2SF(tg_heep_SF, pfElectrons[e2].eleSCEta);
     eleSF2 = ele_recoSF2*ele_trigSF2*ele_heep_SF2;
-
+    fillHisto(outFile_, cutflowType, "", "recoSF1", 1000, 0, 100, ele_recoSF1 , 1);
+    fillHisto(outFile_, cutflowType, "", "trigSF1", 1000, 0, 100, ele_trigSF1 , 1);
+    fillHisto(outFile_, cutflowType, "", "heepSF1", 1000, 0, 100, ele_heep_SF1, 1);
+    fillHisto(outFile_, cutflowType, "", "recoSF2", 1000, 0, 100, ele_recoSF2 , 1);
+    fillHisto(outFile_, cutflowType, "", "trigSF2", 1000, 0, 100, ele_trigSF2 , 1);
+    fillHisto(outFile_, cutflowType, "", "heepSF2", 1000, 0, 100, ele_heep_SF2, 1);
     //Scale factors are applied on MC only.
     double eleSF = 1.0;
     if(!ev->isData) eleSF = eleSF1*eleSF2;
     evtWeight *= eleSF;
+    fillHisto(outFile_, cutflowType, "", "eleSF1", 1000, 0, 100, eleSF1, 1 );
+    fillHisto(outFile_, cutflowType, "", "eleSF2", 1000, 0, 100, eleSF2, 1 );
     fillHisto(outFile_, cutflowType, "", "eleSF", 1000, 0, 100, eleSF, 1 );
     //---------------------------------------------------//
     // Iso(<0.15) and Non-iso(>0.15) region 
@@ -700,9 +708,6 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
   double amcnlo_weight = 1.0;
   if(effective_evt !=0) amcnlo_weight = effective_evt/nEntries;
   fillHisto(outFile_, cutflowType, "", "amcnlo_weight", 10, 0, 1, amcnlo_weight,1);
-  fillHisto(outFile_, cutflowType, "", "noCharge", 10, -2, 2, 0, n_noCharge);
-  fillHisto(outFile_, cutflowType, "", "oppCharge", 10, -2, 2, -1, n_oppCharge);
-  fillHisto(outFile_, cutflowType, "", "sameCharge", 10, -2, 2, 1, n_sameCharge);
   f->Close(); 
   delete f;
 }
@@ -711,12 +716,12 @@ void Analyzer::processEvents(){
   
   //Data, MC sample from lxplus and T2
   //CutFlowAnalysis("DYJetsToLL_M50_EleMC_20190117_Ntuple_8.root", "PF", ""); 
-  ///CutFlowAnalysis("TT_EleMC_20190117_Ntuple_7.root", "PF", "");
+  CutFlowAnalysis("outFile_.root", "PF", "");
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094/", "PF", "");
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_for2016Data_EleMC_20190117/EleMC_20190117/TT_EleMC_20190117/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_EleMC_20190117/190117_103502/0000/TT_EleMC_20190117_Ntuple_1.root", "PF", "");
 
   //====================================
   //condor submission
-  CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
   //====================================
 } 

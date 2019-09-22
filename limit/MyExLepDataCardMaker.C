@@ -14,13 +14,23 @@
 //----------------------------------------//
 MyExLepDataCardMaker DC;
 void MyExLepDataCardMaker(TString inFileDir="stack_tmp_Mu_Sys", 
-        TString histSubDir_="ZTag1", 
+        TString histSubDir_="ZTag3", 
         TString histName="mlZ_max_sig250", 
         TString channelName="mu", 
         int mass = 250, 
         TString label="ExLep250", 
         TString hPlusFileName="all_ExLep_M250.root")
   {
+  TFile* fData    = TFile::Open(inFileDir+"/all_Data.root");
+  //bkg
+  TFile* fVV      = TFile::Open(inFileDir+"/all_VV.root");
+  //TFile* fDY      = TFile::Open(inFileDir+"/all_DY.root");
+  TFile* fDY      = TFile::Open(inFileDir+"/all_DY_dd.root");
+  TFile* fWJ      = TFile::Open(inFileDir+"/all_WJets.root");
+  TFile* fTT      = TFile::Open(inFileDir+"/all_TT.root");
+  //signal
+  //TFile *fLstar250       = TFile::Open(inFileDir+"/all_ExLep_M250.root");
+
   TString histSubDir = "Iso/"+histSubDir_+"/";
   bool isMuChannel = false; 
   if(channelName=="mu") isMuChannel = true;
@@ -29,8 +39,11 @@ void MyExLepDataCardMaker(TString inFileDir="stack_tmp_Mu_Sys",
   
   cout<<" ======> mass point: "<<mass<<endl;
   //ttbar
-  double sf_ttbar = 1; 
+  double sf_ttbar = 1.0; 
   TH1F* hTTbar = DC.readHisto(fTT, "base/", histSubDir, histName, sf_ttbar, "TTbar"); 
+  cout<<"--------------------------"<<endl;
+  cout<<hTTbar->Integral()<<endl;
+  cout<<"--------------------------"<<endl;
   TH1F* hTTbar_JESUp = DC.readHisto(fTT, "JESPlus/", histSubDir, histName, sf_ttbar, "TTbar");
   TH1F* hTTbar_JESDown = DC.readHisto(fTT, "JESMinus/", histSubDir, histName, sf_ttbar, "TTbar"); 
   TH1F* hTTbar_JERUp = DC.readHisto(fTT, "JERPlus/", histSubDir, histName, sf_ttbar, "TTbar"); 
@@ -63,7 +76,7 @@ void MyExLepDataCardMaker(TString inFileDir="stack_tmp_Mu_Sys",
 
   //wh
   //lstar
-  double sf_lstar = 1; 
+  double sf_lstar = 1.0; 
   TH1F* hLstar = DC.readHisto(fLstar, "base/", histSubDir, histName, sf_lstar, "Signal"); 
   TH1F* hLstar_JESUp = DC.readHisto(fLstar, "JESPlus/", histSubDir, histName, sf_lstar, "Signal"); 
   TH1F* hLstar_JESDown = DC.readHisto(fLstar, "JESMinus/", histSubDir, histName, sf_lstar, "Signal"); 
@@ -131,6 +144,7 @@ void MyExLepDataCardMaker(TString inFileDir="stack_tmp_Mu_Sys",
         out << line << endl;
       }  
       else if(line.find("CMS_stat_zjet")!=string::npos){ 
+	cout<<DC.getStatUnc(hDYJet,  0)<<endl;
         line.replace( line.find("XXXX") , 4 , string(Form("%.2f", DC.getStatUnc(hDYJet,  0))));  
         out << line << endl; 
       }
@@ -146,7 +160,7 @@ void MyExLepDataCardMaker(TString inFileDir="stack_tmp_Mu_Sys",
         line.replace( line.find("TTTT") , 4 , string(Form("%.3f", JESUnc_ttbar)) );
 
         float JESUnc_zjet = (hDYJet->Integral() > 0) ? DC.getSysUnc(hDYJet, hDYJet_JESUp, hDYJet_JESDown) : 1.00;
-        line.replace( line.find("DDDD") , 4 , string(Form("%.3f", JESUnc_zjet)) );
+        //line.replace( line.find("DDDD") , 4 , string(Form("%.3f", JESUnc_zjet)) );
 
         float JESUnc_vv = (hVV->Integral() > 0) ? DC.getSysUnc(hVV, hVV_JESUp, hVV_JESDown) : 1.00;
         line.replace( line.find("VVVV") , 4 , string(Form("%.3f", JESUnc_vv)) );
@@ -160,7 +174,8 @@ void MyExLepDataCardMaker(TString inFileDir="stack_tmp_Mu_Sys",
         line.replace( line.find("TTTT") , 4 , string(Form("%.3f", JERUnc_ttbar)) );
 
         float JERUnc_zjet = (hDYJet->Integral() > 0) ? DC.getSysUnc(hDYJet, hDYJet_JERUp, hDYJet_JERDown) : 1.00;
-        line.replace( line.find("DDDD") , 4 , string(Form("%.3f", JERUnc_zjet)) );
+        //line.replace( line.find("DDDD") , 4 , string(Form("%.3f", JERUnc_zjet)) );
+        //line.replace( line.find("DDDD") , 4 , string(Form("%.3f", 1.00)) );
 
         float JERUnc_vv = (hVV->Integral() > 0) ? DC.getSysUnc(hVV, hVV_JERUp, hVV_JERDown) : 1.00;
         line.replace( line.find("VVVV") , 4 , string(Form("%.3f", JERUnc_vv)) );
@@ -174,7 +189,8 @@ void MyExLepDataCardMaker(TString inFileDir="stack_tmp_Mu_Sys",
         line.replace( line.find("TTTT") , 4 , string(Form("%.3f", bTagUnc_ttbar)) );
 
         float bTagUnc_zjet = (hDYJet->Integral() > 0) ? DC.getSysUnc(hDYJet, hDYJet_bTagUp, hDYJet_bTagDown) : 1.00;
-        line.replace( line.find("DDDD") , 4 , string(Form("%.3f", bTagUnc_zjet)) );
+        //line.replace( line.find("DDDD") , 4 , string(Form("%.3f", bTagUnc_zjet)) );
+        //line.replace( line.find("DDDD") , 4 , string(Form("%.3f", 1.00)) );
 
         float bTagUnc_vv = (hVV->Integral() > 0) ? DC.getSysUnc(hVV, hVV_bTagUp, hVV_bTagDown) : 1.00;
         line.replace( line.find("VVVV") , 4 , string(Form("%.3f", bTagUnc_vv)) );

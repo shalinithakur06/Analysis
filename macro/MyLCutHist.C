@@ -96,6 +96,6 @@ void MyLCutHist(TString histName = "/base/Iso/ZTag/mlZmin_mlZmax", TString xaxis
   //hData->Draw("same");
   //leg->AddEntry(hData,"Data","lp");
   leg->Draw();
-  if(isMuChannel) c->SaveAs("lCutHist_mu.pdf");
-  else c->SaveAs("lCutHist_ele.pdf");
+  if(isMuChannel) c->SaveAs("lCutHist_mu.png");
+  else c->SaveAs("lCutHist_ele.png");
 }

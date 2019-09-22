@@ -9,7 +9,7 @@ bool isEleChannel = false;
 //INPUT FILES
 TFile* fData = TFile::Open("all_Data.root");
 TFile* fVV	= TFile::Open("all_VV.root");
-TFile* fDY	= TFile::Open("all_DY_M50.root");
+TFile* fDY	= TFile::Open("all_DY.root");
 //TFile* fDY	= TFile::Open("all_DY_Pt.root");
 TFile* fTT	= TFile::Open("all_TT.root");
 TFile* fWJ	= TFile::Open("all_WJets.root");

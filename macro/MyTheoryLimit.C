@@ -1,467 +1,197 @@
 
-double MT = 174.3; 
-//---------------------------------
-//the momentum transfer scale Q2 at which to evaluate alphaEM
-//https://github.com/pinkenburg/pythiaeRHIC/blob/048fc8f55d8ef1c8efce0ede8877e317325f5945/pythia/pyalem.f
-//https://github.com/lovedeepkaursaini/lstarGI/blob/master/Theory/calc.cc
-//---------------------------------
-//See R. Kleiss et al, CERN 89-08, vol. 3, pp. 129-131.
-double pyalem( double Q2){
-  ////use pythia default
-  double MSTU101 = 1; 
-  double PARU104 = 1; 
-  double PARU1 = 3.141592653589793; 
-  double PARU101 = 0.00729735; 
-  double AEMPI = PARU101/(3*PARU1);
-  double PRIGG = 0; 
-  double PARU103 = 0.007764;   /// 1/128.8; 
-  if( MSTU101 <= 0 || Q2 < 2E-6 ) 
-    PRIGG = 0; 
-  else if (MSTU101 == 2 && Q2 < PARU104) 
-    PRIGG = 0; 
-  else if (MSTU101 == 2 ) 
-    PRIGG = 1- PARU101/PARU103; 
-  else if(Q2 < 0.09) 
-    PRIGG = AEMPI*(13.4916+log(Q2))+0.00835*log(1+Q2) ;
-  else if(Q2 < 9)
-    PRIGG = AEMPI*(16.32 + 2*log(Q2))+ 0.00238*log(1+3.927*Q2); 
-  else if(Q2 <1E4)
-    PRIGG = AEMPI*(13.4955 + 3*log(Q2))+ 0.00165+0.00299*log(1+Q2); 
-  else PRIGG = AEMPI *(13.4955+3*log(Q2))+0.00221+0.00293*log(1+Q2);
-  double PYALEM = PARU101/(1-PRIGG); 
-  return PYALEM; 
+//CHANNEL
+bool isMuChannel = true;
+bool isEleChannel = false;
+
+//--------------------------------------------
+//function to make graph from two array
+//--------------------------------------------
+TGraph* makeGraph(vector<double> Xarray, vector<double> Yarray){
+  const int n = Xarray.size();
+  double x[n], y[n];
+   for (Int_t i=0;i<n;i++) {
+     x[i] = Xarray[i];
+     y[i] = Yarray[i] ;
+   }
+   TGraph* gr = new TGraph(n,x,y);
+   return gr;
 }
 
-//---------------------------------
-//decay width
-//---------------------------------
-//from pywidth.f
-double wid(double M, double L ,int cha){
-  double SH = M*M; 
-  double SHR = M; 
-  double AEM = 0.0079772474; /// about 1/137.035
-  ///running aem. 
-  AEM =  pyalem(SH);
-  double FAC = SH/(L*L)*SHR; 
-  double QF; 
-  double f = 1.0;   //// f
-  double ff = 1.0;   /// f'
-  double xw = 0.23122;  ///dpg 2007 constant. sin^2(theta_w). pythia use 0.232; 
-  double xw1 = 1-xw; 
-  double WDTP; 
-  double MZ = 91.1876; 
-  double MW = 80.403; 
-  double RM1; 
-  if(cha ==1){  ///mu->mug
-    QF = -f/2.0 - ff/2.0; 
-    WDTP = FAC*AEM*QF*QF*1/4.0; 
-  }else if( cha==2){///mu*->Zmu
-    QF = -f*xw1/2.0+ff*xw/2.0; 
-    RM1 = MZ*MZ/SH; 
-    WDTP = FAC*AEM*QF*QF/(8*xw*xw1)*(1-RM1)*(1-RM1)*(2+RM1);
-  }else if( cha==3){ ///mu*->Wnu
-    //QF = f/sqrt(2.0);
-    RM1 = MW*MW/SH; 
-    WDTP = FAC*AEM*f*f/(16*xw)*(1-RM1)*(1-RM1)*(2+RM1);
-  }else{
-    cout<<"channel: "<<cha<<"  not defined"<<endl;
-    exit(1);
-  }
-  return WDTP; 
+//--------------------------------------------
+//function to decorate Graph  
+//--------------------------------------------
+TGraph* decorateGraph(TGraph *graph, TString xTitle, TString yTitle, TString myTitle, double yMin, double yMax, int color){
+  graph->SetTitle(myTitle);
+  graph->GetYaxis()->SetTitleOffset(1.30);
+  graph->GetXaxis()->SetTitle(xTitle);
+  graph->GetXaxis()->SetTitleSize(0.04);
+  graph->GetXaxis()->SetLabelSize(0.035);
+  graph->GetYaxis()->SetTitle(yTitle);
+  graph->GetYaxis()->SetTitleSize(0.04);
+  graph->GetYaxis()->SetMoreLogLabels(true);
+  graph->GetXaxis()->SetMoreLogLabels(true);
+  //graph->GetYaxis()->SetRangeUser(yMin, yMax);
+  //graph->GetXaxis()->SetRangeUser(0.44, 0.72);
+  graph->GetYaxis()->SetLabelSize(0.035);
+  graph->GetXaxis()->SetNdivisions(14);
+  graph->GetYaxis()->SetNdivisions(10);
+  graph->GetYaxis()->CenterTitle();
+  graph->SetLineColor(color);
+  graph->SetLineWidth(3);
+  //graph->SetMarkerStyle(20);
+  //graph->SetMarkerSize(1);
+  graph->SetMarkerColor(color);
+  return graph;
 }
 
-//---------------------------------
-////for e*->e+t+tbar needs to calculate again( MT= 175, not small for small e*)
-//---------------------------------
-double width_ci_ttbar(double *x,double *par){
-  double Lambda = par[0];
-  double M = par[1];
-  double m23 = x[0]; ///
-  //m23 = sqrt(m23);
-  double PI = 3.141592653589793; 
-  double g = sqrt(4*PI);
-  double m2 = 0; ///lepton mass set zero
-  double m3 = MT; 
-  double m4 = MT;
-  double X = (-pow(m2,2) + pow(m23,2) + pow(m3,2))/(2.*m23);
-  double Y = (pow(M,2) - pow(m23,2) - pow(m4,2))/(2.*m23);
-  double A = pow(X+Y,2)- pow( sqrt(X*X-m3*m3)+sqrt(Y*Y-m4*m4),2);
-  double B = pow(X+Y,2)- pow( sqrt(X*X-m3*m3)-sqrt(Y*Y-m4*m4),2);
-  double MSquare = (2*pow(g,4)*(-pow(m2,2) + pow(m23,2) - pow(m3,2))*(pow(M,2) - pow(m23,2) + pow(m4,2)))/
-    pow(Lambda,4);
-  double val = 1/pow(2*PI,3) * 1/(32*pow(M,3)) * MSquare * (B-A);
-  val *= 2*m23; 
-  return val; 
-}
+void MyTheoryLimit(){
+  vector<double>lambVec250;             vector<double>lambVec500;
+  lambVec250.push_back(861.4	);      lambVec500.push_back(167.4    );   
+  lambVec250.push_back(98.63	);      lambVec500.push_back(35.9     );
+  lambVec250.push_back(11.87	);      lambVec500.push_back(8.921    );
+  lambVec250.push_back(2.455	);      lambVec500.push_back(2.247    );
+  lambVec250.push_back(0.784	);      lambVec500.push_back(0.6843   );
+  lambVec250.push_back(0.2793	);      lambVec500.push_back(0.2766   );
+  lambVec250.push_back(0.1133	);      lambVec500.push_back(0.1373   );
+  lambVec250.push_back(0.06922	);      lambVec500.push_back(0.08491  );
+  lambVec250.push_back(0.01524	);      lambVec500.push_back(0.02411  );
+  lambVec250.push_back(0.006653	);      lambVec500.push_back(0.009437 );
+  lambVec250.push_back(0.002478	);      lambVec500.push_back(0.004609 );
+  lambVec250.push_back(0.001263	);      lambVec500.push_back(0.002353 );
+  lambVec250.push_back(0.0006454	);      lambVec500.push_back(0.001109 );
+  lambVec250.push_back(0.0003316	);      lambVec500.push_back(0.000748 );
 
-//---------------------------------
-// width for contact interaction
-//---------------------------------
-double widci(double isCorrection, double M,double L){
-  //// 1/(96*pi)*NC*S*M^5/L^4
-  //double SHR = M; 
-  //double NC = 
-  double PI = 3.141592653589793; 
-  double WDTP = 1/(96*PI)*pow(M,5)/pow(L,4); 
-  double sum; 
-  double NC = 1; 
-  double S = 2; 
-  ///mu*->mu+mumu
-  sum = WDTP*NC*S; 
-  NC = 1; 
-  S = 1; 
-  ///mu*->mu+ e/tau + E/Tau  or 3 neutrino pairs
-  sum += WDTP*NC*S*5; 
-  NC = 3; 
-  S = 1; 
-  ///mu*->mu+ qQ; 
-  //sum += WDTP*NC*S*6; 
-  sum += WDTP*NC*S*5; // mass set to be 0 
-  if(M>2*MT && isCorrection){
-    double m23Square_l = pow(MT,2);
-    double m23Square_u = pow(M-MT,2);
-    ///top
-    TF1 *ftmp = new TF1("ftmp",width_ci_ttbar,sqrt(m23Square_l),sqrt(m23Square_u),2);
-    ftmp->SetParameter(0,L);
-    ftmp->SetParameter(1,M);
-    double tmp = ftmp->Integral(sqrt(m23Square_l),sqrt(m23Square_u));
-    sum += tmp*S*NC; 
-  }
-  else if(M>2*MT) sum += WDTP*S*NC;
-  return sum; 
-}
+  vector<double>lambVec750;             vector<double>lambVec1000;
+  lambVec750.push_back(59.4     );       lambVec1000.push_back(23.51     );   
+  lambVec750.push_back(16.27    );       lambVec1000.push_back(7.798     );
+  lambVec750.push_back(4.485    );       lambVec1000.push_back(2.778     );
+  lambVec750.push_back(1.646    );       lambVec1000.push_back(1.084     );
+  lambVec750.push_back(0.5934   );       lambVec1000.push_back(0.4112    );
+  lambVec750.push_back(0.2133   );       lambVec1000.push_back(0.1598    );
+  lambVec750.push_back(0.09433  );       lambVec1000.push_back(0.06778   );
+  lambVec750.push_back(0.04673  );       lambVec1000.push_back(0.03527   );
+  lambVec750.push_back(0.02302  );       lambVec1000.push_back(0.01221   );
+  lambVec750.push_back(0.007783 );       lambVec1000.push_back(0.005419  );
+  lambVec750.push_back(0.004525 );       lambVec1000.push_back(0.002615  );
+  lambVec750.push_back(0.002142 );       lambVec1000.push_back(0.001787  );
+  lambVec750.push_back(0.001279 );       lambVec1000.push_back(0.0009694 );
+  lambVec750.push_back(0.0008643);       lambVec1000.push_back(0.0005933 );
 
-///Shilpi - May 29, 2011
-/////e*->eee
-double widci_ee(double M,double L){
-  //// 1/(96*pi)*NC*S*M^5/L^4
-  double PI = 3.141592653589793; 
-  double WDTP = 1/(96*PI)*pow(M,5)/pow(L,4); 
-  double sum = 0; 
-  double NC = 1; 
-  double S = 2; 
-  ///mu*->mu+mumu
-  sum = WDTP*NC*S; 
-  return sum; 
-}
+  vector<double>lambVec1250;            vector<double>lambVec1500;        
+  lambVec1250.push_back(11.83    );      lambVec1500.push_back(6.69     );
+  lambVec1250.push_back(4.825    );      lambVec1500.push_back(2.705    );
+  lambVec1250.push_back(1.579    );      lambVec1500.push_back(1.11     );
+  lambVec1250.push_back(0.6337   );      lambVec1500.push_back(0.3795   );
+  lambVec1250.push_back(0.2394   );      lambVec1500.push_back(0.1995   );
+  lambVec1250.push_back(0.1085   );      lambVec1500.push_back(0.0855   );
+  lambVec1250.push_back(0.05432  );      lambVec1500.push_back(0.0394   );
+  lambVec1250.push_back(0.02816  );      lambVec1500.push_back(0.02071  );
+  lambVec1250.push_back(0.008043 );      lambVec1500.push_back(0.005673 );
+  lambVec1250.push_back(0.003708 );      lambVec1500.push_back(0.002339 );
+  lambVec1250.push_back(0.001767 );      lambVec1500.push_back(0.001348 );
+  lambVec1250.push_back(0.001057 );      lambVec1500.push_back(0.000795 );
+  lambVec1250.push_back(0.0007054);      lambVec1500.push_back(0.0004033);
+  lambVec1250.push_back(0.0004234);      lambVec1500.push_back(0.0002709);
 
-//e*->e mu/tau mu/tau or 2 neutrinoes
-double widci_mutau(double M,double L){
-  //// 1/(96*pi)*NC*S*M^5/L^4
-  double PI = 3.141592653589793; 
-  double WDTP = 1/(96*PI)*pow(M,5)/pow(L,4); 
-  double sum = 0; 
-  double NC = 1; 
-  double S = 2; 
-  ///mu*->mu+mumu
-  //sum = WDTP*NC*S; 
-  NC = 1; 
-  S = 1; 
-  ///mu*->mu+ e/tau + E/Tau  or 3 neutrino pairs
-  sum += WDTP*NC*S*5; 
-  return sum; 
-}
+  vector<double>lambVec1750;            vector<double>lambVec2000;       
+  lambVec1750.push_back(0.0000 );        lambVec2000.push_back(2.276     );
+  lambVec1750.push_back(0.0000 );        lambVec2000.push_back(1.107     );
+  lambVec1750.push_back(0.0000 );        lambVec2000.push_back(0.4566    );
+  lambVec1750.push_back(0.0000 );        lambVec2000.push_back(0.1832    );
+  lambVec1750.push_back(0.0000 );        lambVec2000.push_back(0.09486   );
+  lambVec1750.push_back(0.0000 );        lambVec2000.push_back(0.04627   );
+  lambVec1750.push_back(0.0000 );        lambVec2000.push_back(0.0223    );
+  lambVec1750.push_back(0.0000 );        lambVec2000.push_back(0.01141   );
+  lambVec1750.push_back(0.0000 );        lambVec2000.push_back(0.003424  );
+  lambVec1750.push_back(0.0000 );        lambVec2000.push_back(0.001149  );
+  lambVec1750.push_back(0.0000 );        lambVec2000.push_back(0.0005401 );
+  lambVec1750.push_back(0.0000 );        lambVec2000.push_back(0.0002838 );
+  lambVec1750.push_back(0.0000 );        lambVec2000.push_back(0.0001541 );
+  lambVec1750.push_back(0.0000 );        lambVec2000.push_back(0.00009769);
 
-//e*->eqq
-double widci_qq(double M,double L){
-  //// 1/(96*pi)*NC*S*M^5/L^4
-  //double SHR = M; 
-  //double NC = 
-  double PI = 3.141592653589793; 
-  double WDTP = 1/(96*PI)*pow(M,5)/pow(L,4); 
-  double sum = 0; 
-  double NC = 1; 
-  double S = 2; 
-  NC = 3; 
-  S = 1; 
-  ///mu*->mu+ qQ; 
-  //sum += WDTP*NC*S*6; 
-  sum += WDTP*NC*S*5; // mass set to be 0 
-  if(M>2*MT){
-    double m23Square_l = pow(MT,2);
-    double m23Square_u = pow(M-MT,2);
-    ///top
-    TF1 *ftmp = new TF1("ftmp",width_ci_ttbar,sqrt(m23Square_l),sqrt(m23Square_u),2);
-    ftmp->SetParameter(0,L);
-    ftmp->SetParameter(1,M);
-    double tmp = ftmp->Integral(sqrt(m23Square_l),sqrt(m23Square_u));
-    sum += tmp*S*NC; 
-  }
-  return sum; 
-}
-//////////////////////////////////////////////////////////////////////////
-///simplified branching ratio vs M/L
-void BF_factor(double res[]){
-  ////from pywidth.f
-  double AEM = 0.0079772474; /// about 1/137.035
-  //double QF; 
-  double f = 1.0;   //// f
-  double ff = 1.0;   /// f'
-  double xw = 0.23122;  ///sin^2(theta_w). 
-  double xw1 = 1-xw; 
-  double QF1 = -f/2.0 - ff/2.0; 
-  double QF2 = -f*xw1/2.0+ff*xw/2.0; 
-  double A = 1/4.0*AEM*QF1*QF1; 
-  double B = 1/(8*xw*xw1)*AEM*QF2*QF2*2;
-  double C = AEM*f*f/(16*xw)*2; 
-  double D = 25/(96*3.1415926535);
-  res[0] = A; 
-  res[1] = B; 
-  res[2] = C; 
-  res[3] = D; 
-}
-
-double pyalps( double Q2){
-  ///order to run alpahS
-  int MSTU111 = 1; 
-  ///default quark mass.
-  ///starting from 1. 
-  double PMAS[7]={0,0.33,0.33,0.5,1.5,4.8,175};
-  /////coeff
-  double STEPDN[7] ={0,0,0,0.10568,0.13398,0.17337,0};
-  double STEPUP[7]={0,0,0,0,-0.11413,-0.14563,-0.18988};
-  int NF = 4; 
-  double PARU112 =0.192;
-  double PARU1 = 3.141592653589793; 
-  double PARU111 = 0.2; 
-  //// 0-order alpahS
-  if(MSTU111 <=0 ){
-    double val = PARU111; 
-    return val; 
-  }
-  double Q2EFF = Q2; 
-  double ALAM2 = PARU112*PARU112; 
-  /// C... MSTU(115), default 0. MSTU(112) default 5, the nominal # of flavours assumed in//
-  ///C... alphas expression
-  ////C... paru(112)  D = 0.25GeV Lambad used in running alphaS, acutally print out  0.192 
-  ////C... paru(113) D = 1, the flavour threshold for the effecitve number of flavours Nf to use
-  ///C... in the alphaS expression, Q2 = paru113*mq^2. 
-  ///C... paru(114) D = 4GeV^2  Q2 values below which alphaS is assumed to be constant 
-  ////C... MSTU(113)  default 3: minimum number of flavours that may be assumed in alphas expression.
-  ///C... MSTU(114), default 5, maximum....
-  ////C... MSTU(112), the nominal number of ...
-  int MSTU113 = 3; 
-  int PARU113 = 1; 
-  int MSTU114 = 5; 
-  ///// treatment of alphS singularity for Q2->0. 
-  int MSTU115 = 0;  ///allow it to diverge like 1/log(Q2/Lambda2);
-  while(NF >  max(3,MSTU113)){
-    double Q2THR = PARU113*pow(PMAS[NF],2);
-    if(Q2EFF < Q2THR){
-      NF = NF-1; 
-      double Q2RAT = Q2THR/ALAM2; 
-      ALAM2 = ALAM2*pow(Q2RAT,2.0/(33-2*NF));
-      if(MSTU111 == 2) ALAM2 = ALAM2*pow(log(Q2RAT),STEPDN[NF]);
-      ////continue; 
-    }else break; 
-  }
-  cout<<"after 1st loop. "<<ALAM2<<" "<<Q2EFF<<endl;
-  while( NF < min(6,MSTU114)){
-    double Q2THR = PARU113*pow(PMAS[NF+1],2);
-    if(Q2EFF> Q2THR){
-      NF = NF +1; 
-      double Q2RAT = Q2THR/ALAM2; 
-      ALAM2 = ALAM2*pow(Q2RAT,-2.0/(33-2*NF));
-      if(MSTU111 ==2) ALAM2 = ALAM2*pow(log(Q2RAT),STEPUP[NF]);
-    }else break; 
-  }
-  cout<<"after 2nd loop. "<<ALAM2<<" "<<Q2EFF<<endl;
-  if(MSTU115 == 1) Q2EFF = Q2EFF + ALAM2; 
-  double tmp = Q2EFF/ALAM2;
-  cout<<"Q2EFF/AlAM2: "<<Q2EFF<<" "<<ALAM2<<endl;
-  cout<<"log: "<<log(tmp)<<endl;
-  if(tmp<1.0001) tmp  = 1.0001; 
-  double ALGQ = log(tmp);
-  double B0 = (33-2*NF)/6.0; 
-  double PARU115 = 10; 
-  double val = 2*PARU1/(B0*ALGQ);
-  if(val>PARU115) val = PARU115; 
-  if(MSTU111 ==1)
-    return val;
-  ///2nd order
-
-  // B1=(153D0-19D0*NF)/6D0
-  //      PYALPS=MIN(PARU(115),PARU(2)/(B0*ALGQ)*(1D0-B1*LOG(ALGQ)/
-  //   &  (B0**2*ALGQ)))
-  double B1 = (153-19*NF)/6.0; 
-  val = val*(1-B1*log(ALGQ)/(B0*B0*ALGQ)); 
-  return val; 
-}
-
-///brachcing ratio of mu*->mu+ga
-float getBranchRatioMuStarMG(float M,float Lambda){
-  if(Lambda<1000){
-    cout<<"warning Lambda<1TEV.."<<endl;
-  }
-  float br =wid(M,Lambda,1)/(wid(M,Lambda,2)+wid(M,Lambda,3)+wid(M,Lambda,1)+widci(false, M,Lambda));
-  return br; 
-}
-
-///////////////////////////////////SHILPI/////////////////////////////////
-///brachcing ratio of l*->l+ga
-float brlg(float M,float Lambda){
-  if(Lambda<1000){
-    cout<<"warning Lambda<1TEV.."<<endl;
-  }
-  float br =wid(M,Lambda,1)/(wid(M,Lambda,2)+wid(M,Lambda,3)+wid(M,Lambda,1)+widci(false, M,Lambda));
-  //float br =wid(M,Lambda,1)/(wid(M,Lambda,2)+wid(M,Lambda,3)+wid(M,Lambda,1));
-  return br; 
-}
-
-///brachcing ratio of l*->l+Z
-float corrFacbrlz(float M,float Lambda){
-  if(Lambda<1000){
-    cout<<"warning Lambda<1TEV.."<<endl;
-  }
-  float br =(wid(M,Lambda,2)+wid(M,Lambda,3)+wid(M,Lambda,1))/(wid(M,Lambda,2)+wid(M,Lambda,3)+wid(M,Lambda,1)+widci(false, M,Lambda));
-  return br; 
-}
-
-float brpho(float M,float Lambda){
-  if(Lambda<1000){
-    cout<<"warning Lambda<1TEV.."<<endl;
-  }
-  float br =wid(M,Lambda,1)/(wid(M,Lambda,2)+wid(M,Lambda,3)+wid(M,Lambda,1)+widci(false, M,Lambda));
-  return br; 
-}
-
-float brlz(float M,float Lambda){
-  if(Lambda<1000){
-    cout<<"warning Lambda<1TEV.."<<endl;
-  }
-  float br =wid(M,Lambda,2)/(wid(M,Lambda,2)+wid(M,Lambda,3)+wid(M,Lambda,1)+widci(false, M,Lambda));
-  return br; 
-}
-
-float brCI(float M,float Lambda){
-  if(Lambda<1000){
-    cout<<"warning Lambda<1TEV.."<<endl;
-  }
-  float br =widci(false, M,Lambda)/(wid(M,Lambda,2)+wid(M,Lambda,3)+wid(M,Lambda,1)+widci(false, M,Lambda));
-  return br; 
-}
-
-///brachcing ratio of l*->W+nu
-float brnw(float M,float Lambda){
-  if(Lambda<1000){
-    cout<<"warning Lambda<1TEV.."<<endl;
-  }
-  float br =wid(M,Lambda,3)/(wid(M,Lambda,2)+wid(M,Lambda,3)+wid(M,Lambda,1)+widci(false, M,Lambda));
-  return br; 
-}
-
-///brachcing ratio of contact interaction
-float brci(float M,float Lambda){
-  if(Lambda<1000){
-    cout<<"warning Lambda<1TEV.."<<endl;
-  }
-  float br =widci(false, M,Lambda)/(wid(M,Lambda,2)+wid(M,Lambda,3)+wid(M,Lambda,1)+widci(false, M,Lambda));
-  return br; 
-}
-
-///brachcing ratio of contact interaction: e*->eee
-float brci_ee(float M,float Lambda){
-  if(Lambda<1000){
-    cout<<"warning Lambda<1TEV.."<<endl;
-  }
-  float br =widci_ee(M,Lambda)/(wid(M,Lambda,2)+wid(M,Lambda,3)+wid(M,Lambda,1)+widci(false, M,Lambda));
-  return br; 
-}
-
-///brachcing ratio of contact interaction: e*->e mu/tau mu/tau neutrinoes
-float brci_mutau(float M,float Lambda){
-  if(Lambda<1000){
-    cout<<"warning Lambda<1TEV.."<<endl;
-  }
+  vector<double>lambVec2500;             vector<double>lambVec3000;       
+  lambVec2500.push_back(1.086     );     lambVec3000.push_back(0.5149    );
+  lambVec2500.push_back(0.5275    );     lambVec3000.push_back(0.2822    );
+  lambVec2500.push_back(0.2277    );     lambVec3000.push_back(0.1424    );
+  lambVec2500.push_back(0.1155    );     lambVec3000.push_back(0.07183   );
+  lambVec2500.push_back(0.05286   );     lambVec3000.push_back(0.03289   );
+  lambVec2500.push_back(0.03009   );     lambVec3000.push_back(0.01738   );
+  lambVec2500.push_back(0.01253   );     lambVec3000.push_back(0.008909  );
+  lambVec2500.push_back(0.008244  );     lambVec3000.push_back(0.004948  );
+  lambVec2500.push_back(0.00212   );     lambVec3000.push_back(0.001507  );
+  lambVec2500.push_back(0.0006827 );     lambVec3000.push_back(0.0004379 );
+  lambVec2500.push_back(0.000284  );     lambVec3000.push_back(0.0001703 );
+  lambVec2500.push_back(0.0001393 );     lambVec3000.push_back(0.00008872);
+  lambVec2500.push_back(0.00007738);     lambVec3000.push_back(0.00003888);
+  lambVec2500.push_back(0.00005921);     lambVec3000.push_back(0.00002767);
   
-  float br =widci_mutau(M,Lambda)/(wid(M,Lambda,2)+wid(M,Lambda,3)+wid(M,Lambda,1)+widci(false, M,Lambda));
-  return br; 
+  vector<string>lambVecLabel;
+  lambVecLabel.push_back("#lambda = 250  GeV");
+  lambVecLabel.push_back("#lambda = 500  GeV");
+  lambVecLabel.push_back("#lambda = 750  GeV");
+  lambVecLabel.push_back("#lambda = 1000 GeV");
+  lambVecLabel.push_back("#lambda = 1250 GeV");
+  lambVecLabel.push_back("#lambda = 1500 GeV");
+  lambVecLabel.push_back("#lambda = 1750 GeV");
+  lambVecLabel.push_back("#lambda = 2000 GeV");
+  lambVecLabel.push_back("#lambda = 2500 GeV");
+  lambVecLabel.push_back("#lambda = 3000 GeV");
+  lambVecLabel.push_back("#lambda = 3500 GeV");
+  lambVecLabel.push_back("#lambda = 4000 GeV");
+  lambVecLabel.push_back("#lambda = 4500 GeV");
+  lambVecLabel.push_back("#lambda = 5000 GeV");
+
+  vector<vector<double>> lambdaVecAll;
+  lambdaVecAll.push_back(lambVec250);
+  lambdaVecAll.push_back(lambVec500);
+  lambdaVecAll.push_back(lambVec750);
+  lambdaVecAll.push_back(lambVec1000);
+  lambdaVecAll.push_back(lambVec1250);
+  lambdaVecAll.push_back(lambVec1500);
+  lambdaVecAll.push_back(lambVec1750);
+  lambdaVecAll.push_back(lambVec2000);
+  lambdaVecAll.push_back(lambVec2500);
+  lambdaVecAll.push_back(lambVec3000);
+
+  vector<double> massVec;
+  massVec.push_back(250 );  
+  massVec.push_back(500 );  
+  massVec.push_back(750 );  
+  massVec.push_back(1000);  
+  massVec.push_back(1250);  
+  massVec.push_back(1500);  
+  massVec.push_back(1750);  
+  massVec.push_back(2000);  
+  massVec.push_back(2500);  
+  massVec.push_back(3000);  
+  massVec.push_back(3500);  
+  massVec.push_back(4000);  
+  massVec.push_back(4500);  
+  massVec.push_back(5000);  
+  
+  TFile *outFile = new TFile("theoryXss.root", "RECREATE");
+  TCanvas * can = new TCanvas();
+  can->cd();
+  gPad->SetGridy();
+  gPad->SetGridx();
+  gPad->SetLogy();
+  gPad->SetLogx();
+  TLegend* leg = new TLegend(0.15,0.78,0.90,0.88,NULL,"brNDC");
+  leg->SetNColumns(3);
+  leg->SetBorderSize(0);
+  leg->SetTextSize(0.03);
+  leg->SetFillColor(0);
+  for(int i = 0; i<lambdaVecAll.size(); i++){
+    TGraph * myGraph = makeGraph(massVec, lambdaVecAll.at(i));
+    myGraph->Write();
+    if(isMuChannel)decorateGraph(myGraph, "M_{l^{*}} [GeV]", "#sigma (fb) #times BR", "Theoretical cross section", 0.75, 1.15, i+1);
+    if(i==0) myGraph->Draw("ALP");
+    else myGraph->Draw("LPsame");
+    leg->AddEntry(myGraph, TString(lambVecLabel.at(i)),"PL");
+  }
+  outFile->Close();
+  leg->Draw();
+  can->SaveAs("theoryXss.pdf");
 }
 
-///brachcing ratio of contact interaction: e*->e qq
-float brci_qq(float M,float Lambda){
-  if(Lambda<1000){
-    cout<<"warning Lambda<1TEV.."<<endl;
-  }
-  float br =widci_qq(M,Lambda)/(wid(M,Lambda,2)+wid(M,Lambda,3)+wid(M,Lambda,1)+widci(false, M,Lambda));
-  return br; 
-}
 
-////////SHILPI////////////////////////////////////////////////////////
-float Lambda0 = 10; 
-float Xsec_Sig[10] = {1.610e-2,8.717e-3,4.806e-3,2.657e-3,1.474e-3,3.236e-4,6.589e-5};
-float Mas_mustar[10]={200,400,600,800,1000,1500,2000};
-//input the mass point j >=0 && j<=6 
-///xlim is the cross section limit value 
-double searchCS(int j,double xlimt){
-  int useCorrDecay = 0; 
-  ///first find L1 and L2
-  double L1 = 3; 
-  double L2 = 3; 
-  double M = Mas_mustar[j];
-  int found = 0; 
-  double br ;
-  double Lstart = 0.1; 
-  if(j>=5) Lstart = 0.05; 
-  for(double L = Lstart; L<=50; L += 1){
-    L1 = L ;
-    L2 = L+1; 
-    double xs = Xsec_Sig[j]*pow(Lambda0,4)/pow(L1,4);
-    ////corrected due to top
-    if(useCorrDecay==1) br= wid(M,L1*1000,1)/(wid(M,L1*1000,2)+wid(M,L1*1000,3)+wid(M,L1*1000,1)+widci(false, M,L1*1000));
-    else br = wid(M,L1*1000,1)/(wid(M,L1*1000,2)+wid(M,L1*1000,3)+wid(M,L1*1000,1)+widci(true, (M,L1*1000));
-    double xsbr1 = xs*br; 
-    xs = Xsec_Sig[j]*pow(Lambda0,4)/pow(L2,4);
-    if(useCorrDecay==1) br= wid(M,L2*1000,1)/(wid(M,L2*1000,2)+wid(M,L2*1000,3)+wid(M,L2*1000,1)+widci(false, M,L2*1000));
-    else br = wid(M,L2*1000,1)/(wid(M,L2*1000,2)+wid(M,L2*1000,3)+wid(M,L2*1000,1)+widci(true, (M,L2*1000));
-    double xsbr2 = xs*br; 
-    if(xsbr1>xlimt && xsbr2<xlimt){
-      found =1; 
-      break; 
-    }
-  } 
-  if(found ==0) {
-    cout<<"eroor not found "<<endl; 
-    return -1 ;
-  }
-  double stepsize = 1; ///inGeV
-  double errMin = 1;
-  L1 *= 1000;
-  L2 *= 1000;
-  double Lm = 3;
-  for(double L = L1; L<= L2; L += stepsize){
-    double xsecmux =  Xsec_Sig[j] * pow(Lambda0,4)/pow(L/1000.,4);
-    if(useCorrDecay==1) br= wid(M,L,1)/(wid(M,L,2)+wid(M,L,3)+wid(M,L,1)+widci(false, M,L));
-    else br = wid(M,L,1)/(wid(M,L,2)+wid(M,L,3)+wid(M,L,1)+widci(true, (M,L));
-    double xmuxmug = xsecmux*br;
-    double err = fabs(xmuxmug - xlimt);
-    if(err<errMin){
-      errMin = err;
-      Lm = L;
-    }
-  }
-  if( errMin > 0.002){
-    cout<<"wrong errMin "<< errMin <<endl; 
-    exit(1);
-  }
-  errMin = 1;
-  double Lm1 = Lm; 
-  //low finally do once again search with useCorrDeacy =1 
-  useCorrDecay = 1; 
-  for(double L = Lm1 - 100; L<= Lm1 + 100; L += stepsize){
-    double xsecmux =  Xsec_Sig[j] * pow(Lambda0,4)/pow(L/1000.,4);
-    if(useCorrDecay==1) br= wid(M,L,1)/(wid(M,L,2)+wid(M,L,3)+wid(M,L,1)+widci(false, M,L));
-    else br = wid(M,L,1)/(wid(M,L,2)+wid(M,L,3)+wid(M,L,1)+widci(true, (M,L));
-    double xmuxmug = xsecmux*br;
-    double err = fabs(xmuxmug - xlimt);
-    if(err<errMin){
-      errMin = err;
-      Lm = L;
-    }
-  }
-  if( errMin > 0.002){
-    cout<<"wrong errMin2 "<< errMin <<endl; 
-    exit(1);
-  }
-  return Lm; 
-}

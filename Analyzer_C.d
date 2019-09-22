@@ -294,11 +294,10 @@
 ./Analyzer_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/Math/GenVector/DisplacementVector3Dfwd.h
 ./Analyzer_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/Math/PxPyPzE4D.h
 ./Analyzer_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/Math/LorentzVector.h
-./Analyzer_C.so: interface/MyMET.h interface/MyTrack.h interface/MyVertex.h
+./Analyzer_C.so: interface/MyMET.h interface/MyVertex.h
 ./Analyzer_C.so: interface/MyElectron.h interface/MyMuon.h
-./Analyzer_C.so: interface/MyMCParticle.h interface/SampleInfo.h
-./Analyzer_C.so: interface/ObjectSelector.hh interface/UncertaintyComputer.hh
-./Analyzer_C.so: interface/BTagSF.hh
+./Analyzer_C.so: interface/SampleInfo.h interface/ObjectSelector.hh
+./Analyzer_C.so: interface/UncertaintyComputer.hh interface/BTagSF.hh
 ./Analyzer_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TRandom3.h
 ./Analyzer_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TH2D.h
 ./Analyzer_C.so: interface/BTagCalibrationStandalone.h

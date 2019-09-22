@@ -15,16 +15,17 @@ class MyVertex
   ~MyVertex();
   
   void Reset();
-  
   double chi2;
-  Point3D        ErrXYZ;   //  error position
-  int isValid;
-  int totVtx;
-  double ndof;
   double normalizedChi2;
+  int  ndof;
+  int totVtx;
   double rho;  // for maxd0 selection (<2)
-  double rhoAll;
+  bool isValid;
   Point3D        XYZ;      //  position
+  Point3D        ErrXYZ;   //  error position
+  //fixedGridRhoAll: 
+  //https://github.com/cms-analysis/flashgg/blob/e2fac35487f23fe05b20160d7b51f34bd06b0660/ Taggers/python/globalVariables_cff.py
+  double rhoAll;  
   
  private :
 

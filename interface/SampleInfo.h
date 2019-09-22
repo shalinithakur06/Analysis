@@ -12,7 +12,6 @@ class SampleInfo
   ~SampleInfo();
   
   std::string sampleName;
-  //int mcEvtType;
   std::vector<double>pileup;
   std::vector<double>truepileup;
   ///std::vector<double>puWeights;
@@ -24,7 +23,7 @@ class SampleInfo
   //particle status
   std::vector<int>hepISTUP;
   std::vector<double>topPtWeights;
-  double gen_weight; 
+  double gen_weight;
  private :
 
 };

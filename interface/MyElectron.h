@@ -15,10 +15,8 @@ class MyElectron
   
   void Reset();
   
-  std::string GetName() { 
-      std::string name(eleName);
-      return name; 
-  };
+  ///std::string GetName() { return name; };
+ 
 //Variables : https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2  
 
   ///basic
@@ -41,7 +39,7 @@ class MyElectron
   double nInnerHits;  //expected missing inner hits 
   double nInnerLostHits;  //expected missing inner hits 
   bool isPassConVeto; //pass conversion veto
-  bool isEcalDriven;  
+  bool isEcalDriven;
   double energy5x5;
   double energy2x5;
   double eleRho;
@@ -61,9 +59,11 @@ class MyElectron
   double relCombPFIsoEA;//Rel. comb. PF iso with EA corr
   double D0;
   double Dz;
-  double trigger_ele_pt;
-  int quality;
+
+  //conversion and IDs
+  bool passEleID;
   bool passConversionVeto;
+
  private :
 };
 #endif

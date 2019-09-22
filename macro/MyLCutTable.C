@@ -38,8 +38,8 @@ double getStatUnc(TH1F* hCentral, double sError = 0.0){
 string doubleToStr(double val){
      ostringstream convert;
      string result("");
-     convert <<std::setprecision(2)<<std::scientific<<val;
-     //convert <<std::setprecision(3)<<val;
+     //convert <<std::setprecision(2)<<std::scientific<<val;
+     convert <<std::setprecision(3)<<val;
      result = convert.str();
   return result;
 }
@@ -88,7 +88,7 @@ string getSigYield(TString sigFile, TString zTagDir, TString histName){
   return doubleToStr(yield)+"$\\pm$"+doubleToStr(stat_err)+"$\\pm$"+doubleToStr(sys_err);
 }
 
-void makeLCutTable(ofstream & outFile, TString zTagDir){  
+void makeLCutTable(ofstream & outFile, TString zTagDir, TString maxY){  
   outFile<<"\\begin{table}"<<endl;
   outFile<<"\\begin{center}"<<endl;  
   //outFile<<"\\begin{LARGE}"<<endl;  
@@ -96,24 +96,24 @@ void makeLCutTable(ofstream & outFile, TString zTagDir){
   outFile<<"\\begin{tabular}{ |r|r|r|r|r|r|r|}"<<endl;  
   outFile<<"\\hline "<<endl; 
   outFile<<"L-Cut & "<<"$M_{l^*}$ & "<<"$N_{sig}\\pm stat \\pm sys $ &"<<"$N_{t\\bar{t}}\\pm stat \\pm sys $ & "<<"$N_{DY}\\pm stat \\pm sys $ & "<<"$N_{VV}\\pm stat \\pm sys $ &"<<"$N_{Bkg}\\pm stat \\pm sys$\\\\"<<endl;
-  outFile<<"(X, Y) & "<<"(GeV) & "<<"&"<<"& "<<"&"<<"&"<<"\\\\"<<endl;
+  outFile<<" (X, Y) (GeV) & "<<"(GeV) & "<<"&"<<"& "<<"&"<<"&"<<"\\\\"<<endl;
   outFile<<"\\hline "<<endl; 
 
   vector<string>lCutVec;
-  lCutVec.push_back("$540, 300$");
-  lCutVec.push_back("$550, 560$");
-  lCutVec.push_back("$800, 900$");
-  lCutVec.push_back("$1050, 1080$");
-  lCutVec.push_back("$1300, 1370$");
-  lCutVec.push_back("$1400, 1700$");
-  lCutVec.push_back("$1400, 1700$");
-  lCutVec.push_back("$1400, 1700$");
-  lCutVec.push_back("$1400, 1700$");
-  lCutVec.push_back("$1400, 1700$");
-  lCutVec.push_back("$1400, 1700$");
-  lCutVec.push_back("$1400, 1700$");
-  lCutVec.push_back("$1400, 1700$");
-  lCutVec.push_back("$1400, 1700$");
+  lCutVec.push_back("$300, 440$"); 
+  lCutVec.push_back("$560, 450$"); 
+  lCutVec.push_back("$900, 700$"); 
+  lCutVec.push_back("$1080,950$");
+  lCutVec.push_back("$1370,1200$");
+  lCutVec.push_back("$1700,1300$");
+  lCutVec.push_back("$1950,1300$");
+  lCutVec.push_back("$2200,1300$");
+  lCutVec.push_back("$2700,1300$");
+  lCutVec.push_back("$3200,1300$");
+  lCutVec.push_back("$3700,1300$");
+  lCutVec.push_back("$4200,1300$");
+  lCutVec.push_back("$4700,1300$");
+  lCutVec.push_back("$5200,1300$");
   
   vector<string>sigMassVec;
   sigMassVec.push_back("250");
@@ -148,7 +148,7 @@ void makeLCutTable(ofstream & outFile, TString zTagDir){
   outFile<<"\\end{center}"<<endl;
   string chName = "muon";
   if(isEleChannel) chName = "electron";
-  outFile<<"\\caption{Event yields after different L-cut $(M_{lZ}^{max} > X, M_{lZ}^{min} < Y)$ for "+chName+" channel.}"<<endl;
+  outFile<<"\\caption{Event yields after different L-cut $(M_{lZ}^{min} < X, M_{lZ}^{max} > Y + "+maxY+")$ for "+chName+" channel.}"<<endl;
   outFile<<"\\end{table}"<<endl;
 } 
 
@@ -166,18 +166,16 @@ void MyLCutTable(){
   outFile<<"\\textwidth 7.0in"<<endl;  
   outFile<<"\\begin{document}"<<endl;  
   outFile<<""<<endl;
-  /*
-  makeLCutTable(outFile, "ZTag1");
-  makeLCutTable(outFile, "ZTag2");
-  makeLCutTable(outFile, "ZTag3");
-  makeLCutTable(outFile, "ZTag4");
-  makeLCutTable(outFile, "ZTag5");
-  makeLCutTable(outFile, "ZTag6");
-  makeLCutTable(outFile, "ZTag7");
-  makeLCutTable(outFile, "ZTag8");
-  */
-  makeLCutTable(outFile, "ZTag9");
-  outFile<<"\\end{document}"<<endl;  
+  makeLCutTable(outFile, "ZTag1", "0");
+  makeLCutTable(outFile, "ZTag2", "100");
+  makeLCutTable(outFile, "ZTag3", "200");
+  makeLCutTable(outFile, "ZTag4", "350");
+  makeLCutTable(outFile, "ZTag5", "400");
+  makeLCutTable(outFile, "ZTag6", "500");
+  makeLCutTable(outFile, "ZTag7", "600");
+  makeLCutTable(outFile, "ZTag8", "700");
+  makeLCutTable(outFile, "ZTag9", "800");
+  outFile<<"\\end{document}"<<endl; 
   outFile.close(); 
 } 
 

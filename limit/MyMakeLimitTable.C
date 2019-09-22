@@ -2,7 +2,7 @@
 #include <fstream>
 #include <iomanip>
 
-void makeLimitTable(TString CHANNEL, TString zTagDir,
+void makeLimitTable(TString CHANNEL, TString zTagDir, TString label,
          bool obs, bool isOut, ofstream & outFile)
   {
 
@@ -142,7 +142,8 @@ void makeLimitTable(TString CHANNEL, TString zTagDir,
   if(CHANNEL=="mu") ch_name = "muon";
   if(CHANNEL=="ele") ch_name = "electron";
   if(CHANNEL=="mu_ele") ch_name = "lepton";
-  outFile<<"\\caption{95\\% CL exclusion limit for "+ch_name+" channel.}"<<endl; 
+  ///outFile<<"\\caption{95\\% CL exclusion limit for "+ch_name+" channel.}"<<endl; 
+  outFile<<"\\caption{95\\% CL exclusion limit after different L-cut $(M_{lZ}^{min} < X, M_{lZ}^{max} > Y + "+label+")$ for "+CHANNEL+" channel.}"<<endl;
   outFile<<"\\label{tab:limit_"+ch_name+"}"<<endl;
   outFile<<"\\end{center}"<<endl; 
   outFile<<"\\end{table}"<<endl; 
@@ -163,20 +164,29 @@ void MyMakeLimitTable(){
   outFile<<"\\usepackage[cm]{fullpage}"<<endl;  
   outFile<<"\\begin{document}"<<endl;  
   outFile<<""<<endl;
-  //muon 
-  /*
-  makeLimitTable("mu", "ZTag1",  false, true, outFile);
-  makeLimitTable("mu", "ZTag2",  false, true, outFile);
-  makeLimitTable("mu", "ZTag3",  false, true, outFile);
-  makeLimitTable("mu", "ZTag4",  false, true, outFile);
-  makeLimitTable("mu", "ZTag5",  false, true, outFile);
-  makeLimitTable("mu", "ZTag6",  false, true, outFile);
-  makeLimitTable("mu", "ZTag7",  false, true, outFile);
-  makeLimitTable("mu", "ZTag8",  false, true, outFile);
-  */
-  makeLimitTable("mu", "ZTag9",  false, true, outFile);
+  //muon
+  //makeLimitTable("mu", "ZTag1", "0",   false, true, outFile);
+  //makeLimitTable("mu", "ZTag2", "100", false, true, outFile);
+  //makeLimitTable("mu", "ZTag3", "200", false, true, outFile);
+  //makeLimitTable("mu", "ZTag4", "350", false, true, outFile);
+  //makeLimitTable("mu", "ZTag5", "400", false, true, outFile);
+  //makeLimitTable("mu", "ZTag6", "500", false, true, outFile);
+  //makeLimitTable("mu", "ZTag7", "600", false, true, outFile);
+  //makeLimitTable("mu", "ZTag8", "700", false, true, outFile);
+  //makeLimitTable("mu", "ZTag9", "800", false, true, outFile);
+  
   //electron 
-  makeLimitTable("ele", "ZTag9",  false, true, outFile);
+  makeLimitTable("ele", "ZTag1", "0",   false, true, outFile);
+  //makeLimitTable("ele", "ZTag2", "100", false, true, outFile);
+  //makeLimitTable("ele", "ZTag3", "200", false, true, outFile);
+  //makeLimitTable("ele", "ZTag4", "350", false, true, outFile);
+  //makeLimitTable("ele", "ZTag5", "400", false, true, outFile);
+  //makeLimitTable("ele", "ZTag6", "500", false, true, outFile);
+  //makeLimitTable("ele", "ZTag7", "600", false, true, outFile);
+  //makeLimitTable("ele", "ZTag8", "700", false, true, outFile);
+  //makeLimitTable("ele", "ZTag9", "800", false, true, outFile);
+  //makeLimitTable("ele", "ZTag9",  false, true, outFile);
+  
   //lepton 
   //makeLimitTable("mu_ele", false, true, outFile);
   outFile<<"\\end{document}"<<endl;  

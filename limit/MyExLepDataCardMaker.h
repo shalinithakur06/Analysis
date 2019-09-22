@@ -10,20 +10,11 @@
 
 using namespace std;
 double totLumi = 35.9;
-TString inFileDir="stack_tmp_Mu_Sys";
-//TString inFileDir="stack_for2016Data_20190117_Mu_Sys";
-//TString histname="mlZ_max_sig1500";
+//TString inFileDir="stack_for2016Data_20190117_Ele_Sys";
+TString inFileDir="stack_for2016Data_20190117_Mu_Sys";
 bool isMuChannel = true;
 bool isEleChannel = false;
-TFile* fData    = TFile::Open(inFileDir+"/all_Data.root");
-//bkg
-TFile* fVV      = TFile::Open(inFileDir+"/all_VV.root");
-TFile* fDY      = TFile::Open(inFileDir+"/all_DY_M50.root");
-TFile* fWJ      = TFile::Open(inFileDir+"/all_WJets.root");
 TFile* fTT      = TFile::Open(inFileDir+"/all_TT.root");
-
-//signal
-TFile *fLstar250       = TFile::Open(inFileDir+"/all_ExLep_M250.root");
 
 class MyExLepDataCardMaker{
   public:
@@ -71,7 +62,7 @@ TH1F* MyExLepDataCardMaker:: readHisto(TFile *inFile, TString histDir, TString h
     hist->Reset();
   }else hist = (TH1F*)(inFile->Get(histPath+inHistName));
   hist->Scale(sf);
-  cout<<setw(10)<<process<<setw(15)<<histPath<<setw(15)<<inHistName<<setw(15)<<hist->Integral()<<endl;
+  cout<<setw(10)<<process<<setw(10)<<""<<histPath<<setw(15)<<inHistName<<setw(15)<<hist->Integral()<<endl;
   return hist;
 }  
 

@@ -16,12 +16,10 @@ EXT = -std=c++11
 all:
 	@$(MAKE) eventdict.cc; $(MAKE) libMyEvent.so
 
-eventdict.cc: ../interface/MyEvent.h ../interface/MyMCParticle.h ../interface/MyTrack.h ../interface/MyVertex.h ../interface/MyJet.h ../interface/MyMET.h ../interface/MyElectron.h ../interface/MyMuon.h ../interface/SampleInfo.h ../interface/Reader.h ../interface/ObjectSelector.hh ../interface/HistogramPlotter.hh ../interface/BTagSF.hh ../interface/UncertaintyComputer.hh LinkDef.h
+eventdict.cc: ../interface/MyEvent.h  ../interface/MyVertex.h ../interface/MyJet.h ../interface/MyMET.h ../interface/MyElectron.h ../interface/MyMuon.h ../interface/SampleInfo.h ../interface/Reader.h ../interface/ObjectSelector.hh ../interface/HistogramPlotter.hh ../interface/BTagSF.hh ../interface/UncertaintyComputer.hh LinkDef.h
 	rootcint -f eventdict.cc -c -I${PWD}/.. -p \
 	interface/MyEvent.h \
 	interface/MyMET.h \
-	interface/MyMCParticle.h \
-	interface/MyTrack.h \
 	interface/MyVertex.h \
 	interface/MyJet.h \
 	interface/MyElectron.h \

@@ -40,8 +40,6 @@ namespace std {} using namespace std;
 // Header files passed as explicit arguments
 #include "interface/MyEvent.h"
 #include "interface/MyMET.h"
-#include "interface/MyMCParticle.h"
-#include "interface/MyTrack.h"
 #include "interface/MyVertex.h"
 #include "interface/MyJet.h"
 #include "interface/MyElectron.h"
@@ -101,51 +99,6 @@ namespace ROOT {
 } // end of namespace ROOT
 
 namespace ROOT {
-   static TClass *MyMCParticle_Dictionary();
-   static void MyMCParticle_TClassManip(TClass*);
-   static void *new_MyMCParticle(void *p = 0);
-   static void *newArray_MyMCParticle(Long_t size, void *p);
-   static void delete_MyMCParticle(void *p);
-   static void deleteArray_MyMCParticle(void *p);
-   static void destruct_MyMCParticle(void *p);
-
-   // Function generating the singleton type initializer
-   static TGenericClassInfo *GenerateInitInstanceLocal(const ::MyMCParticle*)
-   {
-      ::MyMCParticle *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::MyMCParticle));
-      static ::ROOT::TGenericClassInfo 
-         instance("MyMCParticle", "interface/MyMCParticle.h", 11,
-                  typeid(::MyMCParticle), ::ROOT::Internal::DefineBehavior(ptr, ptr),
-                  &MyMCParticle_Dictionary, isa_proxy, 4,
-                  sizeof(::MyMCParticle) );
-      instance.SetNew(&new_MyMCParticle);
-      instance.SetNewArray(&newArray_MyMCParticle);
-      instance.SetDelete(&delete_MyMCParticle);
-      instance.SetDeleteArray(&deleteArray_MyMCParticle);
-      instance.SetDestructor(&destruct_MyMCParticle);
-      return &instance;
-   }
-   TGenericClassInfo *GenerateInitInstance(const ::MyMCParticle*)
-   {
-      return GenerateInitInstanceLocal((::MyMCParticle*)0);
-   }
-   // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::MyMCParticle*)0x0); R__UseDummy(_R__UNIQUE_(Init));
-
-   // Dictionary for non-ClassDef classes
-   static TClass *MyMCParticle_Dictionary() {
-      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const ::MyMCParticle*)0x0)->GetClass();
-      MyMCParticle_TClassManip(theClass);
-   return theClass;
-   }
-
-   static void MyMCParticle_TClassManip(TClass* ){
-   }
-
-} // end of namespace ROOT
-
-namespace ROOT {
    static TClass *MyVertex_Dictionary();
    static void MyVertex_TClassManip(TClass*);
    static void *new_MyVertex(void *p = 0);
@@ -186,51 +139,6 @@ namespace ROOT {
    }
 
    static void MyVertex_TClassManip(TClass* ){
-   }
-
-} // end of namespace ROOT
-
-namespace ROOT {
-   static TClass *MyTrack_Dictionary();
-   static void MyTrack_TClassManip(TClass*);
-   static void *new_MyTrack(void *p = 0);
-   static void *newArray_MyTrack(Long_t size, void *p);
-   static void delete_MyTrack(void *p);
-   static void deleteArray_MyTrack(void *p);
-   static void destruct_MyTrack(void *p);
-
-   // Function generating the singleton type initializer
-   static TGenericClassInfo *GenerateInitInstanceLocal(const ::MyTrack*)
-   {
-      ::MyTrack *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::MyTrack));
-      static ::ROOT::TGenericClassInfo 
-         instance("MyTrack", "interface/MyTrack.h", 11,
-                  typeid(::MyTrack), ::ROOT::Internal::DefineBehavior(ptr, ptr),
-                  &MyTrack_Dictionary, isa_proxy, 4,
-                  sizeof(::MyTrack) );
-      instance.SetNew(&new_MyTrack);
-      instance.SetNewArray(&newArray_MyTrack);
-      instance.SetDelete(&delete_MyTrack);
-      instance.SetDeleteArray(&deleteArray_MyTrack);
-      instance.SetDestructor(&destruct_MyTrack);
-      return &instance;
-   }
-   TGenericClassInfo *GenerateInitInstance(const ::MyTrack*)
-   {
-      return GenerateInitInstanceLocal((::MyTrack*)0);
-   }
-   // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::MyTrack*)0x0); R__UseDummy(_R__UNIQUE_(Init));
-
-   // Dictionary for non-ClassDef classes
-   static TClass *MyTrack_Dictionary() {
-      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const ::MyTrack*)0x0)->GetClass();
-      MyTrack_TClassManip(theClass);
-   return theClass;
-   }
-
-   static void MyTrack_TClassManip(TClass* ){
    }
 
 } // end of namespace ROOT
@@ -430,7 +338,7 @@ namespace ROOT {
       ::MyEvent *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::MyEvent));
       static ::ROOT::TGenericClassInfo 
-         instance("MyEvent", "interface/MyEvent.h", 39,
+         instance("MyEvent", "interface/MyEvent.h", 37,
                   typeid(::MyEvent), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &MyEvent_Dictionary, isa_proxy, 4,
                   sizeof(::MyEvent) );
@@ -818,27 +726,6 @@ namespace ROOT {
 
 namespace ROOT {
    // Wrappers around operator new
-   static void *new_MyMCParticle(void *p) {
-      return  p ? new(p) ::MyMCParticle : new ::MyMCParticle;
-   }
-   static void *newArray_MyMCParticle(Long_t nElements, void *p) {
-      return p ? new(p) ::MyMCParticle[nElements] : new ::MyMCParticle[nElements];
-   }
-   // Wrapper around operator delete
-   static void delete_MyMCParticle(void *p) {
-      delete ((::MyMCParticle*)p);
-   }
-   static void deleteArray_MyMCParticle(void *p) {
-      delete [] ((::MyMCParticle*)p);
-   }
-   static void destruct_MyMCParticle(void *p) {
-      typedef ::MyMCParticle current_t;
-      ((current_t*)p)->~current_t();
-   }
-} // end of namespace ROOT for class ::MyMCParticle
-
-namespace ROOT {
-   // Wrappers around operator new
    static void *new_MyVertex(void *p) {
       return  p ? new(p) ::MyVertex : new ::MyVertex;
    }
@@ -857,27 +744,6 @@ namespace ROOT {
       ((current_t*)p)->~current_t();
    }
 } // end of namespace ROOT for class ::MyVertex
-
-namespace ROOT {
-   // Wrappers around operator new
-   static void *new_MyTrack(void *p) {
-      return  p ? new(p) ::MyTrack : new ::MyTrack;
-   }
-   static void *newArray_MyTrack(Long_t nElements, void *p) {
-      return p ? new(p) ::MyTrack[nElements] : new ::MyTrack[nElements];
-   }
-   // Wrapper around operator delete
-   static void delete_MyTrack(void *p) {
-      delete ((::MyTrack*)p);
-   }
-   static void deleteArray_MyTrack(void *p) {
-      delete [] ((::MyTrack*)p);
-   }
-   static void destruct_MyTrack(void *p) {
-      typedef ::MyTrack current_t;
-      ((current_t*)p)->~current_t();
-   }
-} // end of namespace ROOT for class ::MyTrack
 
 namespace ROOT {
    // Wrappers around operator new
@@ -1276,69 +1142,6 @@ namespace ROOT {
 } // end of namespace ROOT for class vector<int>
 
 namespace ROOT {
-   static TClass *vectorlEfloatgR_Dictionary();
-   static void vectorlEfloatgR_TClassManip(TClass*);
-   static void *new_vectorlEfloatgR(void *p = 0);
-   static void *newArray_vectorlEfloatgR(Long_t size, void *p);
-   static void delete_vectorlEfloatgR(void *p);
-   static void deleteArray_vectorlEfloatgR(void *p);
-   static void destruct_vectorlEfloatgR(void *p);
-
-   // Function generating the singleton type initializer
-   static TGenericClassInfo *GenerateInitInstanceLocal(const vector<float>*)
-   {
-      vector<float> *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(vector<float>));
-      static ::ROOT::TGenericClassInfo 
-         instance("vector<float>", -2, "vector", 214,
-                  typeid(vector<float>), ::ROOT::Internal::DefineBehavior(ptr, ptr),
-                  &vectorlEfloatgR_Dictionary, isa_proxy, 0,
-                  sizeof(vector<float>) );
-      instance.SetNew(&new_vectorlEfloatgR);
-      instance.SetNewArray(&newArray_vectorlEfloatgR);
-      instance.SetDelete(&delete_vectorlEfloatgR);
-      instance.SetDeleteArray(&deleteArray_vectorlEfloatgR);
-      instance.SetDestructor(&destruct_vectorlEfloatgR);
-      instance.AdoptCollectionProxyInfo(TCollectionProxyInfo::Generate(TCollectionProxyInfo::Pushback< vector<float> >()));
-      return &instance;
-   }
-   // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const vector<float>*)0x0); R__UseDummy(_R__UNIQUE_(Init));
-
-   // Dictionary for non-ClassDef classes
-   static TClass *vectorlEfloatgR_Dictionary() {
-      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const vector<float>*)0x0)->GetClass();
-      vectorlEfloatgR_TClassManip(theClass);
-   return theClass;
-   }
-
-   static void vectorlEfloatgR_TClassManip(TClass* ){
-   }
-
-} // end of namespace ROOT
-
-namespace ROOT {
-   // Wrappers around operator new
-   static void *new_vectorlEfloatgR(void *p) {
-      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<float> : new vector<float>;
-   }
-   static void *newArray_vectorlEfloatgR(Long_t nElements, void *p) {
-      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<float>[nElements] : new vector<float>[nElements];
-   }
-   // Wrapper around operator delete
-   static void delete_vectorlEfloatgR(void *p) {
-      delete ((vector<float>*)p);
-   }
-   static void deleteArray_vectorlEfloatgR(void *p) {
-      delete [] ((vector<float>*)p);
-   }
-   static void destruct_vectorlEfloatgR(void *p) {
-      typedef vector<float> current_t;
-      ((current_t*)p)->~current_t();
-   }
-} // end of namespace ROOT for class vector<float>
-
-namespace ROOT {
    static TClass *vectorlEdoublegR_Dictionary();
    static void vectorlEdoublegR_TClassManip(TClass*);
    static void *new_vectorlEdoublegR(void *p = 0);
@@ -1402,69 +1205,6 @@ namespace ROOT {
 } // end of namespace ROOT for class vector<double>
 
 namespace ROOT {
-   static TClass *vectorlEROOTcLcLMathcLcLLorentzVectorlEROOTcLcLMathcLcLPxPyPzE4DlEdoublegRsPgRsPgR_Dictionary();
-   static void vectorlEROOTcLcLMathcLcLLorentzVectorlEROOTcLcLMathcLcLPxPyPzE4DlEdoublegRsPgRsPgR_TClassManip(TClass*);
-   static void *new_vectorlEROOTcLcLMathcLcLLorentzVectorlEROOTcLcLMathcLcLPxPyPzE4DlEdoublegRsPgRsPgR(void *p = 0);
-   static void *newArray_vectorlEROOTcLcLMathcLcLLorentzVectorlEROOTcLcLMathcLcLPxPyPzE4DlEdoublegRsPgRsPgR(Long_t size, void *p);
-   static void delete_vectorlEROOTcLcLMathcLcLLorentzVectorlEROOTcLcLMathcLcLPxPyPzE4DlEdoublegRsPgRsPgR(void *p);
-   static void deleteArray_vectorlEROOTcLcLMathcLcLLorentzVectorlEROOTcLcLMathcLcLPxPyPzE4DlEdoublegRsPgRsPgR(void *p);
-   static void destruct_vectorlEROOTcLcLMathcLcLLorentzVectorlEROOTcLcLMathcLcLPxPyPzE4DlEdoublegRsPgRsPgR(void *p);
-
-   // Function generating the singleton type initializer
-   static TGenericClassInfo *GenerateInitInstanceLocal(const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >*)
-   {
-      vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > > *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >));
-      static ::ROOT::TGenericClassInfo 
-         instance("vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >", -2, "vector", 214,
-                  typeid(vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >), ::ROOT::Internal::DefineBehavior(ptr, ptr),
-                  &vectorlEROOTcLcLMathcLcLLorentzVectorlEROOTcLcLMathcLcLPxPyPzE4DlEdoublegRsPgRsPgR_Dictionary, isa_proxy, 0,
-                  sizeof(vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >) );
-      instance.SetNew(&new_vectorlEROOTcLcLMathcLcLLorentzVectorlEROOTcLcLMathcLcLPxPyPzE4DlEdoublegRsPgRsPgR);
-      instance.SetNewArray(&newArray_vectorlEROOTcLcLMathcLcLLorentzVectorlEROOTcLcLMathcLcLPxPyPzE4DlEdoublegRsPgRsPgR);
-      instance.SetDelete(&delete_vectorlEROOTcLcLMathcLcLLorentzVectorlEROOTcLcLMathcLcLPxPyPzE4DlEdoublegRsPgRsPgR);
-      instance.SetDeleteArray(&deleteArray_vectorlEROOTcLcLMathcLcLLorentzVectorlEROOTcLcLMathcLcLPxPyPzE4DlEdoublegRsPgRsPgR);
-      instance.SetDestructor(&destruct_vectorlEROOTcLcLMathcLcLLorentzVectorlEROOTcLcLMathcLcLPxPyPzE4DlEdoublegRsPgRsPgR);
-      instance.AdoptCollectionProxyInfo(TCollectionProxyInfo::Generate(TCollectionProxyInfo::Pushback< vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > > >()));
-      return &instance;
-   }
-   // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >*)0x0); R__UseDummy(_R__UNIQUE_(Init));
-
-   // Dictionary for non-ClassDef classes
-   static TClass *vectorlEROOTcLcLMathcLcLLorentzVectorlEROOTcLcLMathcLcLPxPyPzE4DlEdoublegRsPgRsPgR_Dictionary() {
-      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >*)0x0)->GetClass();
-      vectorlEROOTcLcLMathcLcLLorentzVectorlEROOTcLcLMathcLcLPxPyPzE4DlEdoublegRsPgRsPgR_TClassManip(theClass);
-   return theClass;
-   }
-
-   static void vectorlEROOTcLcLMathcLcLLorentzVectorlEROOTcLcLMathcLcLPxPyPzE4DlEdoublegRsPgRsPgR_TClassManip(TClass* ){
-   }
-
-} // end of namespace ROOT
-
-namespace ROOT {
-   // Wrappers around operator new
-   static void *new_vectorlEROOTcLcLMathcLcLLorentzVectorlEROOTcLcLMathcLcLPxPyPzE4DlEdoublegRsPgRsPgR(void *p) {
-      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > > : new vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >;
-   }
-   static void *newArray_vectorlEROOTcLcLMathcLcLLorentzVectorlEROOTcLcLMathcLcLPxPyPzE4DlEdoublegRsPgRsPgR(Long_t nElements, void *p) {
-      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >[nElements] : new vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >[nElements];
-   }
-   // Wrapper around operator delete
-   static void delete_vectorlEROOTcLcLMathcLcLLorentzVectorlEROOTcLcLMathcLcLPxPyPzE4DlEdoublegRsPgRsPgR(void *p) {
-      delete ((vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >*)p);
-   }
-   static void deleteArray_vectorlEROOTcLcLMathcLcLLorentzVectorlEROOTcLcLMathcLcLPxPyPzE4DlEdoublegRsPgRsPgR(void *p) {
-      delete [] ((vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >*)p);
-   }
-   static void destruct_vectorlEROOTcLcLMathcLcLLorentzVectorlEROOTcLcLMathcLcLPxPyPzE4DlEdoublegRsPgRsPgR(void *p) {
-      typedef vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > > current_t;
-      ((current_t*)p)->~current_t();
-   }
-} // end of namespace ROOT for class vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > >
-
-namespace ROOT {
    static TClass *vectorlEMyVertexgR_Dictionary();
    static void vectorlEMyVertexgR_TClassManip(TClass*);
    static void *new_vectorlEMyVertexgR(void *p = 0);
@@ -1526,69 +1266,6 @@ namespace ROOT {
       ((current_t*)p)->~current_t();
    }
 } // end of namespace ROOT for class vector<MyVertex>
-
-namespace ROOT {
-   static TClass *vectorlEMyTrackgR_Dictionary();
-   static void vectorlEMyTrackgR_TClassManip(TClass*);
-   static void *new_vectorlEMyTrackgR(void *p = 0);
-   static void *newArray_vectorlEMyTrackgR(Long_t size, void *p);
-   static void delete_vectorlEMyTrackgR(void *p);
-   static void deleteArray_vectorlEMyTrackgR(void *p);
-   static void destruct_vectorlEMyTrackgR(void *p);
-
-   // Function generating the singleton type initializer
-   static TGenericClassInfo *GenerateInitInstanceLocal(const vector<MyTrack>*)
-   {
-      vector<MyTrack> *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(vector<MyTrack>));
-      static ::ROOT::TGenericClassInfo 
-         instance("vector<MyTrack>", -2, "vector", 214,
-                  typeid(vector<MyTrack>), ::ROOT::Internal::DefineBehavior(ptr, ptr),
-                  &vectorlEMyTrackgR_Dictionary, isa_proxy, 4,
-                  sizeof(vector<MyTrack>) );
-      instance.SetNew(&new_vectorlEMyTrackgR);
-      instance.SetNewArray(&newArray_vectorlEMyTrackgR);
-      instance.SetDelete(&delete_vectorlEMyTrackgR);
-      instance.SetDeleteArray(&deleteArray_vectorlEMyTrackgR);
-      instance.SetDestructor(&destruct_vectorlEMyTrackgR);
-      instance.AdoptCollectionProxyInfo(TCollectionProxyInfo::Generate(TCollectionProxyInfo::Pushback< vector<MyTrack> >()));
-      return &instance;
-   }
-   // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const vector<MyTrack>*)0x0); R__UseDummy(_R__UNIQUE_(Init));
-
-   // Dictionary for non-ClassDef classes
-   static TClass *vectorlEMyTrackgR_Dictionary() {
-      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const vector<MyTrack>*)0x0)->GetClass();
-      vectorlEMyTrackgR_TClassManip(theClass);
-   return theClass;
-   }
-
-   static void vectorlEMyTrackgR_TClassManip(TClass* ){
-   }
-
-} // end of namespace ROOT
-
-namespace ROOT {
-   // Wrappers around operator new
-   static void *new_vectorlEMyTrackgR(void *p) {
-      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<MyTrack> : new vector<MyTrack>;
-   }
-   static void *newArray_vectorlEMyTrackgR(Long_t nElements, void *p) {
-      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<MyTrack>[nElements] : new vector<MyTrack>[nElements];
-   }
-   // Wrapper around operator delete
-   static void delete_vectorlEMyTrackgR(void *p) {
-      delete ((vector<MyTrack>*)p);
-   }
-   static void deleteArray_vectorlEMyTrackgR(void *p) {
-      delete [] ((vector<MyTrack>*)p);
-   }
-   static void destruct_vectorlEMyTrackgR(void *p) {
-      typedef vector<MyTrack> current_t;
-      ((current_t*)p)->~current_t();
-   }
-} // end of namespace ROOT for class vector<MyTrack>
 
 namespace ROOT {
    static TClass *vectorlEMyMuongR_Dictionary();
@@ -1715,69 +1392,6 @@ namespace ROOT {
       ((current_t*)p)->~current_t();
    }
 } // end of namespace ROOT for class vector<MyMET>
-
-namespace ROOT {
-   static TClass *vectorlEMyMCParticlegR_Dictionary();
-   static void vectorlEMyMCParticlegR_TClassManip(TClass*);
-   static void *new_vectorlEMyMCParticlegR(void *p = 0);
-   static void *newArray_vectorlEMyMCParticlegR(Long_t size, void *p);
-   static void delete_vectorlEMyMCParticlegR(void *p);
-   static void deleteArray_vectorlEMyMCParticlegR(void *p);
-   static void destruct_vectorlEMyMCParticlegR(void *p);
-
-   // Function generating the singleton type initializer
-   static TGenericClassInfo *GenerateInitInstanceLocal(const vector<MyMCParticle>*)
-   {
-      vector<MyMCParticle> *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(vector<MyMCParticle>));
-      static ::ROOT::TGenericClassInfo 
-         instance("vector<MyMCParticle>", -2, "vector", 214,
-                  typeid(vector<MyMCParticle>), ::ROOT::Internal::DefineBehavior(ptr, ptr),
-                  &vectorlEMyMCParticlegR_Dictionary, isa_proxy, 4,
-                  sizeof(vector<MyMCParticle>) );
-      instance.SetNew(&new_vectorlEMyMCParticlegR);
-      instance.SetNewArray(&newArray_vectorlEMyMCParticlegR);
-      instance.SetDelete(&delete_vectorlEMyMCParticlegR);
-      instance.SetDeleteArray(&deleteArray_vectorlEMyMCParticlegR);
-      instance.SetDestructor(&destruct_vectorlEMyMCParticlegR);
-      instance.AdoptCollectionProxyInfo(TCollectionProxyInfo::Generate(TCollectionProxyInfo::Pushback< vector<MyMCParticle> >()));
-      return &instance;
-   }
-   // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const vector<MyMCParticle>*)0x0); R__UseDummy(_R__UNIQUE_(Init));
-
-   // Dictionary for non-ClassDef classes
-   static TClass *vectorlEMyMCParticlegR_Dictionary() {
-      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const vector<MyMCParticle>*)0x0)->GetClass();
-      vectorlEMyMCParticlegR_TClassManip(theClass);
-   return theClass;
-   }
-
-   static void vectorlEMyMCParticlegR_TClassManip(TClass* ){
-   }
-
-} // end of namespace ROOT
-
-namespace ROOT {
-   // Wrappers around operator new
-   static void *new_vectorlEMyMCParticlegR(void *p) {
-      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<MyMCParticle> : new vector<MyMCParticle>;
-   }
-   static void *newArray_vectorlEMyMCParticlegR(Long_t nElements, void *p) {
-      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<MyMCParticle>[nElements] : new vector<MyMCParticle>[nElements];
-   }
-   // Wrapper around operator delete
-   static void delete_vectorlEMyMCParticlegR(void *p) {
-      delete ((vector<MyMCParticle>*)p);
-   }
-   static void deleteArray_vectorlEMyMCParticlegR(void *p) {
-      delete [] ((vector<MyMCParticle>*)p);
-   }
-   static void destruct_vectorlEMyMCParticlegR(void *p) {
-      typedef vector<MyMCParticle> current_t;
-      ((current_t*)p)->~current_t();
-   }
-} // end of namespace ROOT for class vector<MyMCParticle>
 
 namespace ROOT {
    static TClass *vectorlEMyJetgR_Dictionary();
@@ -2162,8 +1776,6 @@ namespace {
     static const char* headers[] = {
 "interface/MyEvent.h",
 "interface/MyMET.h",
-"interface/MyMCParticle.h",
-"interface/MyTrack.h",
 "interface/MyVertex.h",
 "interface/MyJet.h",
 "interface/MyElectron.h",
@@ -2189,11 +1801,9 @@ namespace {
 #pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
 extern int __Cling_Autoloading_Map;
 class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  SampleInfo;
-class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  MyMCParticle;
+class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  MyVertex;
 namespace std{template <typename _Tp> class __attribute__((annotate("$clingAutoload$string")))  allocator;
 }
-class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  MyVertex;
-class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  MyTrack;
 class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  MyMET;
 class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  MyJet;
 class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  MyElectron;
@@ -2215,8 +1825,6 @@ class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  UncertaintyComp
 #define _BACKWARD_BACKWARD_WARNING_H
 #include "interface/MyEvent.h"
 #include "interface/MyMET.h"
-#include "interface/MyMCParticle.h"
-#include "interface/MyTrack.h"
 #include "interface/MyVertex.h"
 #include "interface/MyJet.h"
 #include "interface/MyElectron.h"
@@ -2236,10 +1844,8 @@ class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  UncertaintyComp
 "MyElectron", payloadCode, "@",
 "MyEvent", payloadCode, "@",
 "MyJet", payloadCode, "@",
-"MyMCParticle", payloadCode, "@",
 "MyMET", payloadCode, "@",
 "MyMuon", payloadCode, "@",
-"MyTrack", payloadCode, "@",
 "MyVertex", payloadCode, "@",
 "ObjectSelector", payloadCode, "@",
 "Reader", payloadCode, "@",

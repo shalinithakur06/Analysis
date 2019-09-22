@@ -1,4 +1,4 @@
-
+#include <cmath>
 //CHANNEL
 bool isMuChannel = true;
 bool isEleChannel = false;
@@ -52,7 +52,7 @@ TGraph* decorateGraph(TGraph *graph, TString xTitle, TString yTitle, TString myT
   graph->GetXaxis()->SetLabelSize(0.03);
   graph->GetYaxis()->SetTitle(yTitle);
   graph->GetYaxis()->SetTitleSize(0.04);
-  graph->GetYaxis()->SetRangeUser(yMin, yMax);
+  //graph->GetYaxis()->SetRangeUser(yMin, yMax);
   graph->GetYaxis()->SetLabelSize(0.035);
   graph->GetXaxis()->SetNdivisions(14);
   graph->GetYaxis()->SetNdivisions(10);
@@ -65,14 +65,27 @@ TGraph* decorateGraph(TGraph *graph, TString xTitle, TString yTitle, TString myT
   graph->SetMarkerColor(color);
   return graph;
 }
-void printOutput(TFile *fBkg, TString sigFile,  double mass){
+double getStatUnc(TH1F* hCentral, double sError = 0.0){
+  double  norm = hCentral->IntegralAndError(1, hCentral->GetNbinsX(), sError);  
+  //double statUnc = (norm > 0) ? 1 + (fabs(sError)/norm) : 1.00;
+  double statUnc = fabs(sError);
+  return statUnc;
+}
+
+void printOutput(TFile *fBkg, TString sigFile,  string mass){
   TH1F * hNoChBkg = (TH1F*)fBkg->Get("base/noCharge");
   TH1F * hOppChBkg = (TH1F*)fBkg->Get("base/oppCharge");
   TH1F * hSameChBkg = (TH1F*)fBkg->Get("base/sameCharge");
   double noChBkg = hNoChBkg->Integral();
   double oppChBkg = hOppChBkg->Integral();
   double sameChBkg = hSameChBkg->Integral();
-  
+  double noChBkgErr   = 0.0;
+  double oppChBkgErr  = 0.0;
+  double sameChBkgErr = 0.0;
+  noChBkgErr   = getStatUnc(hNoChBkg, 0.0);
+  oppChBkgErr  = getStatUnc(hOppChBkg, 0.0);
+  sameChBkgErr = getStatUnc(hSameChBkg, 0.0);
+    
   TFile *fSig = TFile::Open(sigFile);
   TH1F * hNoChSig = (TH1F*)fSig->Get("base/noCharge");
   TH1F * hOppChSig = (TH1F*)fSig->Get("base/oppCharge");
@@ -80,14 +93,40 @@ void printOutput(TFile *fBkg, TString sigFile,  double mass){
   double noChSig = hNoChSig->Integral();
   double oppChSig = hOppChSig->Integral();
   double sameChSig = hSameChSig->Integral();
-  cout<<"--------------------------------------------------------------"<<endl;
-  cout<<std::setprecision(4)<<endl;
-  cout<<setw(20)<<"Charge Selection"<<setw(15)<<"Siganl,M"<<mass<<setw(15)<<"AllBkg"<<setw(15)<<"Sig/AllBkg"<<endl;
-  cout<<setw(20)<<"NoChargeSel"<<setw(15)<<noChSig<<setw(15)<<noChBkg<<setw(15)<<noChSig/noChBkg<<endl;
-  cout<<setw(20)<<"OppChargeSel"<<setw(15)<<oppChSig<<setw(15)<<oppChBkg<<setw(15)<<oppChSig/oppChBkg<<endl;
-  cout<<setw(20)<<"SameChargeSel"<<setw(15)<<sameChSig<<setw(15)<<sameChBkg<<setw(15)<<sameChSig/sameChBkg<<endl;
-}
+  double noChSigErr   = 0.0;
+  double oppChSigErr  = 0.0;
+  double sameChSigErr = 0.0;
+  noChSigErr   = getStatUnc(hNoChSig, 0.0);
+  oppChSigErr  = getStatUnc(hOppChSig, 0.0);
+  sameChSigErr = getStatUnc(hSameChSig, 0.0);
 
+  TH1F* hRatioNoCh = (TH1F*)hNoChSig->Clone("hRatioNoCh");  
+  hRatioNoCh->Divide(hNoChBkg);
+  TH1F* hRatioOppCh = (TH1F*)hOppChSig->Clone("hRatioOppCh");  
+  hRatioOppCh->Divide(hOppChBkg);
+  TH1F* hRatioSameCh = (TH1F*)hSameChSig->Clone("hRatioSameCh");  
+  hRatioSameCh->Divide(hSameChBkg);
+  double rNoChSig   = hRatioNoCh->Integral();
+  double rOppChSig  = hRatioOppCh->Integral();
+  double rSameChSig = hRatioSameCh->Integral();
+  double rNoChSigErr   = 0.0;
+  double rOppChSigErr  = 0.0;
+  double rSameChSigErr = 0.0;
+  rNoChSigErr   = getStatUnc(hRatioNoCh, 0.0);
+  rOppChSigErr  = getStatUnc(hRatioOppCh, 0.0);
+  rSameChSigErr = getStatUnc(hRatioSameCh, 0.0);
+
+  cout<<"--------------------------------------------------------------"<<endl;
+  cout<<std::setprecision(3)<<endl;
+  //cout<<setw(20)<<"Charge Selection"<<setw(15)<<"Siganl,M"<<mass<<setw(15)<<"AllBkg"<<setw(15)<<"Sig/AllBkg"<<endl;
+  //cout<<setw(20)<<"NoChargeSel"<<setw(15)<<noChSig<<setw(15)<<noChBkg<<setw(15)<<noChSig/noChBkg<<endl;
+  //cout<<setw(20)<<"OppChargeSel"<<setw(15)<<oppChSig<<setw(15)<<oppChBkg<<setw(15)<<oppChSig/oppChBkg<<endl;
+  //cout<<setw(20)<<"SameChargeSel"<<setw(15)<<sameChSig<<setw(15)<<sameChBkg<<setw(15)<<sameChSig/sameChBkg<<endl;
+cout<<setw(15)<<"Selection"<<setw(15)<<"Nsig(M"+mass+")"<<setw(10)<<"Esig"<<setw(10)<<"Nbkg"<<setw(10)<<"Ebkg"<<setw(10)<<"Nsig/Nbkg"<<setw(10)<<"E(S/B)"<<endl;
+cout<<setw(15)<<"NoChargeSel"<<setw(15)<<noChSig<<setw(10)<<noChSigErr<<setw(10)<<noChBkg<<setw(10)<<noChBkgErr<<setw(10)<<rNoChSig<<setw(10)<<rNoChSigErr<<endl;
+cout<<setw(15)<<"OppChargeSel"<<setw(15)<<oppChSig<<setw(10)<<oppChSigErr<<setw(10)<<oppChBkg<<setw(10)<<oppChBkgErr<<setw(10)<<rOppChSig<<setw(10)<<rOppChSigErr<<endl;
+cout<<setw(15)<<"SameChargeSel"<<setw(15)<<sameChSig<<setw(10)<<sameChSigErr<<setw(10)<<sameChBkg<<setw(10)<<sameChBkgErr<<setw(10)<<rSameChSig<<setw(10)<<rSameChSigErr<<endl;
+}
 double getRatio(TFile *fBkg, TString sigFile, TString histName){
   TFile *fSig = TFile::Open(sigFile);
   TH1F * hBkg = (TH1F*)fBkg->Get("base/"+histName);
@@ -95,9 +134,11 @@ double getRatio(TFile *fBkg, TString sigFile, TString histName){
   double bkg = hBkg->Integral();
   double sig = hSig->Integral();
   double ratio = 1.0;
+  //cout<<sig<<", "<<bkg<<endl;
   ratio = sig/bkg;
   return ratio;
 }
+
 void MyOptimizeCharge(){
   vector<string>massFiles;
   massFiles.push_back("all_ExLep_M250.root");
@@ -130,17 +171,33 @@ void MyOptimizeCharge(){
   massPoints.push_back(4000);
   massPoints.push_back(4500);
   massPoints.push_back(5000);
+
+  vector<string>massLabel;
+  massLabel.push_back("250");
+  massLabel.push_back("500");
+  massLabel.push_back("750");
+  massLabel.push_back("1000");
+  massLabel.push_back("1250");
+  massLabel.push_back("1500");
+  massLabel.push_back("1750");
+  massLabel.push_back("2000");
+  massLabel.push_back("2500");
+  massLabel.push_back("3000");
+  massLabel.push_back("3500");
+  massLabel.push_back("4000");
+  massLabel.push_back("4500");
+  massLabel.push_back("5000");
   
   //get info regarding charge selection
   vector<double> ratioOppCharge;
   vector<double> ratioNoCharge;
   for(int i = 0; i<massPoints.size(); i++){
-    double ratioOpp = 100*getRatio(fBkg, TString(massFiles[i]), "oppCharge");
-    double ratioNo = 100*getRatio(fBkg, TString(massFiles[i]), "noCharge");
-    cout<<ratioOpp<<"\t"<<ratioNo<<endl;
+    double ratioOpp = getRatio(fBkg, TString(massFiles[i]), "oppCharge");
+    double ratioNo = getRatio(fBkg, TString(massFiles[i]), "noCharge");
+    //cout<<ratioOpp<<"\t"<<ratioNo<<endl;
     ratioOppCharge.push_back(ratioOpp);
     ratioNoCharge.push_back(ratioNo);
-    printOutput(fBkg, TString(massFiles[i]), massPoints[i]);
+    printOutput(fBkg, TString(massFiles[i]), massLabel[i]);
   }
   //create graph for charge selection
   TGraph * graphOppCharge = makeGraph(massPoints, ratioOppCharge);
@@ -159,8 +216,8 @@ void MyOptimizeCharge(){
     yMin = 0.1;
     yMax = 2.0;
   }
-  decorateGraph(graphOppCharge, "M_{l^{*}}", "100*Sig/Bkg", chName, yMin, yMax, kGreen);
-  decorateGraph(graphNoCharge, "M_{l^{*}}", "100*Sig/Bkg", chName, yMin, yMax, kBlue);
+  decorateGraph(graphOppCharge, "M_{l^{*}}", "Sig/Bkg", chName, yMin, yMax, kGreen);
+  decorateGraph(graphNoCharge, "M_{l^{*}}", "Sig/Bkg", chName, yMin, yMax, kBlue);
   //draw graphs in a canvas
   TCanvas * canCharge = new TCanvas();
   canCharge->cd();

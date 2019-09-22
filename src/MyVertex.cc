@@ -1,13 +1,13 @@
 #include "interface/MyVertex.h"
 
 MyVertex::MyVertex():
-  chi2(-999),
-  isValid(-1),
-  totVtx(0),
-  ndof(0),
-  normalizedChi2(-999),
-  rho(-999),
-  rhoAll(-999)
+ chi2(-9.0),
+ normalizedChi2(-9.0),
+ ndof(0),
+ totVtx(0),
+ rho(-9.0),
+ isValid(true),
+ rhoAll(-9)
 {
 }
 
@@ -17,13 +17,13 @@ MyVertex::~MyVertex()
 
 void MyVertex::Reset()
 {
-  chi2 = -999;
-  ErrXYZ.SetCoordinates(0.0,0.0,0.0);
-  isValid = -1;
-  totVtx=0;
-  ndof = 0;
-  normalizedChi2 = -999.;
-  rho = -999;
-  rhoAll = -999;
-  XYZ.SetCoordinates(0.0,0.0,0.0);
+ chi2 = -9.0;
+ normalizedChi2 = -9.0;
+ ndof = 0;
+ totVtx =0;
+ rho = -9.0;
+ ErrXYZ.SetCoordinates(0.0,0.0,0.0);
+ isValid = true;
+ XYZ.SetCoordinates(0.0,0.0,0.0);
+ rhoAll = -9;
 }

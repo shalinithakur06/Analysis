@@ -27,6 +27,7 @@ void Analyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
   //---------------------------------------------------//
   //for systematics (all sys in one go)
   //---------------------------------------------------//  
+  /*
   if(!ev_->isData){ 
     CutFlowProcessor(url, myKey, "JESPlus", 	outFile_);
     CutFlowProcessor(url, myKey, "JESMinus", 	outFile_);
@@ -37,6 +38,7 @@ void Analyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
     CutFlowProcessor(url, myKey, "TopPtPlus", 	outFile_);
     CutFlowProcessor(url, myKey, "TopPtMinus", 	outFile_);
   }
+  */
   outFile_->Write(); 
   outFile_->Close();
   f_->Close();
@@ -101,7 +103,7 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     	      "incl", bTagSys, otherSysTypes, BTagEntry::FLAV_UDSG);
   
   //getBTagEffHistos(f);
-  TString histPath("myMiniTreeProducer/Jets/");
+  TString histPath("myMiniTreeProducer/MCINFO/");
   TH2D* h2_BTagEff_Denom_b 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Denom_b"));
   TH2D* h2_BTagEff_Denom_c 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Denom_c"));
   TH2D* h2_BTagEff_Denom_udsg 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Denom_udsg")); 
@@ -115,9 +117,6 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
   double kfCount = 0;
   double n_negEvt = 0.0;
   double n_posEvt = 0.0;
-  double n_noCharge = 0.0;
-  double n_oppCharge = 0.0;
-  double n_sameCharge = 0.0;
   double n_oneTrig = 0.0;
   double n_twoTrig = 0.0;
   for(int i=0; i<nEntries; ++i){
@@ -251,9 +250,11 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
     int m2 = m_init[1];
     
     //charge selection
-    n_noCharge++ ;
-    if(pfMuons[m1].charge == pfMuons[m2].charge) n_sameCharge++;
-    if(pfMuons[m1].charge != pfMuons[m2].charge) n_oppCharge++;
+    fillHisto(outFile_, cutflowType, "", "noCharge", 10, -2, 2, 1, evtWeight);
+    if(pfMuons[m1].charge == pfMuons[m2].charge) 
+      fillHisto(outFile_, cutflowType, "", "sameCharge", 10, -2, 2, 1, evtWeight);
+    if(pfMuons[m1].charge != pfMuons[m2].charge)
+      fillHisto(outFile_, cutflowType, "", "oppCharge", 10, -2, 2, 1, evtWeight);
     //both muons should have opposite charge
     if(pfMuons[m1].charge == pfMuons[m2].charge) continue;
 
@@ -371,10 +372,10 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
       fillHisto(outFile_, cutflowType_, "ControlP","eta_2ndMu", 50, -5, 5, pfMuons[m2].p4.eta(), evtWeight );
       
       //fill histos for Z boson
-      fillHisto(outFile_, cutflowType_, "ControlP","pt_Z",  500, 0, 10000, vZ.Pt(), evtWeight );
       fillHisto(outFile_, cutflowType_, "ControlP","eta_Z", 50, -5, 5, vZ.Rapidity(), evtWeight );
       fillHisto(outFile_, cutflowType_, "ControlP","phi_Z", 50, -5, 5, vZ.Phi(), evtWeight );
       fillHisto(outFile_, cutflowType_, "ControlP","mll", 500, 0, 10000, vZ.M(), evtWeight );
+      fillHisto(outFile_, cutflowType_, "ControlP","pt_Z",  500, 0, 10000, vZ.Pt(), evtWeight );
       if(vZ.M() > 80 && vZ.M()< 100){
         fillHisto(outFile_, cutflowType_, "ControlP2","pt_Z",  200, 0, 1000, vZ.Pt(), evtWeight );
         fillHisto(outFile_, cutflowType_, "ControlP2","pz_Z",  200, 0, 1000, vZ.Pz(), evtWeight );
@@ -537,6 +538,7 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
       if(!ev->isData) new_evtWeight = 1.11*evtWeight; 
       MyLorentzVector vZmax =  pfJets[j_final[allZjet[0]]].p4 + pfMuons[m1].p4;
       MyLorentzVector vZmin =  pfJets[j_final[allZjet[0]]].p4 + pfMuons[m2].p4;
+      fillHisto(outFile_, cutflowType_, "ZTag","mass_fatjet", 500, 0, 5000, pfJets[j_final[allZjet[0]]].p4.M(), new_evtWeight);
       nCutPass++;
       fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, new_evtWeight );
       //fill histos for muon
@@ -584,8 +586,6 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
         fillHisto(outFile_, cutflowType_, "ZTag","ak8Tau21", 50, 0, 5, pfJets[ind_jet].ak8Tau2/pfJets[ind_jet].ak8Tau1, new_evtWeight );
       }
       fillHisto(outFile_, cutflowType_, "ZTag","final_multi_jet", 15, 0, 15, count_jets, new_evtWeight );
-      nCutPass++;
-      fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight);
       //fill histos for nvtx
       fillHisto(outFile_, cutflowType_, "ZTag","nvtx", 100, 0, 100, pri_vtxs, new_evtWeight );
       for(std::size_t n=0; n<Vertices.size(); n++){
@@ -732,9 +732,6 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
   fillHisto(outFile_, cutflowType, "", "positive_weight", 10, -2, 2, -1, n_posEvt);
   fillHisto(outFile_, cutflowType, "", "negative_weight", 10, -2, 2,  1, n_negEvt);
   fillHisto(outFile_, cutflowType, "", "amcnlo_weight", 10, 0, 1, amcnlo_weight, 1 );
-  fillHisto(outFile_, cutflowType, "", "noCharge", 10, -2, 2, 0, n_noCharge);
-  fillHisto(outFile_, cutflowType, "", "oppCharge", 10, -2, 2, -1, n_oppCharge);
-  fillHisto(outFile_, cutflowType, "", "sameCharge", 10, -2, 2, 1, n_sameCharge);
   fillHisto(outFile_, cutflowType, "", "oneTrig", 10, -2, 4, 1, n_oneTrig);
   fillHisto(outFile_, cutflowType, "", "twoTrig", 10, -2, 4, 2, n_twoTrig);
   f->Close(); 
@@ -744,7 +741,7 @@ void Analyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType,
 void Analyzer::processEvents(){ 
   //Data, MC sample from lxplus and T2
   //CutFlowAnalysis("TTJetsP_MuMC_20171104_Ntuple_1.root", "PF", ""); 
-  //CutFlowAnalysis("outFile_.root", "PF", ""); 
+  CutFlowAnalysis("outFile_.root", "PF", ""); 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094/", "PF", "");
 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/sthakur/ntuple_for2016Data_MuMC_20190117/MuMC_20190117/TT_MuMC_20190117/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_MuMC_20190117/190117_092153/0000/TT_MuMC_20190117_Ntuple_1.root" , "PF", "");
@@ -754,6 +751,6 @@ void Analyzer::processEvents(){
 
    //====================================
   //condor submission
-  CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
   //====================================
 } 

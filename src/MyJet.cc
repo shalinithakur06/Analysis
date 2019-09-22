@@ -19,14 +19,11 @@ MyJet::MyJet():
   chargedMultiplicity(0.),
   chargedEmEnergyFraction(-9.),
   neutralMultiplicity(0.),
-  jetIDLoose(false),
   
   ///JEC
   JECUncertainty(-9.),
   scaleFactor(0.0),
   resolution(0.0),
-  triggerJet_pt(-9.),
-  quality(0),
   //subjetiness, pruned mass
   ak8Tau1(-1),
   ak8Tau2(-1),
@@ -61,21 +58,14 @@ void MyJet::Reset()
   chargedMultiplicity = 0.;
   chargedEmEnergyFraction = -9.;
   neutralMultiplicity = 0.;
-  jetIDLoose = false;
   
   ///btag, JEC, SV
   bDiscriminator.clear();
   JECs.clear();
   JECUncertainty = -9.;
-  SVP4.clear();
-  SVflightDistance.clear();
-  SVflightDistanceErr.clear();
-  SVNChi2.clear();
 
   scaleFactor = 0.0;
   resolution = 0.0;
-  triggerJet_pt = 0.;
-  quality = 0;
 
   //subjetiness, pruned mass
   ak8Tau1 = -1;

@@ -17,10 +17,8 @@ class MyMuon
   
   void Reset();
   
-  std::string GetName() { 
-      std::string name(muName);
-      return name; 
-  };
+  ///std::string GetName() { return name; };
+
   //https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideMuonIdRun2
 
   ///basic
@@ -30,8 +28,9 @@ class MyMuon
   //std::string name;
   TString muName;
   MyLorentzVector p4; 
+  MyLorentzVector Genp4; 
   int type;
-  Point3D    vertex;   
+  Point3D  vertex;   
 
   ///id
   //Loose
@@ -49,21 +48,24 @@ class MyMuon
   double Dz;
   int nMatchedStations;
   int nMuonHits;
+  int nMuonHitsTuneP;
   int nPixelHits;
   int nTrackerLayers;
-
+  
   //High Pt
-  double bestMuPtErr;
+  double bestMuPtErr; 
   double bestMuPtTrack;
- 
+
   ///iso
   double ChHadIso; 
   double NeuHadIso;  
-  double pfRelIso;
   double PhotonIso;  
   double PileupIso;
-  double trigger_mu_pt;
-  int quality;
+  double pfRelIso;
+  double trkRelIso;
+  double expectedMatchedStations;
+  double nStationMask;
+  double nRPCLayers;
  private :
 
 };
